@@ -1,40 +1,58 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ErrorBoundary } from "@/components/system/ErrorBoundary";
+import { ScrollToTop } from "@/components/system/ScrollToTop";
+import { RouteFallback } from "@/components/system/RouteFallback";
 import Index from "./pages/Index.tsx";
-import Clients from "./pages/Clients.tsx";
-import ClientDetail from "./pages/ClientDetail.tsx";
-import Actions from "./pages/Actions.tsx";
-import Alerts from "./pages/Alerts.tsx";
-import Bookings from "./pages/Bookings.tsx";
-import Reports from "./pages/Reports.tsx";
-import Settings from "./pages/Settings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
-const queryClient = new QueryClient();
+const Clients = lazy(() => import("./pages/Clients.tsx"));
+const ClientDetail = lazy(() => import("./pages/ClientDetail.tsx"));
+const Actions = lazy(() => import("./pages/Actions.tsx"));
+const Alerts = lazy(() => import("./pages/Alerts.tsx"));
+const Bookings = lazy(() => import("./pages/Bookings.tsx"));
+const Reports = lazy(() => import("./pages/Reports.tsx"));
+const Settings = lazy(() => import("./pages/Settings.tsx"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="/clients/:id" element={<ClientDetail />} />
-          <Route path="/actions" element={<Actions />} />
-          <Route path="/alerts" element={<Alerts />} />
-          <Route path="/bookings" element={<Bookings />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/clients" element={<Clients />} />
+              <Route path="/clients/:id" element={<ClientDetail />} />
+              <Route path="/actions" element={<Actions />} />
+              <Route path="/alerts" element={<Alerts />} />
+              <Route path="/bookings" element={<Bookings />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

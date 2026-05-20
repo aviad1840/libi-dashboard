@@ -13,7 +13,7 @@ export function ProgressBar({
   size?: "sm" | "md";
   className?: string;
 }) {
-  const pct = Math.min(100, Math.max(0, (value / max) * 100));
+  const pct = max <= 0 ? 0 : Math.min(100, Math.max(0, (value / max) * 100));
   const colorMap = {
     primary: "bg-primary",
     success: "bg-success",

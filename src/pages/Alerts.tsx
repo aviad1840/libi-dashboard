@@ -1,7 +1,6 @@
 import { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/common/Card";
-import { Chip } from "@/components/common/Chip";
 import { alerts as initialAlerts } from "@/data/mock";
 import { ALERT_SEVERITY } from "@/data/constants";
 import { CheckCircle2, BellOff } from "lucide-react";

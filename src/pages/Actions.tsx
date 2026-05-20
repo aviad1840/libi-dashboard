@@ -5,7 +5,7 @@ import { Avatar } from "@/components/common/Avatar";
 import { Chip } from "@/components/common/Chip";
 import { actions } from "@/data/mock";
 import { getClient } from "@/data/clients";
-import { getService } from "@/data/services";
+import { getServiceOrFallback } from "@/data/services";
 import { ACTION_TYPE_LABELS, CONTENT_WORLDS, PERSONA_LABELS, RISK_LABELS } from "@/data/constants";
 import { ChevronDown, ChevronUp, Phone, Calendar, UserRound, X, AlertOctagon, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -19,9 +19,10 @@ const PRIORITY_INFO: Record<ActionPriority, { label: string; tone: "destructive"
 };
 
 function ActionCard({ actionId }: { actionId: string }) {
-  const action = actions.find((a) => a.id === actionId)!;
-  const client = getClient(action.clientId)!;
-  const [expanded, setExpanded] = useState(action.priority === "high");
+  const action = actions.find((a) => a.id === actionId);
+  const client = action ? getClient(action.clientId) : undefined;
+  const [expanded, setExpanded] = useState(action?.priority === "high");
+  if (!action || !client) return null;
   const priority = PRIORITY_INFO[action.priority];
   const typeInfo = ACTION_TYPE_LABELS[action.type];
   const persona = PERSONA_LABELS[client.lev.persona];
@@ -124,7 +125,7 @@ function ActionCard({ actionId }: { actionId: string }) {
                 <div className="text-xs font-semibold text-foreground mb-2">שירותים מומלצים</div>
                 <div className="space-y-2">
                   {action.suggestedServiceIds.map((sid) => {
-                    const s = getService(sid);
+                    const s = getServiceOrFallback(sid);
                     const w = CONTENT_WORLDS[s.world];
                     return (
                       <div key={sid} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/30 transition-colors">

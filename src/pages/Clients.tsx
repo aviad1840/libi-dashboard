@@ -9,22 +9,36 @@ import { NURSING_LEVEL_TONE, PERSONA_LABELS, RISK_LABELS } from "@/data/constant
 import { ChevronLeft, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+
+type LevelFilter = "all" | "1" | "2" | "3";
+type RiskFilter = "all" | "risk" | "ok";
+
+const LEVEL_OPTIONS: LevelFilter[] = ["all", "1", "2", "3"];
+const RISK_OPTIONS: { v: RiskFilter; l: string }[] = [
+  { v: "all", l: "הכל" },
+  { v: "risk", l: "בסיכון" },
+  { v: "ok", l: "תקין" },
+];
 
 export default function Clients() {
   const [query, setQuery] = useState("");
-  const [level, setLevel] = useState<"all" | "1" | "2" | "3">("all");
-  const [risk, setRisk] = useState<"all" | "risk" | "ok">("all");
+  const [level, setLevel] = useState<LevelFilter>("all");
+  const [risk, setRisk] = useState<RiskFilter>("all");
+
+  const debouncedQuery = useDebouncedValue(query, 200);
 
   const filtered = useMemo(() => {
+    const q = debouncedQuery.trim();
     return clients.filter((c) => {
       const fullName = `${c.firstName} ${c.lastName}`;
-      if (query && !fullName.includes(query) && !c.city.includes(query)) return false;
+      if (q && !fullName.includes(q) && !c.city.includes(q)) return false;
       if (level !== "all" && String(c.nursingLevel) !== level) return false;
       if (risk === "risk" && c.lev.riskFlags.length === 0) return false;
       if (risk === "ok" && c.lev.riskFlags.length > 0) return false;
       return true;
     });
-  }, [query, level, risk]);
+  }, [debouncedQuery, level, risk]);
 
   const lonelinessTone = (s: number) => (s <= 3 ? "text-destructive" : s <= 5 ? "text-warning" : "text-success");
 
@@ -32,18 +46,26 @@ export default function Clients() {
     <AppLayout title="מטופלים" subtitle={`סה״כ ${clients.length} מטופלים · ${filtered.length} מוצגים`}>
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-5">
-        <div className="relative flex-1 min-w-[240px] max-w-md">
-          <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <label htmlFor="client-search" className="sr-only">חיפוש מטופלים</label>
+          <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
           <input
+            id="client-search"
+            type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="חיפוש לפי שם או עיר…"
             className="w-full h-10 pr-10 pl-3 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
           />
         </div>
+        <label className="sr-only" htmlFor="level-filter">סינון לפי רמת סיעוד</label>
         <select
+          id="level-filter"
           value={level}
-          onChange={(e) => setLevel(e.target.value as any)}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (LEVEL_OPTIONS.includes(v as LevelFilter)) setLevel(v as LevelFilter);
+          }}
           className="h-10 px-3 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary"
         >
           <option value="all">כל הרמות</option>
@@ -51,18 +73,16 @@ export default function Clients() {
           <option value="2">רמה 2</option>
           <option value="3">רמה 3</option>
         </select>
-        <div className="flex bg-card border border-border rounded-lg p-1 text-sm">
-          {([
-            { v: "all", l: "הכל" },
-            { v: "risk", l: "בסיכון" },
-            { v: "ok", l: "תקין" },
-          ] as const).map((opt) => (
+        <div className="flex bg-card border border-border rounded-lg p-1 text-sm" role="group" aria-label="סינון לפי סיכון">
+          {RISK_OPTIONS.map((opt) => (
             <button
               key={opt.v}
+              type="button"
               onClick={() => setRisk(opt.v)}
+              aria-pressed={risk === opt.v}
               className={cn(
                 "px-3 h-8 rounded-md font-medium transition-colors",
-                risk === opt.v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                risk === opt.v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
               {opt.l}

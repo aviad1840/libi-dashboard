@@ -30,4 +30,19 @@ export const services: Service[] = [
   { id: "s18", name: "קניות ומשלוח מצרכים", world: "home_services", units: 2, subsidy: 20, description: "קניות שבועיות לפי רשימה אישית.", vendor: "סופר עד הבית" },
 ];
 
-export const getService = (id: string) => services.find((s) => s.id === id)!;
+export const getService = (id: string): Service | undefined =>
+  services.find((s) => s.id === id);
+
+export const getServiceOrFallback = (id: string): Service => {
+  const s = services.find((x) => x.id === id);
+  if (s) return s;
+  return {
+    id,
+    name: "שירות לא ידוע",
+    world: "home_services",
+    units: 0,
+    subsidy: 0,
+    description: "",
+    vendor: "—",
+  };
+};

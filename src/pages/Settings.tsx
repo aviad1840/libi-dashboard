@@ -1,5 +1,5 @@
 import AppLayout from "@/components/layout/AppLayout";
-import { Card, CardHeader } from "@/components/common/Card";
+import { Card } from "@/components/common/Card";
 import { Bell, Globe, Lock, UserCog } from "lucide-react";
 
 const SECTIONS = [

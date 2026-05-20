@@ -1,3 +1,4 @@
+import type React from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardHeader } from "@/components/common/Card";
 import { Chip } from "@/components/common/Chip";
@@ -6,15 +7,16 @@ import { ProgressBar } from "@/components/common/ProgressBar";
 import { stats, kpis, sarahChangelog } from "@/data/dashboard";
 import { schedule, actions, alerts, attentionRows } from "@/data/mock";
 import { getClient } from "@/data/clients";
-import { getService } from "@/data/services";
-import { ACTION_TYPE_LABELS, NURSING_LEVEL_TONE, RISK_LABELS, CONTENT_WORLDS } from "@/data/constants";
-import { Users, AlertTriangle, Calendar, Bell, Wallet, ArrowUpRight, ArrowDownRight, Home, Phone, Package, FileText, Sparkles, ChevronLeft, TrendingUp, TrendingDown } from "lucide-react";
+import { ACTION_TYPE_LABELS } from "@/data/constants";
+import { Users, AlertTriangle, Calendar, Bell, Wallet, ArrowUpRight, ArrowDownRight, Home, Phone, Package, FileText, Sparkles, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const SCHEDULE_ICON_MAP = { visit: Home, call: Phone, vendor: Package, plan: FileText, assessment: AlertTriangle, family: Users, report: FileText };
 
-function StatCard({ icon: Icon, label, value, sub, tone = "primary" }: { icon: any; label: string; value: string | number; sub: string; tone?: "primary" | "warning" | "success" | "info" | "destructive" }) {
+type IconComponent = React.ComponentType<{ className?: string }>;
+
+function StatCard({ icon: Icon, label, value, sub, tone = "primary" }: { icon: IconComponent; label: string; value: string | number; sub: string; tone?: "primary" | "warning" | "success" | "info" | "destructive" }) {
   const toneMap = {
     primary: "bg-primary-soft text-primary",
     warning: "bg-warning-soft text-warning-foreground",
@@ -37,7 +39,8 @@ function StatCard({ icon: Icon, label, value, sub, tone = "primary" }: { icon: a
 }
 
 function SarahSpotlight() {
-  const sarah = getClient("c1")!;
+  const sarah = getClient("c1");
+  if (!sarah) return null;
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-primary-soft/40 to-card">
       <div className="flex items-start justify-between gap-4 mb-4">

@@ -7,7 +7,7 @@ import { Chip } from "@/components/common/Chip";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import { getClient } from "@/data/clients";
 import { bookings } from "@/data/mock";
-import { getService } from "@/data/services";
+import { getServiceOrFallback } from "@/data/services";
 import { CONTENT_WORLDS, NURSING_LEVEL_TONE, PERSONA_LABELS, RISK_LABELS, BOOKING_STATUS } from "@/data/constants";
 import { Phone, MapPin, UserRound, ChevronRight, CheckCircle2, AlertCircle, Sparkles, Wallet, Activity, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,8 +19,8 @@ const TABS = [
 ] as const;
 
 export default function ClientDetail() {
-  const { id } = useParams();
-  const client = getClient(id!);
+  const { id } = useParams<{ id: string }>();
+  const client = getClient(id);
   const [tab, setTab] = useState<typeof TABS[number]["id"]>("functional");
 
   if (!client) {
@@ -250,7 +250,7 @@ export default function ClientDetail() {
               ) : (
                 <div className="divide-y divide-border">
                   {clientBookings.map((b) => {
-                    const service = getService(b.serviceId);
+                    const service = getServiceOrFallback(b.serviceId);
                     const status = BOOKING_STATUS[b.status];
                     const world = CONTENT_WORLDS[service.world];
                     const [y, m, d] = b.date.split("-");

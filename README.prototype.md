@@ -2,6 +2,16 @@
 
 מסמך מלווה לסניף `claude/inter-ministerial-prototype`. הסניף הזה **מוסיף** מעטפת לאומית מעל גרסת הפיילוט (`claude/code-review-improvements-Ng0u1`) — לא מחליף אותה. שתי התצוגות חיות במערכת אחת ועוברים ביניהן בלחיצה.
 
+## 🚀 Deploy / שיתוף מהיר
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/aviad1840/libi-dashboard/tree/claude/inter-ministerial-prototype&project-name=libi-prototype&repository-name=libi-prototype)
+
+**ערכת שיתוף מלאה** (Vercel · StackBlitz · scripts לדמו · מיילים מוכנים): [`SHARING.md`](SHARING.md)
+
+**מסמכים טכניים מצורפים**:
+- 📐 [ארכיטקטורה על נימבוס](docs/nimbus-architecture.md)
+- 🛡️ [תוכנית ניהול סיכונים](docs/risk-management.md) — לפי המדריך לשימוש אחראי ב-AI במגזר הציבורי
+
 ## למה אב-טיפוס נפרד
 
 | גרסה | מטרה | קהל |

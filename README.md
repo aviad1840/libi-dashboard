@@ -4,6 +4,14 @@
 
 המוצר מתמקד ב**טיפול משמעותי**: זיהוי בדידות, פרסונה, חלום אישי, וארנק שירותים מחולק לחמישה עולמות תוכן (שייכות ומשמעות, בריאות ותפקוד, חוסן, טכנולוגיה מסייעת, שירותי בית).
 
+## 🚀 Deploy / שיתוף מהיר
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/aviad1840/libi-dashboard&project-name=libi-dashboard&repository-name=libi-dashboard)
+
+**גרסת אב-טיפוס בין-משרדי** (לקול קורא ‎3.0): branch `claude/inter-ministerial-prototype` · [PR #1](https://github.com/aviad1840/libi-dashboard/pull/1)
+
+**כל קישורי השיתוף** (דפלוי + הדגמה + טקסטים מוכנים לסמנכ"לית): [`SHARING.md`](SHARING.md)
+
 ## הרצה מקומית
 
 ```bash

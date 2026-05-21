@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardHeader } from "@/components/common/Card";
 import { Chip } from "@/components/common/Chip";
 import { AssistedDecisionFooter } from "@/components/prototype/AssistedDecisionFooter";
 import { DEFAULT_ROI, NATIONAL_KPIS, ROADMAP, SCALABILITY, PILOTS } from "@/data/national";
-import { TrendingUp, Users, Database, Layers, Banknote, CheckCircle2, CircleDot, Circle, MapPin, ArrowLeft } from "lucide-react";
+import { TrendingUp, Users, Database, Layers, Banknote, CheckCircle2, CircleDot, Circle, MapPin, ArrowLeft, Activity, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const fmt = new Intl.NumberFormat("he-IL");
@@ -44,7 +45,64 @@ export default function PolicyIntelligence() {
       subtitle="קול קורא 3.0 · תשתית AI לסיעוד ולהזדקנות מיטבית · בסיס: החלטת ממשלה 127"
     >
       <div className="space-y-6 max-w-7xl">
-        {/* Hero */}
+        {/* Executive hero — the first thing the VP sees */}
+        <section className="bg-gradient-to-bl from-primary via-primary to-primary-glow text-primary-foreground rounded-2xl p-6 md:p-8 shadow-lg">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-xs font-semibold mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse-soft" aria-hidden="true" />
+                קול קורא 3.0 · פעיל עד 30/07/2026
+              </div>
+              <h1 className="text-2xl md:text-4xl font-bold leading-tight">
+                תשתית AI לאומית להזדקנות מיטבית
+              </h1>
+              <p className="text-sm md:text-base opacity-90 mt-3 max-w-2xl leading-relaxed">
+                הרחבה של מודל שטח מוכח מפיילוט "עכשיו אני" — מ-286 משתתפים בפסגת זאב ל-240,000 זכאים ארציים,
+                באמצעות 5 שכבות AI על נימבוס. שותפות של 4 משרדים. חיסכון פוטנציאלי: 2 מיליארד ₪/שנה.
+              </p>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Link
+                  to="/national/architecture"
+                  className="inline-flex items-center gap-1.5 px-4 h-10 rounded-lg bg-white text-primary text-sm font-bold hover:bg-white/95 transition-colors"
+                >
+                  <Layers className="w-4 h-4" aria-hidden="true" /> ראו את 5 שכבות ה-AI
+                </Link>
+                <Link
+                  to="/national/early-warning"
+                  className="inline-flex items-center gap-1.5 px-4 h-10 rounded-lg bg-white/15 text-white border border-white/30 text-sm font-semibold hover:bg-white/25 transition-colors"
+                >
+                  <Activity className="w-4 h-4" aria-hidden="true" /> דמו Early Warning
+                </Link>
+                <Link
+                  to="/national/proposal"
+                  className="inline-flex items-center gap-1.5 px-4 h-10 rounded-lg bg-white/15 text-white border border-white/30 text-sm font-semibold hover:bg-white/25 transition-colors"
+                >
+                  <FileText className="w-4 h-4" aria-hidden="true" /> תקציר להגשה
+                </Link>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 w-full lg:w-auto lg:max-w-md shrink-0">
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="text-2xl md:text-3xl font-bold tabular-nums">240K</div>
+                <div className="text-xs opacity-90 mt-0.5">זכאי סיעוד ארצי</div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="text-2xl md:text-3xl font-bold tabular-nums">2 מיליארד ₪</div>
+                <div className="text-xs opacity-90 mt-0.5">חיסכון פוטנציאלי/שנה</div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="text-2xl md:text-3xl font-bold tabular-nums">4</div>
+                <div className="text-xs opacity-90 mt-0.5">משרדים שותפים</div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="text-2xl md:text-3xl font-bold tabular-nums">5</div>
+                <div className="text-xs opacity-90 mt-0.5">שכבות AI על נימבוס</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Secondary stats (kept for detail) */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <HeroStat icon={Users} value={fmt.format(240_000)} label="זכאי סיעוד ברמות 1-3" />
           <HeroStat icon={Database} value="1.7M" label="מסמכים שנתיים" />

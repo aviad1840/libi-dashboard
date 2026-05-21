@@ -132,3 +132,36 @@
     border-radius: 3px;
   }
 }
+
+@media print {
+  aside,
+  nav,
+  header.sticky,
+  .print\:hidden {
+    display: none !important;
+  }
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body {
+    background: white !important;
+  }
+  .libi-card,
+  .libi-stat-card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+  .print\:break-inside-avoid {
+    break-inside: avoid;
+  }
+  .bg-gradient-to-l,
+  .bg-gradient-to-bl,
+  .bg-gradient-to-br {
+    background-image: none !important;
+    background-color: hsl(var(--primary)) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

@@ -1,7 +1,9 @@
 import { ReactNode, useState } from "react";
 import { Menu, X } from "lucide-react";
 import AppSidebar from "./AppSidebar";
+import { PrototypeBanner } from "./PrototypeBanner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useViewMode } from "@/hooks/use-view-mode";
 import { cn } from "@/lib/utils";
 
 interface AppLayoutProps {
@@ -14,11 +16,13 @@ interface AppLayoutProps {
 export default function AppLayout({ children, title, subtitle, actions }: AppLayoutProps) {
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [viewMode] = useViewMode();
 
   const closeDrawer = () => setDrawerOpen(false);
 
   return (
     <div dir="rtl" className="min-h-screen bg-background">
+      {viewMode === "national" && <PrototypeBanner />}
       {/* Skip-to-content for keyboard users */}
       <a
         href="#main-content"

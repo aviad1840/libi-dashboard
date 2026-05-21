@@ -18,6 +18,17 @@ const Bookings = lazy(() => import("./pages/Bookings.tsx"));
 const Reports = lazy(() => import("./pages/Reports.tsx"));
 const Settings = lazy(() => import("./pages/Settings.tsx"));
 
+// Inter-ministerial prototype routes (national view)
+const PolicyIntelligence = lazy(() => import("./pages/prototype/PolicyIntelligence.tsx"));
+const Architecture = lazy(() => import("./pages/prototype/Architecture.tsx"));
+const EarlyWarning = lazy(() => import("./pages/prototype/EarlyWarning.tsx"));
+const AIIntake = lazy(() => import("./pages/prototype/AIIntake.tsx"));
+const Matching = lazy(() => import("./pages/prototype/Matching.tsx"));
+const Outcomes = lazy(() => import("./pages/prototype/Outcomes.tsx"));
+const Assistant = lazy(() => import("./pages/prototype/Assistant.tsx"));
+const Partners = lazy(() => import("./pages/prototype/Partners.tsx"));
+const Proposal = lazy(() => import("./pages/prototype/Proposal.tsx"));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -38,6 +49,7 @@ const App = () => (
           <ScrollToTop />
           <Suspense fallback={<RouteFallback />}>
             <Routes>
+              {/* Coordinator view (Branch A pages) */}
               <Route path="/" element={<Index />} />
               <Route path="/clients" element={<Clients />} />
               <Route path="/clients/:id" element={<ClientDetail />} />
@@ -46,6 +58,18 @@ const App = () => (
               <Route path="/bookings" element={<Bookings />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
+
+              {/* National / inter-ministerial prototype */}
+              <Route path="/national" element={<PolicyIntelligence />} />
+              <Route path="/national/architecture" element={<Architecture />} />
+              <Route path="/national/early-warning" element={<EarlyWarning />} />
+              <Route path="/national/intake" element={<AIIntake />} />
+              <Route path="/national/matching" element={<Matching />} />
+              <Route path="/national/outcomes" element={<Outcomes />} />
+              <Route path="/national/assistant" element={<Assistant />} />
+              <Route path="/national/partners" element={<Partners />} />
+              <Route path="/national/proposal" element={<Proposal />} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

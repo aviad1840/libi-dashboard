@@ -149,17 +149,6 @@ export const attentionRows = [
   { clientId: "c2", reason: "יתרה נמוכה", tone: "bg-warning-soft text-warning-foreground" },
   { clientId: "c4", reason: "ירידה תפקודית", tone: "bg-destructive-soft text-destructive" },
   { clientId: "c3", reason: "יתרה פגה בקרוב", tone: "bg-warning-soft text-warning-foreground" },
-].map((r) => ({ ...r, client: clients.find((c) => c.id === r.clientId)! }));
-
-// Override mock client names for attention rows for narrative consistency
-const overrideName = (id: string, first: string, last: string) => {
-  const c = clients.find((c) => c.id === id);
-  if (c) {
-    c.firstName = first;
-    c.lastName = last;
-  }
-};
-overrideName("c2", "רחל", "מזרחי");
-overrideName("c3", "מרים", "גבאי");
-overrideName("c4", "דוד", "פרץ");
-overrideName("c5", "יוסף", "לוי");
+]
+  .map((r) => ({ ...r, client: clients.find((c) => c.id === r.clientId) }))
+  .filter((r): r is typeof r & { client: NonNullable<typeof r.client> } => !!r.client);

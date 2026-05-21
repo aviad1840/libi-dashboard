@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LIBI — לב | בחירת גרסה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Heebo', sans-serif; background: hsl(210 20% 98%); color: hsl(215 25% 15%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .container { max-width: 1100px; width: 100%; }
+    header { text-align: center; margin-bottom: 2.5rem; }
+    .logo { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+    .logo-icon { width: 56px; height: 56px; border-radius: 16px; background: hsl(212 55% 23%); color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .logo-text { font-size: 28px; font-weight: 800; color: hsl(212 55% 23%); }
+    h1 { font-size: 32px; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+    .subtitle { color: hsl(215 12% 45%); font-size: 16px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: white; border: 1px solid hsl(215 18% 92%); border-radius: 20px; padding: 2rem; display: flex; flex-direction: column; transition: all 0.2s; }
+    .card:hover { border-color: hsl(212 55% 35%); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .card.featured { background: linear-gradient(135deg, hsl(212 55% 23%), hsl(212 60% 35%)); color: white; border: none; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; align-self: flex-start; margin-bottom: 1rem; }
+    .badge.coord { background: hsl(152 50% 94%); color: hsl(152 60% 30%); }
+    .badge.nat { background: rgba(255,255,255,0.2); color: white; }
+    h2 { font-size: 24px; font-weight: 800; margin-bottom: 0.75rem; line-height: 1.2; }
+    .card p { font-size: 14px; line-height: 1.6; opacity: 0.85; margin-bottom: 1.5rem; flex: 1; }
+    ul { list-style: none; margin-bottom: 1.5rem; }
+    ul li { font-size: 13px; padding: 4px 0; opacity: 0.8; }
+    ul li::before { content: "•"; margin-left: 8px; opacity: 0.6; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 15px; text-decoration: none; transition: all 0.15s; }
+    .cta.primary-on-dark { background: white; color: hsl(212 55% 23%); }
+    .cta.primary-on-dark:hover { background: rgba(255,255,255,0.9); }
+    .cta.primary { background: hsl(212 55% 23%); color: white; }
+    .cta.primary:hover { background: hsl(212 60% 30%); }
+    footer { text-align: center; margin-top: 3rem; font-size: 13px; color: hsl(215 12% 45%); }
+    footer a { color: hsl(212 55% 35%); text-decoration: none; margin: 0 8px; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">♥</div>
+        <div class="logo-text">לב · LIBI</div>
+      </div>
+      <h1>תשתית AI להזדקנות מיטבית</h1>
+      <p class="subtitle">פיילוט "עכשיו אני" · קול קורא 3.0 · המוסד לביטוח לאומי</p>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <span class="badge coord">פיילוט פעיל</span>
+        <h2>גרסת פיילוט שטח</h2>
+        <p>חוויית המתאמת היומיומית — לוח בקרה, מטופלים, פעולות לב, התראות, דוחות. מותאם לעבודה בשטח עם 75 קשישים.</p>
+        <ul>
+          <li>8 מסכים מלאים בעברית/RTL</li>
+          <li>מנוע המלצות אוטומטי (6 כללי heuristic)</li>
+          <li>Persistence ב-localStorage</li>
+          <li>28 בדיקות אוטומטיות עוברות</li>
+        </ul>
+        <a href="./pilot/" class="cta primary">פתחי את הפיילוט →</a>
+      </div>
+
+      <div class="card featured">
+        <span class="badge nat">אב-טיפוס בין-משרדי</span>
+        <h2>חזון לאומי לקול קורא 3.0</h2>
+        <p>הצגה לסמנכ"לית, ועדת היגוי, ולהגשת קול קורא 30/07. 5 שכבות AI על נימבוס × 4 משרדים × 240,000 זכאים.</p>
+        <ul>
+          <li>17 מסכים (8 פיילוט + 9 לאומיים)</li>
+          <li>Policy Intelligence עם ROI calculator חי</li>
+          <li>ארכיטקטורה + ניהול סיכונים מתועדים</li>
+          <li>תקציר הגשה עם ייצוא PDF</li>
+        </ul>
+        <a href="./prototype/" class="cta primary-on-dark">פתחי את האב-טיפוס →</a>
+      </div>
+    </div>
+
+    <footer>
+      <a href="https://github.com/aviad1840/libi-dashboard">קוד מקור</a>·
+      <a href="https://github.com/aviad1840/libi-dashboard/pull/1">PR אב-טיפוס</a>·
+      <a href="https://github.com/aviad1840/libi-dashboard/pull/2">PR פיילוט</a>·
+      <a href="https://github.com/aviad1840/libi-dashboard/blob/claude/inter-ministerial-prototype/SHARING.md">ערכת שיתוף</a>
+    </footer>
+  </div>
+</body>
+</html>

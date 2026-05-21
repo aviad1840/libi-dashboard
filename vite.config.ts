@@ -4,7 +4,10 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
+// Use a relative base path so the build runs from any sub-path
+// (e.g. GitHub Pages at /libi-dashboard/prototype/, Vercel at /, etc.)
 export default defineConfig(({ mode }) => ({
+  base: "./",
   server: {
     host: "::",
     port: 8080,

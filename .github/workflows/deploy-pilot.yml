@@ -1,0 +1,45 @@
+name: Deploy Pilot to GitHub Pages
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-Ng0u1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-pilot
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Prepare deploy directory
+        run: |
+          mkdir -p public-deploy/pilot
+          cp -r dist/* public-deploy/pilot/
+
+      - name: Deploy to gh-pages (pilot)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public-deploy
+          keep_files: true
+          commit_message: "deploy: pilot"

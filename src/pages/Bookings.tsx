@@ -4,7 +4,7 @@ import { Card } from "@/components/common/Card";
 import { Avatar } from "@/components/common/Avatar";
 import { bookings } from "@/data/mock";
 import { getClient } from "@/data/clients";
-import { getService } from "@/data/services";
+import { getServiceOrFallback } from "@/data/services";
 import { BOOKING_STATUS, CONTENT_WORLDS } from "@/data/constants";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -54,8 +54,9 @@ export default function Bookings() {
             </thead>
             <tbody>
               {filtered.map((b) => {
-                const c = getClient(b.clientId)!;
-                const s = getService(b.serviceId);
+                const c = getClient(b.clientId);
+                if (!c) return null;
+                const s = getServiceOrFallback(b.serviceId);
                 const w = CONTENT_WORLDS[s.world];
                 const status = BOOKING_STATUS[b.status];
                 return (

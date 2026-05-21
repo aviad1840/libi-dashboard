@@ -160,6 +160,21 @@ const sarah: Client = {
   daysSinceActivity: 4,
 };
 
-export const clients: Client[] = [sarah, ...generated];
+// Narrative name overrides for storyline clients shown across the app.
+// Applied at read-time to avoid mutating the source dataset.
+const NARRATIVE_OVERRIDES: Record<string, Partial<Client>> = {
+  c2: { firstName: "רחל", lastName: "מזרחי" },
+  c3: { firstName: "מרים", lastName: "גבאי" },
+  c4: { firstName: "דוד", lastName: "פרץ" },
+  c5: { firstName: "יוסף", lastName: "לוי" },
+};
 
-export const getClient = (id: string) => clients.find((c) => c.id === id);
+function withOverride(c: Client): Client {
+  const o = NARRATIVE_OVERRIDES[c.id];
+  return o ? { ...c, ...o } : c;
+}
+
+export const clients: Client[] = [sarah, ...generated].map(withOverride);
+
+export const getClient = (id: string | undefined): Client | undefined =>
+  id ? clients.find((c) => c.id === id) : undefined;

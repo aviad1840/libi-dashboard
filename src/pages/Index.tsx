@@ -1,20 +1,24 @@
+import type React from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardHeader } from "@/components/common/Card";
 import { Chip } from "@/components/common/Chip";
 import { Avatar } from "@/components/common/Avatar";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import { stats, kpis, sarahChangelog } from "@/data/dashboard";
-import { schedule, actions, alerts, attentionRows } from "@/data/mock";
+import { schedule, attentionRows } from "@/data/mock";
+import { useActions } from "@/data/actions-store";
+import { useAlerts } from "@/data/alerts-store";
 import { getClient } from "@/data/clients";
-import { getService } from "@/data/services";
-import { ACTION_TYPE_LABELS, NURSING_LEVEL_TONE, RISK_LABELS, CONTENT_WORLDS } from "@/data/constants";
-import { Users, AlertTriangle, Calendar, Bell, Wallet, ArrowUpRight, ArrowDownRight, Home, Phone, Package, FileText, Sparkles, ChevronLeft, TrendingUp, TrendingDown } from "lucide-react";
+import { ACTION_TYPE_LABELS } from "@/data/constants";
+import { Users, AlertTriangle, Bell, Wallet, ArrowUpRight, ArrowDownRight, Home, Phone, Package, FileText, Sparkles, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const SCHEDULE_ICON_MAP = { visit: Home, call: Phone, vendor: Package, plan: FileText, assessment: AlertTriangle, family: Users, report: FileText };
 
-function StatCard({ icon: Icon, label, value, sub, tone = "primary" }: { icon: any; label: string; value: string | number; sub: string; tone?: "primary" | "warning" | "success" | "info" | "destructive" }) {
+type IconComponent = React.ComponentType<{ className?: string }>;
+
+function StatCard({ icon: Icon, label, value, sub, tone = "primary" }: { icon: IconComponent; label: string; value: string | number; sub: string; tone?: "primary" | "warning" | "success" | "info" | "destructive" }) {
   const toneMap = {
     primary: "bg-primary-soft text-primary",
     warning: "bg-warning-soft text-warning-foreground",
@@ -37,7 +41,8 @@ function StatCard({ icon: Icon, label, value, sub, tone = "primary" }: { icon: a
 }
 
 function SarahSpotlight() {
-  const sarah = getClient("c1")!;
+  const sarah = getClient("c1");
+  if (!sarah) return null;
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-primary-soft/40 to-card">
       <div className="flex items-start justify-between gap-4 mb-4">
@@ -128,7 +133,8 @@ function DailySchedule() {
 }
 
 function CrmActions() {
-  const sarahActions = actions.filter((a) => a.clientId === "c1");
+  const { byClient } = useActions();
+  const sarahActions = byClient("c1");
   const priorityTone = { high: "destructive", medium: "warning", low: "info" } as const;
   return (
     <Card>
@@ -192,13 +198,25 @@ function KpiPanel() {
 }
 
 function AlertsPanel() {
+  const { all, unread } = useAlerts();
   return (
     <Card>
-      <CardHeader title="התראות" subtitle={`${stats.alertsUnread} חדשות`} action={<Link to="/alerts" className="text-xs font-medium text-primary hover:underline">הכל</Link>} />
+      <CardHeader
+        title="התראות"
+        subtitle={`${unread.length} חדשות`}
+        action={
+          <Link to="/alerts" className="text-xs font-medium text-primary hover:underline">
+            הכל
+          </Link>
+        }
+      />
       <div className="space-y-2">
-        {alerts.slice(0, 4).map((a) => (
+        {all.slice(0, 4).map((a) => (
           <div key={a.id} className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-muted/60">
-            <div className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0", a.read ? "bg-border" : "bg-info animate-pulse-soft")} />
+            <div
+              className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0", a.read ? "bg-border" : "bg-info animate-pulse-soft")}
+              aria-hidden="true"
+            />
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium text-foreground leading-tight">{a.title}</div>
               <div className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{a.description}</div>
@@ -237,14 +255,21 @@ function AttentionTable() {
 }
 
 export default function Index() {
+  const { all: allActions, open: openActions } = useActions();
+  const { open: openAlerts, unread } = useAlerts();
+  const highPriority = openActions.filter((a) => a.priority === "high").length;
+
   return (
-    <AppLayout title="בוקר טוב, שרית 👋" subtitle="הנה מה שמחכה לך היום — 3 פעולות דחופות, 5 מטופלים דורשים תשומת לב.">
+    <AppLayout
+      title="בוקר טוב, שרית 👋"
+      subtitle={`${highPriority} פעולות דחופות · ${openActions.length} פעולות פתוחות · ${openAlerts.length} התראות`}
+    >
       {/* 5 stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
         <StatCard icon={Users} label="מטופלים" value={stats.totalClients} sub={`${stats.activeClients} פעילים`} tone="primary" />
         <StatCard icon={AlertTriangle} label="בסיכון" value={stats.atRisk} sub="דורשים התערבות" tone="destructive" />
-        <StatCard icon={Calendar} label="הזמנות" value={stats.bookings} sub={`${stats.bookingsCompleted} הושלמו`} tone="info" />
-        <StatCard icon={Bell} label="התראות" value={stats.alertsTotal} sub={`${stats.alertsUnread} חדשות`} tone="warning" />
+        <StatCard icon={Sparkles} label="פעולות לב" value={openActions.length} sub={`${allActions.length - openActions.length} הושלמו`} tone="info" />
+        <StatCard icon={Bell} label="התראות" value={openAlerts.length} sub={`${unread.length} חדשות`} tone="warning" />
         <StatCard icon={Wallet} label="ניצול סל" value={`${stats.walletUtilization}%`} sub={`יעד: ${stats.walletTarget}%`} tone="success" />
       </div>
 

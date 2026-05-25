@@ -2,8 +2,11 @@
   "mcpServers": {
     "notebooks": {
       "command": "python3",
-      "args": ["notebooks-mcp/server.py"],
-      "env": {}
+      "args": ["notebooks-mcp/server.py"]
+    },
+    "google-notebooklm": {
+      "command": "python3",
+      "args": ["notebooks-mcp/google_notebooklm_server.py"]
     }
   }
 }

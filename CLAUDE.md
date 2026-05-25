@@ -210,55 +210,75 @@ CrmAction {
 
 ---
 
-## Notebooks MCP — חיבור תיקיות כקונטקסט
+## Notebooks MCP — שני שרתי כלים
 
-`notebooks-mcp/server.py` הוא MCP server שמאפשר לקלוד לקרוא תיקיות מקומיות כ"נוטבוקים".
+`.claude/settings.json` רושם שני MCP servers שפועלים אוטומטית בכל סשן Claude Code מקומי.
 
-### הגדרה (פעם אחת על המכונה המקומית)
+### הגדרה — פעם אחת
 
 ```bash
-# 1. התקן dependencies
-cd notebooks-mcp && pip install mcp
-
-# 2. הגדר נוטבוקים ב-~/.claude/notebooks.json
-# (ראה notebooks-mcp/notebooks.example.json לדוגמה)
+bash notebooks-mcp/setup.sh   # מתקין הכל + מסביר שלב הלוגין
+notebooklm login               # פותח דפדפן לחיבור חשבון Google
 ```
 
-**`~/.claude/notebooks.json` — קובץ שנמצא על המכונה המקומית שלך (לא ב-git):**
+---
+
+### 1. Local Notebooks (`notebooks-mcp/server.py`)
+
+קורא תיקיות מקומיות — קוד, הערות, Obsidian, כל קבצי טקסט.
+
+**קונפיג:** `~/.claude/notebooks.json` (על המכונה שלך, לא ב-git)
 ```json
 {
   "notebooks": {
-    "libi": {
-      "path": "/Users/you/libi-dashboard",
-      "description": "לב dashboard"
-    },
-    "notes": {
-      "path": "/Users/you/Documents/notes",
-      "description": "הערות מחקר"
-    }
+    "libi": { "path": "/Users/you/libi-dashboard", "description": "לב dashboard" },
+    "notes": { "path": "/Users/you/Documents/notes", "description": "הערות מחקר" }
   }
 }
 ```
 
-### שימוש בשיחה
+| כלי | שימוש |
+|-----|-------|
+| `notebook_list` | רשימת כל הנוטבוקים המוגדרים |
+| `notebook_context <name>` | טעינת כל הקבצים לקונטקסט |
+| `notebook_search <name> <query>` | חיפוש בתוך נוטבוק |
+| `notebook_add <name> <path>` | הוספת נוטבוק חדש |
 
-כשה-MCP פעיל, קלוד יכול (בלי שתצטרך לבקש):
-- **`notebook_list`** — רשימת כל הנוטבוקים המוגדרים
-- **`notebook_context <name>`** — טעינת כל הקבצים מהתיקייה כקונטקסט
-- **`notebook_search <name> <query>`** — חיפוש מונח בתוך נוטבוק
-- **`notebook_add <name> <path>`** — הוספת נוטבוק חדש לקונפיג
+---
 
-### `.claude/settings.json` (כבר קיים בריפו)
+### 2. Google NotebookLM (`notebooks-mcp/google_notebooklm_server.py`)
 
-```json
-{
-  "mcpServers": {
-    "notebooks": {
-      "command": "python3",
-      "args": ["notebooks-mcp/server.py"]
-    }
-  }
-}
-```
+גישה מלאה לחשבון Google NotebookLM — כל הנוטבוקים, מקורות, יצירת תוכן.
 
-> **הערה:** ה-MCP רץ על המכונה המקומית. בסביבת cloud/web של Claude Code — השרת לא יהיה זמין אוטומטית; יש לפתוח סשן Claude Code מקומי (CLI/VS Code) כדי שה-MCP יעלה.
+**18 כלים זמינים לקלוד:**
+
+| קטגוריה | כלים |
+|---------|------|
+| **Auth** | `notebooklm_auth_check`, `notebooklm_login` |
+| **נוטבוקים** | `notebooklm_list`, `notebooklm_create`, `notebooklm_use`, `notebooklm_status`, `notebooklm_delete` |
+| **מקורות** | `notebooklm_source_add`, `notebooklm_source_list`, `notebooklm_source_wait`, `notebooklm_source_fulltext`, `notebooklm_source_research` |
+| **שיחה** | `notebooklm_ask`, `notebooklm_history` |
+| **יצירה** | `notebooklm_generate`, `notebooklm_generate_wait`, `notebooklm_download` |
+| **הערות** | `notebooklm_note_create` |
+
+**סוגי תוכן שניתן לייצר:**
+`audio` (פודקאסט) · `video` · `slide-deck` · `quiz` · `flashcards` · `report` · `infographic` · `mind-map` · `data-table`
+
+**מתי להשתמש ב-NotebookLM במקום בקונטקסט ישיר:**
+- מסמכים גדולים (PDF, מחקרים) — `source_add` + `ask` במקום לטעון לקונטקסט
+- יצירת מצגות / אינפוגרפיקה / פודקאסטים מחומר קיים
+- מחקר web אוטומטי — `source_research "נושא"`
+- שמירת ניתוחים של קלוד כהערות בנוטבוק לשימוש עתידי
+
+---
+
+### זמינות לפי סביבה
+
+| סביבה | Local Notebooks | Google NotebookLM |
+|--------|----------------|-------------------|
+| Claude Code CLI (מקומי) | ✅ | ✅ |
+| Claude Code VS Code | ✅ | ✅ |
+| Claude Desktop App | ✅ (הוסף ל-`claude_desktop_config.json`) | ✅ |
+| Claude.ai web (cloud) | ❌ MCP לא רץ בענן | ❌ |
+
+> **טיפ:** לחיבור ב-Claude Desktop App — הרץ `setup.sh`, הוא מדפיס את ה-JSON המדויק להוספה ל-`claude_desktop_config.json`.

@@ -79,66 +79,56 @@ def _merge_mcp_servers(config_path: Path) -> None:
 
 # ── Commands ──────────────────────────────────────────────────────────────
 
-def _inject_operating_layer(project: Path) -> Path | None:
+def _install_global_operating_layer(force: bool = False) -> Path:
     """
-    Copy OPERATING_LAYER.md into <project>/.claude/ and ensure CLAUDE.md
-    references it. Returns the destination path, or None if template missing.
+    Write the operating layer into ~/.claude/CLAUDE.md (global, all projects).
+    Claude Code reads this before any per-project CLAUDE.md.
     """
-    dest = project / ".claude" / "OPERATING_LAYER.md"
-    dest.parent.mkdir(parents=True, exist_ok=True)
+    global_claude_md = Path.home() / ".claude" / "CLAUDE.md"
+    global_claude_md.parent.mkdir(parents=True, exist_ok=True)
 
-    if _OPERATING_LAYER_SRC.exists():
-        shutil.copy2(_OPERATING_LAYER_SRC, dest)
+    if not _OPERATING_LAYER_SRC.exists():
+        print("  ⚠️  Template not found — skipping operating layer install.")
+        return global_claude_md
+
+    layer_content = _OPERATING_LAYER_SRC.read_text(encoding="utf-8")
+    marker = "<!-- notebooks-mcp operating layer -->"
+
+    if global_claude_md.exists() and not force:
+        existing = global_claude_md.read_text(encoding="utf-8")
+        if marker in existing:
+            print(f"  ℹ️  Operating layer already in {global_claude_md} (use --force to overwrite)")
+            return global_claude_md
+        # Append to existing global CLAUDE.md
+        global_claude_md.write_text(
+            existing.rstrip() + f"\n\n{marker}\n\n{layer_content}",
+            encoding="utf-8",
+        )
     else:
-        # fallback: write minimal pointer
-        dest.write_text(
-            "# OPERATING_LAYER\nSee: https://github.com/aviad1840/libi-dashboard/tree/main/notebooks-mcp\n",
+        global_claude_md.write_text(
+            f"{marker}\n\n{layer_content}",
             encoding="utf-8",
         )
 
-    # Ensure CLAUDE.md imports the operating layer
-    claude_md = project / "CLAUDE.md"
-    import_line = "@.claude/OPERATING_LAYER.md"
-    if claude_md.exists():
-        content = claude_md.read_text(encoding="utf-8")
-        if import_line not in content:
-            claude_md.write_text(import_line + "\n\n" + content, encoding="utf-8")
-    else:
-        claude_md.write_text(
-            f"{import_line}\n\n# {project.name}\n\nAdd project documentation here.\n",
-            encoding="utf-8",
-        )
-
-    return dest
+    return global_claude_md
 
 
 def cmd_init(args) -> None:
-    """Activate notebooks-mcp in a project: settings.json + operating layer."""
+    """Activate notebooks-mcp in a project: writes .claude/settings.json only."""
     project = Path(args.path).resolve() if args.path else Path.cwd()
     settings = project / ".claude" / "settings.json"
 
-    # 1. MCP servers
     _merge_mcp_servers(settings)
 
-    # 2. Operating layer (unless --no-system-prompt)
-    ol_dest = None
-    if not getattr(args, "no_system_prompt", False):
-        ol_dest = _inject_operating_layer(project)
-
     print(f"\n✅  notebooks-mcp activated for: {project.name}/")
-    print(f"   MCP config:      {settings}")
-    if ol_dest:
-        print(f"   Operating layer: {ol_dest}")
-        print(f"   CLAUDE.md:       {project / 'CLAUDE.md'}")
+    print(f"   {settings}")
     print()
-    print("   Claude now operates as an autonomous knowledge OS:")
-    print("     • notebook_*        — local folder context")
-    print("     • notebooklm_*      — Google NotebookLM (18 tools)")
-    print("     • Decision memory, proactive retrieval, notebook taxonomy")
+    print("   Tools active in every Claude Code session here:")
+    print("     notebook_*       — local folder notebooks")
+    print("     notebooklm_*     — Google NotebookLM (18 tools)")
     print()
-    if not shutil.which("notebooklm"):
-        print("   Not yet authenticated? Run:  notebooks-mcp login")
-        print()
+    print("   Operating layer: ~/.claude/CLAUDE.md (global — run 'setup' once)")
+    print()
 
 
 def cmd_add(args) -> None:
@@ -192,13 +182,13 @@ def cmd_login(args) -> None:
 
 
 def cmd_setup(args) -> None:
-    """Full first-time setup."""
+    """Full first-time setup — run once, works for all future projects."""
     print("\n═══════════════════════════════════════")
-    print("  notebooks-mcp — First-time setup")
+    print("  notebooks-mcp — Setup")
     print("═══════════════════════════════════════\n")
 
-    # 1. notebooklm-py
-    print("▸ Installing notebooklm-py + playwright ...")
+    # 1. notebooklm-py + playwright
+    print("▸ Installing notebooklm-py ...")
     subprocess.run(
         [_python(), "-m", "pip", "install", "--quiet", "notebooklm-py[playwright]"],
         check=False,
@@ -213,19 +203,16 @@ def cmd_setup(args) -> None:
     else:
         print(f"  ℹ️  {NOTEBOOKS_JSON} already exists")
 
-    print()
-    print("▸ Next steps:")
-    print("  1. Add notebook folders:")
-    print("       notebooks-mcp add NAME /path/to/folder")
-    print()
-    print("  2. Activate in any project:")
-    print("       cd /your/project && notebooks-mcp init")
-    print()
-    print("  3. Connect Google NotebookLM (opens browser):")
-    print("       notebooks-mcp login")
-    print()
-    print("  4. Connect Claude Desktop App (optional):")
-    print("       notebooks-mcp desktop")
+    # 3. Global operating layer → ~/.claude/CLAUDE.md
+    print("▸ Installing operating layer → ~/.claude/CLAUDE.md ...")
+    dest = _install_global_operating_layer(force=getattr(args, "force", False))
+    print(f"  ✅ {dest}\n")
+
+    print("▸ Next:")
+    print("  notebooks-mcp add NAME ~/path      # register folders")
+    print("  notebooks-mcp login                # Google NotebookLM auth")
+    print("  cd /any/project && notebooks-mcp init   # activate per-project MCP")
+    print("  notebooks-mcp desktop              # Claude Desktop App (optional)")
     print()
 
 
@@ -274,15 +261,14 @@ def main() -> None:
     sub.required = True
 
     # init
-    p_init = sub.add_parser("init", help="Activate in current project (MCP + operating layer)")
-    p_init.add_argument("path", nargs="?", default=None, help="Project path (default: current directory)")
-    p_init.add_argument("--no-system-prompt", action="store_true", help="Skip injecting OPERATING_LAYER.md")
+    p_init = sub.add_parser("init", help="Activate MCP in current project (.claude/settings.json)")
+    p_init.add_argument("path", nargs="?", default=None, help="Project path (default: cwd)")
     p_init.set_defaults(func=cmd_init)
 
     # add
     p_add = sub.add_parser("add", help="Register a notebook folder")
     p_add.add_argument("name", help="Short name, e.g. 'research'")
-    p_add.add_argument("path", help="Absolute or relative folder path")
+    p_add.add_argument("path", help="Folder path")
     p_add.add_argument("-d", "--description", default="", help="Optional description")
     p_add.set_defaults(func=cmd_add)
 
@@ -296,11 +282,12 @@ def main() -> None:
     p_list.set_defaults(func=cmd_list)
 
     # login
-    p_login = sub.add_parser("login", help="Authenticate with Google NotebookLM")
+    p_login = sub.add_parser("login", help="Google NotebookLM auth (opens browser)")
     p_login.set_defaults(func=cmd_login)
 
     # setup
-    p_setup = sub.add_parser("setup", help="Full first-time setup")
+    p_setup = sub.add_parser("setup", help="First-time setup (run once)")
+    p_setup.add_argument("--force", action="store_true", help="Overwrite existing operating layer")
     p_setup.set_defaults(func=cmd_setup)
 
     # desktop

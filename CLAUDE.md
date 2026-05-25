@@ -1,7 +1,3 @@
-@.claude/OPERATING_LAYER.md
-
----
-
 # CLAUDE.md — לב | LIBI Dashboard
 
 ## מה זה הפרויקט

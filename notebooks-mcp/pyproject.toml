@@ -22,3 +22,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/notebooks_mcp"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"src/notebooks_mcp/templates" = "notebooks_mcp/templates"

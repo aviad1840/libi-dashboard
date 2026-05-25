@@ -5,7 +5,7 @@ notebooks-mcp CLI
 Global tool — install once, activate in any project.
 
 Usage:
-  notebooks-mcp init               # add .claude/settings.json to current project
+  notebooks-mcp init               # add .claude/settings.json + operating layer to current project
   notebooks-mcp add NAME PATH      # register a notebook folder
   notebooks-mcp list               # list configured notebooks
   notebooks-mcp login              # authenticate with Google NotebookLM
@@ -20,6 +20,10 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+# Path to bundled templates inside the installed package
+_TEMPLATES_DIR = Path(__file__).parent / "templates"
+_OPERATING_LAYER_SRC = _TEMPLATES_DIR / "OPERATING_LAYER.md"
 
 
 # ── Config paths ──────────────────────────────────────────────────────────
@@ -75,23 +79,66 @@ def _merge_mcp_servers(config_path: Path) -> None:
 
 # ── Commands ──────────────────────────────────────────────────────────────
 
+def _inject_operating_layer(project: Path) -> Path | None:
+    """
+    Copy OPERATING_LAYER.md into <project>/.claude/ and ensure CLAUDE.md
+    references it. Returns the destination path, or None if template missing.
+    """
+    dest = project / ".claude" / "OPERATING_LAYER.md"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+
+    if _OPERATING_LAYER_SRC.exists():
+        shutil.copy2(_OPERATING_LAYER_SRC, dest)
+    else:
+        # fallback: write minimal pointer
+        dest.write_text(
+            "# OPERATING_LAYER\nSee: https://github.com/aviad1840/libi-dashboard/tree/main/notebooks-mcp\n",
+            encoding="utf-8",
+        )
+
+    # Ensure CLAUDE.md imports the operating layer
+    claude_md = project / "CLAUDE.md"
+    import_line = "@.claude/OPERATING_LAYER.md"
+    if claude_md.exists():
+        content = claude_md.read_text(encoding="utf-8")
+        if import_line not in content:
+            claude_md.write_text(import_line + "\n\n" + content, encoding="utf-8")
+    else:
+        claude_md.write_text(
+            f"{import_line}\n\n# {project.name}\n\nAdd project documentation here.\n",
+            encoding="utf-8",
+        )
+
+    return dest
+
+
 def cmd_init(args) -> None:
-    """Add .claude/settings.json to the current project directory."""
+    """Activate notebooks-mcp in a project: settings.json + operating layer."""
     project = Path(args.path).resolve() if args.path else Path.cwd()
     settings = project / ".claude" / "settings.json"
 
+    # 1. MCP servers
     _merge_mcp_servers(settings)
 
+    # 2. Operating layer (unless --no-system-prompt)
+    ol_dest = None
+    if not getattr(args, "no_system_prompt", False):
+        ol_dest = _inject_operating_layer(project)
+
     print(f"\n✅  notebooks-mcp activated for: {project.name}/")
-    print(f"   Config: {settings}")
+    print(f"   MCP config:      {settings}")
+    if ol_dest:
+        print(f"   Operating layer: {ol_dest}")
+        print(f"   CLAUDE.md:       {project / 'CLAUDE.md'}")
     print()
-    print("   Tools available in every Claude Code session here:")
-    print("     • notebook_*        — local folder notebooks")
+    print("   Claude now operates as an autonomous knowledge OS:")
+    print("     • notebook_*        — local folder context")
     print("     • notebooklm_*      — Google NotebookLM (18 tools)")
+    print("     • Decision memory, proactive retrieval, notebook taxonomy")
     print()
-    print("   If not yet authenticated:")
-    print("     notebooks-mcp login")
-    print()
+    if not shutil.which("notebooklm"):
+        print("   Not yet authenticated? Run:  notebooks-mcp login")
+        print()
 
 
 def cmd_add(args) -> None:
@@ -227,8 +274,9 @@ def main() -> None:
     sub.required = True
 
     # init
-    p_init = sub.add_parser("init", help="Activate in current project (creates .claude/settings.json)")
+    p_init = sub.add_parser("init", help="Activate in current project (MCP + operating layer)")
     p_init.add_argument("path", nargs="?", default=None, help="Project path (default: current directory)")
+    p_init.add_argument("--no-system-prompt", action="store_true", help="Skip injecting OPERATING_LAYER.md")
     p_init.set_defaults(func=cmd_init)
 
     # add

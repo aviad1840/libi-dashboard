@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "notebooks": {
+      "command": "python3",
+      "args": ["-m", "notebooks_mcp.local_server"]
+    },
+    "google-notebooklm": {
+      "command": "python3",
+      "args": ["-m", "notebooks_mcp.google_server"]
+    }
+  }
+}

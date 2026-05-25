@@ -1,0 +1,27 @@
+[project]
+name = "notebooks-mcp"
+version = "0.2.0"
+description = "MCP servers for Claude: local notebook folders + Google NotebookLM"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[project.optional-dependencies]
+google = [
+    "notebooklm-py[playwright]",
+]
+
+[project.scripts]
+notebooks-mcp = "notebooks_mcp.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/notebooks_mcp"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"src/notebooks_mcp/templates" = "notebooks_mcp/templates"

@@ -207,3 +207,58 @@ CrmAction {
 - Branch עבודה: `claude/notebook-claude-integration-D7h6M`
 - Remote: `aviad1840/libi-dashboard` ב-GitHub
 - Push תמיד ל: `git push -u origin claude/notebook-claude-integration-D7h6M`
+
+---
+
+## Notebooks MCP — חיבור תיקיות כקונטקסט
+
+`notebooks-mcp/server.py` הוא MCP server שמאפשר לקלוד לקרוא תיקיות מקומיות כ"נוטבוקים".
+
+### הגדרה (פעם אחת על המכונה המקומית)
+
+```bash
+# 1. התקן dependencies
+cd notebooks-mcp && pip install mcp
+
+# 2. הגדר נוטבוקים ב-~/.claude/notebooks.json
+# (ראה notebooks-mcp/notebooks.example.json לדוגמה)
+```
+
+**`~/.claude/notebooks.json` — קובץ שנמצא על המכונה המקומית שלך (לא ב-git):**
+```json
+{
+  "notebooks": {
+    "libi": {
+      "path": "/Users/you/libi-dashboard",
+      "description": "לב dashboard"
+    },
+    "notes": {
+      "path": "/Users/you/Documents/notes",
+      "description": "הערות מחקר"
+    }
+  }
+}
+```
+
+### שימוש בשיחה
+
+כשה-MCP פעיל, קלוד יכול (בלי שתצטרך לבקש):
+- **`notebook_list`** — רשימת כל הנוטבוקים המוגדרים
+- **`notebook_context <name>`** — טעינת כל הקבצים מהתיקייה כקונטקסט
+- **`notebook_search <name> <query>`** — חיפוש מונח בתוך נוטבוק
+- **`notebook_add <name> <path>`** — הוספת נוטבוק חדש לקונפיג
+
+### `.claude/settings.json` (כבר קיים בריפו)
+
+```json
+{
+  "mcpServers": {
+    "notebooks": {
+      "command": "python3",
+      "args": ["notebooks-mcp/server.py"]
+    }
+  }
+}
+```
+
+> **הערה:** ה-MCP רץ על המכונה המקומית. בסביבת cloud/web של Claude Code — השרת לא יהיה זמין אוטומטית; יש לפתוח סשן Claude Code מקומי (CLI/VS Code) כדי שה-MCP יעלה.

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "notebooks": {
+      "command": "python3",
+      "args": ["notebooks-mcp/server.py"],
+      "env": {}
+    }
+  }
+}

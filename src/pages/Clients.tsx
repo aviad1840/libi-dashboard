@@ -6,16 +6,20 @@ import { ProgressBar } from "@/components/common/ProgressBar";
 import { Chip } from "@/components/common/Chip";
 import { clients } from "@/data/clients";
 import { NURSING_LEVEL_TONE, PERSONA_LABELS, RISK_LABELS } from "@/data/constants";
-import { ChevronLeft, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+
+const PAGE_SIZE = 20;
 
 export default function Clients() {
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<"all" | "1" | "2" | "3">("all");
   const [risk, setRisk] = useState<"all" | "risk" | "ok">("all");
+  const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
+    setPage(1);
     return clients.filter((c) => {
       const fullName = `${c.firstName} ${c.lastName}`;
       if (query && !fullName.includes(query) && !c.city.includes(query)) return false;
@@ -26,6 +30,8 @@ export default function Clients() {
     });
   }, [query, level, risk]);
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const lonelinessTone = (s: number) => (s <= 3 ? "text-destructive" : s <= 5 ? "text-warning" : "text-success");
 
   return (
@@ -43,7 +49,7 @@ export default function Clients() {
         </div>
         <select
           value={level}
-          onChange={(e) => setLevel(e.target.value as any)}
+          onChange={(e) => { setLevel(e.target.value as any); setPage(1); }}
           className="h-10 px-3 rounded-lg border border-border bg-card text-sm outline-none focus:border-primary"
         >
           <option value="all">כל הרמות</option>
@@ -59,7 +65,7 @@ export default function Clients() {
           ] as const).map((opt) => (
             <button
               key={opt.v}
-              onClick={() => setRisk(opt.v)}
+              onClick={() => { setRisk(opt.v); setPage(1); }}
               className={cn(
                 "px-3 h-8 rounded-md font-medium transition-colors",
                 risk === opt.v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
@@ -88,7 +94,7 @@ export default function Clients() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((c) => (
+              {paginated.map((c) => (
                 <tr key={c.id} className="border-t border-border hover:bg-muted/30 transition-colors group">
                   <td className="px-5 py-3">
                     <Link to={`/clients/${c.id}`} className="flex items-center gap-3">
@@ -133,6 +139,47 @@ export default function Clients() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-5 py-3 border-t border-border">
+            <div className="text-xs text-muted-foreground">
+              עמוד {page} מתוך {totalPages} · {filtered.length} תוצאות
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-sm disabled:opacity-40 hover:bg-muted transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+                const p = start + i;
+                return (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={cn(
+                      "w-8 h-8 rounded-lg text-sm font-medium transition-colors",
+                      page === p ? "bg-primary text-primary-foreground" : "border border-border hover:bg-muted text-foreground"
+                    )}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-sm disabled:opacity-40 hover:bg-muted transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </Card>
     </AppLayout>
   );

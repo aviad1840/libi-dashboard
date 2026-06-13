@@ -13,8 +13,8 @@ export const PILOT = {
 };
 
 export const stats = {
-  totalClients: PILOT.citizens,
-  activeClients: 234,
+  totalClients: clients.length,
+  activeClients: clients.filter((c) => c.active).length,
   atRisk: clients.filter((c) => c.lev.riskFlags.length > 0).length,
   atRiskRequiringIntervention: clients.filter((c) => c.lev.riskFlags.some((f) => f === "loneliness" || f === "functional_decline" || f === "fall_risk")).length,
   bookings: 12,

@@ -118,8 +118,8 @@ function generateClient(i: number): Client {
   };
 }
 
-// Generate 75 clients
-const generated = Array.from({ length: 75 }, (_, i) => generateClient(i + 2));
+// Generate 285 clients (+ Sarah = 286, matching Jerusalem pilot)
+const generated = Array.from({ length: 285 }, (_, i) => generateClient(i + 2));
 
 // Sarah — protagonist (id c1) — pinned to top
 const sarah: Client = {

@@ -15,6 +15,8 @@ export const QUICK_PROMPTS = [
   { label: "מי בסיכון?", icon: "⚠️" },
   { label: "כמה לא מנצלים את הארנק?", icon: "💰" },
   { label: "מה הסוכנים עושים עכשיו?", icon: "🤖" },
+  { label: "מה יקרה אם נרחיב ללאומי?", icon: "🌍" },
+  { label: "איך עובדת הארכיטקטורה?", icon: "🏗️" },
 ];
 
 function bold(text: string) { return `**${text}**`; }
@@ -138,6 +140,46 @@ export function generateAiResponse(query: string): string {
       `• 📊 נתוני פיילוט ("הצגי לי סטטיסטיקות")`,
       "",
       `פשוט שאלי בעברית חופשית!`,
+    ].join("\n");
+  }
+
+  // National scale
+  if (q.includes("לאומי") || q.includes("נרחיב") || q.includes("ארצי") || q.includes("220") || q.includes("ישראל")) {
+    return [
+      `🌍 ${bold("תחזית הרחבה לאומית — ישראל 2025-2027:")}`,
+      "",
+      `📍 ${bold("שלב 1 — פיילוט (2025):")} ${PILOT.citizens} אזרחים · ירושלים · חיסכון ₪${PILOT.fiscalSavingsB * 10}M`,
+      `🏙️ ${bold("שלב 2 — הרחבה (2026):")} ~12,000 אזרחים · 14 ערים · חיסכון ₪900M`,
+      `🇮🇱 ${bold("שלב 3 — לאומי (2027):")} ${bold("220,000 אזרחים")} · כל ישראל · חיסכון ${bold("₪20B/שנה")}`,
+      "",
+      `📊 ${bold("ה-ROI:")}`,
+      `• כל ₪1 שמושקע → ₪4.2 חיסכון (מניעת אשפוז + מוסדות)`,
+      `• +3.5 ימי עצמאות לאזרח/שנה בממוצע`,
+      `• ירידה של ${bold("41%")} בתחושת בדידות (נתון פיילוט)`,
+      "",
+      `🤖 ${bold("תפקיד ה-AI:")} 5 סוכני Bedrock מאפשרים סקייל ללא הגדלת כוח אדם יחסי.`,
+    ].join("\n");
+  }
+
+  // Architecture
+  if (q.includes("ארכיטקטורה") || q.includes("טכנולוגיה") || q.includes("איך עובד") || q.includes("bedrock") || q.includes("aws")) {
+    return [
+      `🏗️ ${bold("ארכיטקטורת לב — AWS:")}`,
+      "",
+      `📱 ${bold("Frontend:")} React + TypeScript + Tailwind (RTL עברית)`,
+      `   → מתאמות רואות דשבורד · אזרחים רואים נוף אישי`,
+      "",
+      `🤖 ${bold("AI Layer — Amazon Bedrock:")}`,
+      `   • ${bold("Claude Opus 4.8")} — סוכן-על, תיאום ואסטרטגיה`,
+      `   • ${bold("Claude Sonnet 4.6")} — גילוי שירותים + התאמה + ניטור`,
+      `   • ${bold("Claude Haiku 4.5")} — חיזוק ומעורבות (נפח גבוה)`,
+      "",
+      `🔧 ${bold("Backend — AWS:")}`,
+      `   • ${bold("Lambda")} — serverless, מופעלת לכל סוכן`,
+      `   • ${bold("DynamoDB")} — פרופילי מטופלים + ציוני התאמה`,
+      `   • ${bold("EventBridge")} — תזמון ריצות סוכנים`,
+      "",
+      `🔐 ${bold("אבטחה:")} IAM roles לכל סוכן · הצפנת נתונים רגישים · HIPAA-compliant`,
     ].join("\n");
   }
 

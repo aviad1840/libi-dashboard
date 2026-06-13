@@ -12,6 +12,7 @@ import Bookings from "./pages/Bookings.tsx";
 import Reports from "./pages/Reports.tsx";
 import Settings from "./pages/Settings.tsx";
 import CitizenView from "./pages/CitizenView.tsx";
+import Architecture from "./pages/Architecture.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/citizen" element={<CitizenView />} />
+          <Route path="/architecture" element={<Architecture />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

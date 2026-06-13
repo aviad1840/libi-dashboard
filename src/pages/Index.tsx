@@ -3,12 +3,12 @@ import { Card, CardHeader } from "@/components/common/Card";
 import { Chip } from "@/components/common/Chip";
 import { Avatar } from "@/components/common/Avatar";
 import { ProgressBar } from "@/components/common/ProgressBar";
-import { stats, kpis, sarahChangelog } from "@/data/dashboard";
+import { stats, kpis, sarahChangelog, PILOT } from "@/data/dashboard";
 import { schedule, actions, alerts, attentionRows } from "@/data/mock";
 import { getClient } from "@/data/clients";
 import { getService } from "@/data/services";
 import { ACTION_TYPE_LABELS, NURSING_LEVEL_TONE, RISK_LABELS, CONTENT_WORLDS } from "@/data/constants";
-import { Users, AlertTriangle, Calendar, Bell, Wallet, ArrowUpRight, ArrowDownRight, Home, Phone, Package, FileText, Sparkles, ChevronLeft, TrendingUp, TrendingDown } from "lucide-react";
+import { Users, AlertTriangle, Calendar, Bell, Wallet, ArrowUpRight, ArrowDownRight, Home, Phone, Package, FileText, Sparkles, ChevronLeft, Bot, Wifi } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -210,6 +210,52 @@ function AlertsPanel() {
   );
 }
 
+const AGENTS = [
+  { id: 1, name: "סוכן גילוי שירותים", status: "active", msg: `${PILOT.services} שירותים · עדכון לפני 3 דק'`, dot: "bg-success" },
+  { id: 2, name: "סוכן התאמה", status: "active", msg: `${PILOT.citizens} ציוני התאמה חושבו הבוקר`, dot: "bg-success" },
+  { id: 3, name: "סוכן ניטור בדידות", status: "alert", msg: "⚠️ שרה כהן — לא הגיעה 4 ימים", dot: "bg-destructive animate-pulse" },
+  { id: 4, name: "סוכן חיזוק ומעורבות", status: "active", msg: "נשלחה הזמנה לחוג שירה ב-10:00", dot: "bg-success" },
+  { id: 5, name: "סוכן-על", status: "active", msg: `${stats.pendingActions} פעולות דחופות ממתינות לאישור`, dot: "bg-info" },
+];
+
+function AgentsPanel() {
+  return (
+    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-card">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+            <Bot className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-foreground">סוכני לב פעילים</div>
+            <div className="text-xs text-muted-foreground">Amazon Bedrock · AWS Lambda · 24/7</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-success font-medium">
+          <Wifi className="w-3.5 h-3.5" />
+          5/5 פעילים
+        </div>
+      </div>
+      <div className="space-y-2">
+        {AGENTS.map((a) => (
+          <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-card/70 border border-border/60">
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-bold text-muted-foreground w-4 text-center">{a.id}</span>
+              <div className={cn("w-2 h-2 rounded-full", a.dot)} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-semibold text-foreground">{a.name}</div>
+              <div className={cn("text-[11px] mt-0.5", a.status === "alert" ? "text-destructive font-medium" : "text-muted-foreground")}>
+                {a.msg}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 function AttentionTable() {
   return (
     <Card>
@@ -241,7 +287,7 @@ export default function Index() {
     <AppLayout title="בוקר טוב, שרית 👋" subtitle="הנה מה שמחכה לך היום — 3 פעולות דחופות, 5 מטופלים דורשים תשומת לב.">
       {/* 5 stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-        <StatCard icon={Users} label="מטופלים" value={stats.totalClients} sub={`${stats.activeClients} פעילים`} tone="primary" />
+        <StatCard icon={Users} label="אזרחים בפיילוט" value={stats.totalClients} sub={`${stats.activeClients} פעילים · ירושלים`} tone="primary" />
         <StatCard icon={AlertTriangle} label="בסיכון" value={stats.atRisk} sub="דורשים התערבות" tone="destructive" />
         <StatCard icon={Calendar} label="הזמנות" value={stats.bookings} sub={`${stats.bookingsCompleted} הושלמו`} tone="info" />
         <StatCard icon={Bell} label="התראות" value={stats.alertsTotal} sub={`${stats.alertsUnread} חדשות`} tone="warning" />
@@ -256,6 +302,7 @@ export default function Index() {
           <CrmActions />
         </div>
         <div className="lg:col-span-2 space-y-6">
+          <AgentsPanel />
           <KpiPanel />
           <AlertsPanel />
           <AttentionTable />

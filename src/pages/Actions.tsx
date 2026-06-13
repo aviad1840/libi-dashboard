@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/common/Card";
 import { Avatar } from "@/components/common/Avatar";
@@ -142,16 +143,25 @@ function ActionCard({ actionId }: { actionId: string }) {
 
               {/* Actions */}
               <div className="flex flex-wrap gap-2 pt-2">
-                <button className="flex items-center gap-2 px-3 h-9 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary-glow transition-colors">
+                <button
+                  onClick={() => toast.success(`מתחברת לשיחה עם ${client.firstName} ${client.lastName}`, { description: `${client.phone} · ${action.title}`, duration: 4000 })}
+                  className="flex items-center gap-2 px-3 h-9 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary-glow transition-colors"
+                >
                   <Phone className="w-4 h-4" /> התקשרי
                 </button>
-                <button className="flex items-center gap-2 px-3 h-9 rounded-lg bg-success text-success-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
+                <button
+                  onClick={() => toast.success("שירות תוזמן בהצלחה", { description: `${action.suggestedServiceIds.length > 0 ? "שירות מומלץ" : "שירות"} · ${client.firstName} ${client.lastName}`, duration: 4000 })}
+                  className="flex items-center gap-2 px-3 h-9 rounded-lg bg-success text-success-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+                >
                   <Calendar className="w-4 h-4" /> תזמני שירות
                 </button>
                 <Link to={`/clients/${client.id}`} className="flex items-center gap-2 px-3 h-9 rounded-lg border border-border text-foreground text-sm font-medium hover:bg-muted transition-colors">
                   <UserRound className="w-4 h-4" /> לפרופיל
                 </Link>
-                <button className="flex items-center gap-2 px-3 h-9 rounded-lg border border-border text-muted-foreground text-sm font-medium hover:bg-muted transition-colors mr-auto">
+                <button
+                  onClick={() => toast.info("הפעולה סומנה כסגורה", { description: action.title })}
+                  className="flex items-center gap-2 px-3 h-9 rounded-lg border border-border text-muted-foreground text-sm font-medium hover:bg-muted transition-colors mr-auto"
+                >
                   <X className="w-4 h-4" /> סגירה
                 </button>
               </div>

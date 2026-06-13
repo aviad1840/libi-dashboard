@@ -11,6 +11,9 @@ import { getService } from "@/data/services";
 import { CONTENT_WORLDS, NURSING_LEVEL_TONE, PERSONA_LABELS, RISK_LABELS, BOOKING_STATUS } from "@/data/constants";
 import { Phone, MapPin, UserRound, ChevronRight, CheckCircle2, AlertCircle, Sparkles, Wallet, Activity, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip,
+} from "recharts";
 
 const TABS = [
   { id: "functional", label: "פרופיל תפקודי", icon: Activity },
@@ -156,6 +159,47 @@ export default function ClientDetail() {
                         עריכה ידנית
                       </button>
                     </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Radar chart */}
+              <Card>
+                <CardHeader title="מפת תפקוד" subtitle="ויזואליזציה של 6 מדדים תפקודיים" />
+                <div className="flex items-center gap-4">
+                  <ResponsiveContainer width="55%" height={220}>
+                    <RadarChart data={[
+                      { subject: "ניידות", value: client.functional.mobility, fullMark: 5 },
+                      { subject: "קוגניציה", value: client.functional.cognition, fullMark: 5 },
+                      { subject: "רגשי", value: client.functional.emotional, fullMark: 5 },
+                      { subject: "חברתי", value: client.functional.social, fullMark: 5 },
+                      { subject: "ראייה", value: client.functional.vision, fullMark: 5 },
+                      { subject: "שמיעה", value: client.functional.hearing, fullMark: 5 },
+                    ]}>
+                      <PolarGrid stroke="#e5e7eb" />
+                      <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12, fill: "#6b7280" }} />
+                      <Radar name="פרופיל" dataKey="value" stroke="#1B3A5C" fill="#1B3A5C" fillOpacity={0.2} strokeWidth={2} />
+                      <Tooltip formatter={(v) => [`${v}/5`, "ציון"]} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                  <div className="flex-1 space-y-2">
+                    {([
+                      ["mobility", "ניידות"],
+                      ["cognition", "קוגניציה"],
+                      ["emotional", "רגשי"],
+                      ["social", "חברתי"],
+                      ["vision", "ראייה"],
+                      ["hearing", "שמיעה"],
+                    ] as const).map(([key, label]) => {
+                      const v = client.functional[key];
+                      const tone = v >= 4 ? "text-success" : v >= 3 ? "text-primary" : v >= 2 ? "text-warning" : "text-destructive";
+                      return (
+                        <div key={key} className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground text-xs">{label}</span>
+                          <span className={cn("font-bold tabular-nums text-sm", tone)}>{v}/5</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </Card>

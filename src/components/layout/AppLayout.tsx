@@ -1,7 +1,14 @@
 import { ReactNode } from "react";
+import { motion } from "framer-motion";
 import AppSidebar from "./AppSidebar";
+import AiChatPanel from "./AiChatPanel";
 
-export default function AppLayout({ children, title, subtitle, actions }: { children: ReactNode; title?: string; subtitle?: string; actions?: ReactNode }) {
+export default function AppLayout({ children, title, subtitle, actions }: {
+  children: ReactNode;
+  title?: string;
+  subtitle?: string;
+  actions?: ReactNode;
+}) {
   return (
     <div dir="rtl" className="min-h-screen bg-background">
       <AppSidebar />
@@ -15,8 +22,16 @@ export default function AppLayout({ children, title, subtitle, actions }: { chil
             {actions}
           </header>
         )}
-        <div className="p-8 animate-fade-in">{children}</div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28 }}
+          className="p-8"
+        >
+          {children}
+        </motion.div>
       </main>
+      <AiChatPanel />
     </div>
   );
 }

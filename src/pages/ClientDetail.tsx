@@ -14,12 +14,114 @@ import { cn } from "@/lib/utils";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip,
 } from "recharts";
+import { services as allServices } from "@/data/services";
+import { toast } from "sonner";
 
 const TABS = [
   { id: "functional", label: "פרופיל תפקודי", icon: Activity },
   { id: "wallet", label: "ארנק", icon: Wallet },
+  { id: "basket", label: "סל אישי", icon: Sparkles },
   { id: "bookings", label: "הזמנות", icon: ClipboardList },
 ] as const;
+
+function matchScore(client: ReturnType<typeof getClient> & object, svcId: string): number {
+  // Simple deterministic score based on client id + service id
+  const hash = (client.id + svcId).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  return 60 + (hash % 35);
+}
+
+function BasketTab({ client }: { client: NonNullable<ReturnType<typeof getClient>> }) {
+  const [added, setAdded] = useState<Record<string, boolean>>({});
+  const unitsUsed = Object.keys(added).reduce((sum, id) => {
+    const s = allServices.find(s => s.id === id);
+    return sum + (s?.units ?? 0);
+  }, 0);
+  const remaining = client.wallet.balance - unitsUsed;
+
+  return (
+    <div className="space-y-5">
+      {/* Budget header */}
+      <Card>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-xs text-muted-foreground">יתרה זמינה לסל</div>
+            <div className="text-3xl font-bold text-primary tabular-nums mt-1">{remaining}</div>
+            <div className="text-xs text-muted-foreground">מתוך {client.wallet.total} יח׳ · {unitsUsed} נבחרו</div>
+          </div>
+          <div className="text-right">
+            <div className="text-xs text-muted-foreground mb-1">ניצול מוצע</div>
+            <div className="text-2xl font-bold text-success tabular-nums">
+              {Math.min(100, Math.round((unitsUsed / client.wallet.total) * 100))}%
+            </div>
+          </div>
+        </div>
+        <ProgressBar value={unitsUsed} max={client.wallet.total} tone="primary" className="mt-3" />
+      </Card>
+
+      {/* Services by world */}
+      {Object.entries(CONTENT_WORLDS).map(([worldKey, world]) => {
+        const worldSvcs = allServices.filter(s => s.world === worldKey);
+        return (
+          <Card key={worldKey} padded={false}>
+            <div className={cn("flex items-center gap-3 px-5 py-3 border-b border-border", world.colorClass.replace("text-", "bg-").split(" ")[0] + "/10")}>
+              <span className="text-xl">{world.emoji}</span>
+              <div>
+                <div className="font-semibold text-foreground text-sm">{world.label}</div>
+                <div className="text-xs text-muted-foreground">{world.subsidy}% סבסוד</div>
+              </div>
+            </div>
+            <div className="divide-y divide-border">
+              {worldSvcs.map(svc => {
+                const score = matchScore(client, svc.id);
+                const isAdded = added[svc.id];
+                const canAfford = remaining >= svc.units || isAdded;
+                return (
+                  <div key={svc.id} className={cn("flex items-center gap-4 px-5 py-3 transition-colors", isAdded && "bg-success-soft/30")}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-foreground">{svc.name}</span>
+                        {score >= 85 && (
+                          <span className="text-[10px] bg-primary-soft text-primary px-1.5 py-0.5 rounded-full font-bold">
+                            AI ✓ {score}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{svc.description} · {svc.vendor}</div>
+                    </div>
+                    <div className="text-sm font-bold text-foreground tabular-nums shrink-0">{svc.units} יח׳</div>
+                    <button
+                      onClick={() => {
+                        if (isAdded) {
+                          setAdded(p => { const n = { ...p }; delete n[svc.id]; return n; });
+                          toast.info(`${svc.name} הוסר מהסל`);
+                        } else if (canAfford) {
+                          setAdded(p => ({ ...p, [svc.id]: true }));
+                          toast.success(`${svc.name} נוסף לסל האישי`, { description: `${svc.units} יחידות · ${svc.subsidy}% סבסוד` });
+                        } else {
+                          toast.error("לא מספיק יחידות בארנק");
+                        }
+                      }}
+                      className={cn(
+                        "shrink-0 px-3 h-8 rounded-lg text-xs font-semibold transition-all",
+                        isAdded
+                          ? "bg-success text-success-foreground"
+                          : canAfford
+                          ? "bg-primary-soft text-primary hover:bg-primary hover:text-primary-foreground"
+                          : "bg-muted text-muted-foreground cursor-not-allowed"
+                      )}
+                    >
+                      {isAdded ? "✓ נוסף" : "+ הוסף"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function ClientDetail() {
   const { id } = useParams();
@@ -285,6 +387,10 @@ export default function ClientDetail() {
                 </div>
               </Card>
             </div>
+          )}
+
+          {tab === "basket" && (
+            <BasketTab client={client} />
           )}
 
           {tab === "bookings" && (

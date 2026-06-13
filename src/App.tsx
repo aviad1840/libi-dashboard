@@ -11,6 +11,7 @@ import Alerts from "./pages/Alerts.tsx";
 import Bookings from "./pages/Bookings.tsx";
 import Reports from "./pages/Reports.tsx";
 import Settings from "./pages/Settings.tsx";
+import CitizenView from "./pages/CitizenView.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/bookings" element={<Bookings />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/citizen" element={<CitizenView />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

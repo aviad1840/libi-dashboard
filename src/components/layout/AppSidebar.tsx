@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Heart, LayoutDashboard, Sparkles, Users, Calendar, Bell, FileBarChart2, Settings, LogOut } from "lucide-react";
+import { Heart, LayoutDashboard, Sparkles, Users, Calendar, Bell, FileBarChart2, Settings, LogOut, UserCircle2 } from "lucide-react";
 import { stats } from "@/data/dashboard";
 import { cn } from "@/lib/utils";
 
@@ -51,22 +51,40 @@ export default function AppSidebar() {
               <Icon className="w-[18px] h-[18px] shrink-0" />
               <span className="flex-1">{item.label}</span>
               {item.badge ? (
-                <span
-                  className={cn(
-                    "min-w-5 h-5 px-1.5 rounded-full text-[11px] font-semibold flex items-center justify-center",
-                    item.badgeTone === "destructive"
-                      ? "bg-destructive text-destructive-foreground"
-                      : active
-                      ? "bg-primary-foreground/20 text-primary-foreground"
-                      : "bg-primary text-primary-foreground"
-                  )}
-                >
+                <span className={cn(
+                  "min-w-5 h-5 px-1.5 rounded-full text-[11px] font-semibold flex items-center justify-center",
+                  item.badgeTone === "destructive"
+                    ? "bg-destructive text-destructive-foreground"
+                    : active
+                    ? "bg-primary-foreground/20 text-primary-foreground"
+                    : "bg-primary text-primary-foreground"
+                )}>
                   {item.badge}
                 </span>
               ) : null}
             </NavLink>
           );
         })}
+
+        {/* Demo section */}
+        <div className="pt-4 mt-2 border-t border-border">
+          <div className="px-3 mb-2 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+            דמו האקתון
+          </div>
+          <NavLink
+            to="/citizen"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              pathname === "/citizen"
+                ? "bg-info text-white"
+                : "text-info hover:bg-info-soft"
+            )}
+          >
+            <UserCircle2 className="w-[18px] h-[18px] shrink-0" />
+            <span className="flex-1">מבט אזרח — שרה</span>
+            <span className="text-[10px] bg-info/20 text-info px-1.5 py-0.5 rounded font-bold">חדש</span>
+          </NavLink>
+        </div>
       </nav>
 
       {/* User profile */}

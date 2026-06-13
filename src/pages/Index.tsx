@@ -8,7 +8,9 @@ import { schedule, actions, alerts, attentionRows } from "@/data/mock";
 import { getClient } from "@/data/clients";
 import { getService } from "@/data/services";
 import { ACTION_TYPE_LABELS, NURSING_LEVEL_TONE, RISK_LABELS, CONTENT_WORLDS } from "@/data/constants";
-import { Users, AlertTriangle, Calendar, Bell, Wallet, ArrowUpRight, ArrowDownRight, Home, Phone, Package, FileText, Sparkles, ChevronLeft, Bot, Wifi } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Users, AlertTriangle, Calendar, Bell, Wallet, ArrowUpRight, ArrowDownRight, Home, Phone, Package, FileText, Sparkles, ChevronLeft, Bot, Wifi, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -210,47 +212,100 @@ function AlertsPanel() {
   );
 }
 
-const AGENTS = [
-  { id: 1, name: "סוכן גילוי שירותים", status: "active", msg: `${PILOT.services} שירותים · עדכון לפני 3 דק'`, dot: "bg-success" },
-  { id: 2, name: "סוכן התאמה", status: "active", msg: `${PILOT.citizens} ציוני התאמה חושבו הבוקר`, dot: "bg-success" },
-  { id: 3, name: "סוכן ניטור בדידות", status: "alert", msg: "⚠️ שרה כהן — לא הגיעה 4 ימים", dot: "bg-destructive animate-pulse" },
-  { id: 4, name: "סוכן חיזוק ומעורבות", status: "active", msg: "נשלחה הזמנה לחוג שירה ב-10:00", dot: "bg-success" },
-  { id: 5, name: "סוכן-על", status: "active", msg: `${stats.pendingActions} פעולות דחופות ממתינות לאישור`, dot: "bg-info" },
+type FeedEvent = { id: string; time: string; agent: string; msg: string; type: "alert" | "success" | "info" };
+
+const SEED_EVENTS: FeedEvent[] = [
+  { id: "e1", time: "08:12", agent: "סוכן ניטור", msg: "⚠️ שרה כהן לא הגיעה 4 ימים → פעולה דחופה נוצרה", type: "alert" },
+  { id: "e2", time: "08:15", agent: "סוכן-על", msg: `${stats.pendingActions} פעולות דחופות הופנו למתאמת שרית`, type: "info" },
+  { id: "e3", time: "08:20", agent: "סוכן גילוי", msg: `${PILOT.services} שירותים פעילים · מצא 3 ספקים חדשים`, type: "success" },
+  { id: "e4", time: "08:31", agent: "סוכן התאמה", msg: `חישב ${PILOT.citizens} ציוני התאמה · עדכן 14 המלצות`, type: "info" },
+  { id: "e5", time: "08:45", agent: "סוכן חיזוק", msg: "שלח 8 הזמנות לחוגים · 5 תגובות חיוביות", type: "success" },
+];
+
+const LIVE_EVENTS: FeedEvent[] = [
+  { id: "l1", time: "עכשיו", agent: "סוכן התאמה", msg: "יוסף לוי (c2): המלצה חדשה — פיזיותרפיה בבית, 97% התאמה", type: "info" },
+  { id: "l2", time: "עכשיו", agent: "סוכן גילוי", msg: "ספק חדש אושר: 'אופק' — ליווי רגשי בגבעתיים", type: "success" },
+  { id: "l3", time: "עכשיו", agent: "סוכן ניטור", msg: "12 אזרחים: יתרה תפוג ב-30 יום → התראה לצוות", type: "alert" },
+  { id: "l4", time: "עכשיו", agent: "סוכן-על", msg: "בוצעה אופטימיזציית סל ל-23 מטופלים — ניצול צפוי +8%", type: "success" },
+  { id: "l5", time: "עכשיו", agent: "סוכן חיזוק", msg: "מרים גבאי: ציון חיבור חברתי עלה מ-4 ל-6 ✨", type: "success" },
 ];
 
 function AgentsPanel() {
+  const [events, setEvents] = useState<FeedEvent[]>(SEED_EVENTS);
+  const [liveIdx, setLiveIdx] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const next = LIVE_EVENTS[liveIdx % LIVE_EVENTS.length];
+      const id = `live-${Date.now()}`;
+      setEvents(prev => [{ ...next, id, time: new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }) }, ...prev].slice(0, 7));
+      setLiveIdx(i => i + 1);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [liveIdx]);
+
+  const dotColor = { alert: "bg-destructive", success: "bg-success", info: "bg-info" };
+  const textColor = { alert: "text-destructive", success: "text-success", info: "text-info" };
+
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-card">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
-            <Bot className="w-4 h-4" />
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
+            <Bot className="w-4.5 h-4.5" />
           </div>
           <div>
-            <div className="text-sm font-bold text-foreground">סוכני לב פעילים</div>
-            <div className="text-xs text-muted-foreground">Amazon Bedrock · AWS Lambda · 24/7</div>
+            <div className="text-sm font-bold text-foreground">סוכני לב — Live Feed</div>
+            <div className="text-[11px] text-muted-foreground">Amazon Bedrock · Lambda · DynamoDB</div>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-success font-medium">
-          <Wifi className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-1.5 text-xs text-success font-semibold">
+          <Activity className="w-3 h-3" />
           5/5 פעילים
         </div>
       </div>
-      <div className="space-y-2">
-        {AGENTS.map((a) => (
-          <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-card/70 border border-border/60">
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-xs font-bold text-muted-foreground w-4 text-center">{a.id}</span>
-              <div className={cn("w-2 h-2 rounded-full", a.dot)} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-semibold text-foreground">{a.name}</div>
-              <div className={cn("text-[11px] mt-0.5", a.status === "alert" ? "text-destructive font-medium" : "text-muted-foreground")}>
-                {a.msg}
-              </div>
-            </div>
+
+      {/* Agent status pills */}
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {[
+          { name: "גילוי", icon: "🔍", ok: true },
+          { name: "התאמה", icon: "🎯", ok: true },
+          { name: "ניטור", icon: "⚠️", ok: false },
+          { name: "חיזוק", icon: "🔔", ok: true },
+          { name: "סוכן-על", icon: "👑", ok: true },
+        ].map((a) => (
+          <div key={a.name} className={cn(
+            "flex items-center gap-1.5 text-[11px] font-medium px-2 py-1 rounded-full border",
+            a.ok ? "bg-success-soft text-success border-success/20" : "bg-destructive-soft text-destructive border-destructive/20"
+          )}>
+            <span>{a.icon}</span>
+            <span>{a.name}</span>
+            <span className={cn("w-1.5 h-1.5 rounded-full", a.ok ? "bg-success" : "bg-destructive animate-pulse")} />
           </div>
         ))}
+      </div>
+
+      {/* Live feed */}
+      <div className="space-y-2 max-h-[260px] overflow-hidden">
+        <AnimatePresence initial={false}>
+          {events.map((ev) => (
+            <motion.div
+              key={ev.id}
+              initial={{ opacity: 0, height: 0, y: -8 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-start gap-2.5 p-2 rounded-lg bg-card/80 border border-border/50"
+            >
+              <div className={cn("w-1.5 h-1.5 rounded-full shrink-0 mt-1.5", dotColor[ev.type])} />
+              <div className="flex-1 min-w-0">
+                <div className={cn("text-[11px] font-semibold", textColor[ev.type])}>{ev.agent}</div>
+                <div className="text-[11px] text-foreground/80 mt-0.5 leading-relaxed">{ev.msg}</div>
+              </div>
+              <div className="text-[10px] text-muted-foreground shrink-0 tabular-nums">{ev.time}</div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </Card>
   );
@@ -282,16 +337,29 @@ function AttentionTable() {
   );
 }
 
+const STAT_CARDS = (s: typeof stats) => [
+  { icon: Users, label: "אזרחים בפיילוט", value: s.totalClients, sub: `${s.activeClients} פעילים · ירושלים`, tone: "primary" as const },
+  { icon: AlertTriangle, label: "בסיכון", value: s.atRisk, sub: "דורשים התערבות", tone: "destructive" as const },
+  { icon: Calendar, label: "הזמנות", value: s.bookings, sub: `${s.bookingsCompleted} הושלמו`, tone: "info" as const },
+  { icon: Bell, label: "התראות", value: s.alertsTotal, sub: `${s.alertsUnread} חדשות`, tone: "warning" as const },
+  { icon: Wallet, label: "ניצול סל", value: `${s.walletUtilization}%`, sub: `יעד: ${s.walletTarget}%`, tone: "success" as const },
+];
+
 export default function Index() {
   return (
     <AppLayout title="בוקר טוב, שרית 👋" subtitle="הנה מה שמחכה לך היום — 3 פעולות דחופות, 5 מטופלים דורשים תשומת לב.">
-      {/* 5 stat cards */}
+      {/* 5 stat cards — stagger animate */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-        <StatCard icon={Users} label="אזרחים בפיילוט" value={stats.totalClients} sub={`${stats.activeClients} פעילים · ירושלים`} tone="primary" />
-        <StatCard icon={AlertTriangle} label="בסיכון" value={stats.atRisk} sub="דורשים התערבות" tone="destructive" />
-        <StatCard icon={Calendar} label="הזמנות" value={stats.bookings} sub={`${stats.bookingsCompleted} הושלמו`} tone="info" />
-        <StatCard icon={Bell} label="התראות" value={stats.alertsTotal} sub={`${stats.alertsUnread} חדשות`} tone="warning" />
-        <StatCard icon={Wallet} label="ניצול סל" value={`${stats.walletUtilization}%`} sub={`יעד: ${stats.walletTarget}%`} tone="success" />
+        {STAT_CARDS(stats).map((card, i) => (
+          <motion.div
+            key={card.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: i * 0.07 }}
+          >
+            <StatCard {...card} />
+          </motion.div>
+        ))}
       </div>
 
       {/* 3 + 2 grid */}

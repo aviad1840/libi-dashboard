@@ -1,0 +1,47 @@
+{
+  "_doc": "תדירות מונעת-ערך. curator מעדכן שבועית. אלה 3 חוקים בלבד - לא מנוע אורקסטרציה.",
+  "_rules": {
+    "downshift": "סוכן ללא ממצא מועיל ב-3 ריצות רצופות - הורד רמה אחת. cooldown 14 יום לפני הורדה נוספת",
+    "upshift": "2 ממצאי !! ב-7 ימים - העלה רמה אחת. דורש אישור אביעד",
+    "deadline_boost": "דדליink פעיל מתחת ל-14 יום ב-calendar - radar עולה לרמה גבוהה יותר עד המועד, ואז חוזר אוטומטית",
+    "hysteresis": "אין שינוי תדירות פעמיים באותו שבוע. אין שינוי בשבועיים הראשונים בכלל - אין די נתונים"
+  },
+  "levels": {
+    "high": "5-6/שבוע",
+    "normal": "2-3/שבוע",
+    "low": "1/שבוע",
+    "dormant": "1/שבועיים"
+  },
+  "agents": {
+    "scout": {
+      "level": "high",
+      "since": null,
+      "runs_without_useful": 0
+    },
+    "radar": {
+      "level": "normal",
+      "since": null,
+      "runs_without_useful": 0
+    },
+    "advocate": {
+      "level": "low",
+      "since": null,
+      "runs_without_useful": 0
+    },
+    "rival": {
+      "level": "low",
+      "since": null,
+      "runs_without_useful": 0
+    },
+    "relations": {
+      "level": "low",
+      "since": null,
+      "runs_without_useful": 0
+    },
+    "chief-of-staff": {
+      "level": "high",
+      "since": null,
+      "runs_without_useful": 0
+    }
+  }
+}

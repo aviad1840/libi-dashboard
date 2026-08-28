@@ -1,0 +1,7 @@
+.DS_Store
+*.tmp
+inbox/*
+!inbox/.gitkeep
+!inbox/README.md
+!inbox/processed/.gitkeep
+!inbox/unclear/.gitkeep

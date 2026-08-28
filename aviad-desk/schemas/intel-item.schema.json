@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Intel item",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "summary",
+    "classification",
+    "source_url",
+    "relevance",
+    "test_question",
+    "action",
+    "tier",
+    "novelty"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^I-\\d{8}-\\d{2}$"
+    },
+    "type": {
+      "enum": [
+        "supporting-evidence",
+        "counter-evidence",
+        "gov-move",
+        "player-move",
+        "opportunity",
+        "person",
+        "risk"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 400
+    },
+    "classification": {
+      "enum": [
+        "FACT",
+        "CLAIM",
+        "INFERENCE"
+      ]
+    },
+    "evidence_level": {
+      "enum": [
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6"
+      ]
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "source_date": {
+      "type": "string"
+    },
+    "relevance": {
+      "type": "string"
+    },
+    "test_question": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(OQ|C|P|AP)\\d+$"
+      },
+      "minItems": 1,
+      "description": "חובה. פריט שלא נושא תיוג לא נכנס לדוח"
+    },
+    "action": {
+      "enum": [
+        "none",
+        "read",
+        "include-in-doc",
+        "contact",
+        "urgent"
+      ]
+    },
+    "unverified": {
+      "type": "boolean",
+      "description": "true = מסומן [לאמת]"
+    },
+    "tier": {
+      "enum": [
+        "L0",
+        "L1",
+        "L2"
+      ],
+      "description": "רמת העבודה שהושקעה"
+    },
+    "novelty": {
+      "enum": [
+        "new",
+        "material-change"
+      ],
+      "description": "חובה. פריט שאינו חדש ואין בו שינוי מהותי - לא נכנס לדוח"
+    },
+    "event_id": {
+      "type": "string",
+      "description": "מפתח דדופ ב-state/seen.json"
+    },
+    "escalation_trigger": {
+      "type": "string",
+      "description": "חובה כאשר tier=L2"
+    }
+  }
+}

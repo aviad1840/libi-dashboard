@@ -17,18 +17,24 @@ agents/      הגדרת תפקיד ניטרלית. לא מזכירה ספק, ש�
 runners/     שכבת ההתאמה לפלטפורמה
 routines/    הנחיית הרוטין לכל עובד. מקור האמת - ערוך כאן, ואז עדכן את הרוטין
 RUN.md       פרוטוקול הריצה. שבעה שלבים, בסדר קבוע
-scripts/     desk.sh - אתחול, אכיפת בידוד כתיבה, commit ו-push
+GATEWAY.md   פרוטוקול שכבת הממשק (טלגרם/מייל) - gateway אינו סוכן, ראה שם
+scripts/     desk.sh - אתחול, אכיפת בידוד כתיבה, commit, push, ו-fail (רישום כשל)
+             telegram_send.py / telegram_fetch.py / email_notify.py / agent_status.py - שכבת הממשק בלבד
 state/       seen.json (דדופ) · tempo.json (תדירות) · sources.json (ROI) · runs.jsonl (יומן ריצות)
+             telegram_offset.txt/telegram_audit.jsonl/pending_approvals.json - gateway בלבד
 ```
 
 ### הכללים שלא נשברים
 
 - **קובץ ב-`agents/` לעולם לא מזכיר `git`, שעה, נתיב מוחלט, שם ספק או שם מודל.** כל זה יושב ב-`runners/`
 - **סוכן כותב אך ורק ל-namespace שלו.** חריג יחיד: `curator`. `desk.sh` אוכף
-- **אפס תקשורת יוצאת מכל עובד.** לא מייל, לא הודעה, לא טופס, לא הרשמה
+- **אפס תקשורת יוצאת לצד שלישי מכל עובד.** לא מייל, לא הודעה, לא טופס, לא הרשמה, לא לאדם אחר.
+  היוצא מהכלל היחיד: הודעה לאביעד עצמו דרך `config/telegram.json`/`EMAIL_TO` - ראה `RUN.md` 7.5
 - **אף עובד לא דוחף ל-`main`.** התוצרים נכנסים דרך PR מ-`desk/log`
 - **כל טענה נושאת דירוג ראיה E0-E6.** אין ראיה - כותבים "לא נמצאה ראיה", לא ממציאים
 - **מקף רגיל בלבד. לעולם לא em dash**
+- **`gateway` אינו agent.** אין לו `agents/gateway.md`, הוא שכבת ניתוב בלבד - ראה `GATEWAY.md`.
+  סודות (`TELEGRAM_BOT_TOKEN`, `EMAIL_SMTP_*`) לעולם לא ב-git - ראה `.env.example`
 
 ### לפני שאתה נוגע ב-`aviad-desk/`
 

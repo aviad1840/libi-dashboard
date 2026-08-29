@@ -28,7 +28,8 @@ bash aviad-desk/scripts/desk.sh start scout
 bash aviad-desk/scripts/desk.sh finish scout --items N --l0 N --l1 N --l2 N --note "שורה אחת"
 ```
 
-ודא שקיים PR טיוטה פתוח מ-`desk/log` ל-`main`. אין - פתח אחד בכותרת `aviad-desk: תוצרי עובדים`.
+**אל תפתח PR ואל תנסה.** ה-PR מ-`desk/log` ל-`main` פתוח באופן קבוע, וכל push נכנס אליו מעצמו.
+לסשן של רוטין אין כלי GitHub. `desk.sh finish` הסתיים בהצלחה = סיימת.
 
 ## שלב 5 - הודעת סיכום
 

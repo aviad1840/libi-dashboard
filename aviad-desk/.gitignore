@@ -1,7 +1,10 @@
 .DS_Store
 *.tmp
+__pycache__/
+*.pyc
 inbox/*
 !inbox/.gitkeep
 !inbox/README.md
 !inbox/processed/.gitkeep
 !inbox/unclear/.gitkeep
+!inbox/telegram/

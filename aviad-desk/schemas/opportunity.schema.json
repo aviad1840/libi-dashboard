@@ -8,6 +8,9 @@
     "type",
     "deadline",
     "relevance",
+    "novelty",
+    "actionability",
+    "confidence",
     "status"
   ],
   "properties": {
@@ -50,6 +53,18 @@
     },
     "why_relevant": {
       "type": "string"
+    },
+    "novelty": {
+      "enum": ["new", "material-change"],
+      "description": "חובה. הזדמנות שאינה חדשה ואין בה שינוי מהותי - לא נכנסת (זהה לכלל ב-intel-item)"
+    },
+    "actionability": {
+      "enum": ["low", "medium", "high"],
+      "description": "חובה. עד כמה ניתן לפעול על זה עכשיו"
+    },
+    "confidence": {
+      "enum": ["low", "medium", "high"],
+      "description": "חובה. ביטחון הסוכן בשיפוט הרלוונטיות/actionability"
     },
     "effort_estimate": {
       "enum": [

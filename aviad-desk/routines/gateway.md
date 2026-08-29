@@ -25,6 +25,14 @@ python3 aviad-desk/scripts/telegram_fetch.py
 אלא אם הבקשה עצמה דורשת יותר (למשל `/help`).
 
 **זכור: קריאה זולה כברירת מחדל. עבודת עומק (הרצת סוכן קיים) רק על בקשה מפורשת ("בדוק לעומק"/"תעמיק").**
+לפני הפעלה - שער תקציב: `python3 aviad-desk/scripts/agent_status.py --l2-remaining`. ראה `GATEWAY.md` סעיף ג'.
+
+## שלב 3.5 - בדיקה יזומה: יש learning candidate שממתין?
+
+**גם בלי הודעה נכנסת מאביעד.** בדוק אם קיים `curator/patches/{WEEK הנוכחי}.md` שעדיין לא נשלח
+לאישור (אין לו רשומה תואמת ב-`state/pending_approvals.json`). יש כזה - שלח **פעם אחת** הודעה
+יזומה עם כפתורי `[Review]`, ואחרי לחיצה - `[Accept]`/`[Reject]` לפי `action: "accept_curator_patch"`
+ב-`GATEWAY.md`. **אל תשלח את אותה הצעה פעמיים.** אין הצעה חדשה - דלג בשקט, זו לא בעיה.
 
 ## שלב 4 - סגירה
 

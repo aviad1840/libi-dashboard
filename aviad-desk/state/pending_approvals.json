@@ -1,7 +1,7 @@
 {
   "_doc": "בקשות לפעולה חיצונית שממתינות לאישור מפורש דרך טלגרם. gateway בלבד כותב לכאן.",
   "_rules": {
-    "allowed_actions": ["send_email_digest"],
+    "allowed_actions": ["send_email_digest", "override_l2_budget", "accept_curator_patch"],
     "note": "כל action אחר לא נתמך ולא מבוצע, גם אם אושר בטעות - ראה GATEWAY.md"
   },
   "items": []

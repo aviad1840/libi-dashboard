@@ -18,8 +18,8 @@ runners/     שכבת ההתאמה לפלטפורמה
 routines/    הנחיית הרוטין לכל עובד. מקור האמת - ערוך כאן, ואז עדכן את הרוטין
 RUN.md       פרוטוקול הריצה. שבעה שלבים, בסדר קבוע
 GATEWAY.md   פרוטוקול שכבת הממשק (טלגרם/מייל) - gateway אינו סוכן, ראה שם
-scripts/     desk.sh - אתחול, אכיפת בידוד כתיבה, commit ו-push
-             telegram_send.py / telegram_fetch.py / email_notify.py - שכבת הממשק בלבד
+scripts/     desk.sh - אתחול, אכיפת בידוד כתיבה, commit, push, ו-fail (רישום כשל)
+             telegram_send.py / telegram_fetch.py / email_notify.py / agent_status.py - שכבת הממשק בלבד
 state/       seen.json (דדופ) · tempo.json (תדירות) · sources.json (ROI) · runs.jsonl (יומן ריצות)
              telegram_offset.txt/telegram_audit.jsonl/pending_approvals.json - gateway בלבד
 ```

@@ -177,13 +177,13 @@ cmd_finish() {
     cat /tmp/desk-validate.txt >&2; die "validate.py נכשל. לא דוחפים"
   fi
 
-  # רישום הריצה. זה המקור שממנו curator מחשב עלות לממצא מועיל
+  # רישום הריצה. זה המקור שממנו curator מחשב עלות לממצא מועיל, וגם /agents ו-/status ב-gateway
   python3 - "$agent" "${items:-0}" "${l0:-0}" "${l1:-0}" "${l2:-0}" "$note" <<'PY'
 import json,sys,datetime,pathlib
 p = pathlib.Path("aviad-desk/state/runs.jsonl"); p.parent.mkdir(parents=True, exist_ok=True)
 rec = {"date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
        "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
-       "agent": sys.argv[1], "items": int(sys.argv[2] or 0),
+       "agent": sys.argv[1], "status": "ok", "items": int(sys.argv[2] or 0),
        "l0": int(sys.argv[3] or 0), "l1": int(sys.argv[4] or 0), "l2": int(sys.argv[5] or 0),
        "note": sys.argv[6][:200]}
 with p.open("a", encoding="utf-8") as fh: fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -213,9 +213,53 @@ ${note}" || die "commit נכשל"
   info "נדחף ל-$LOG_BRANCH"
 }
 
+# ------------------------------------------------------------------------ fail
+# רישום כשל - best-effort לחלוטין. לעולם לא חוסם: הסוכן/gateway חייב להיות מסוגל
+# להודיע לאביעד בטלגרם גם אם רישום ה-audit עצמו נכשל. ראה RUN.md - פורמט כשל.
+cmd_fail() {
+  local agent="$1"; shift
+  local reason=""
+  while [ $# -gt 0 ]; do
+    case "$1" in --reason) reason="$2"; shift 2;; *) shift;; esac
+  done
+
+  local rec
+  rec="$(python3 - "$agent" "$reason" <<'PY'
+import json,sys,datetime
+print(json.dumps({
+  "date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
+  "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+  "agent": sys.argv[1], "status": "failed", "reason": sys.argv[2][:300],
+}, ensure_ascii=False))
+PY
+)"
+
+  # ניסיון למקם על ענף התוצרים - לא חוסם אם נכשל, רק מדלג על הכתיבה ל-git
+  if git rev-parse -q --verify "origin/$LOG_BRANCH" >/dev/null 2>&1; then
+    git checkout -f -B "$LOG_BRANCH" "origin/$LOG_BRANCH" --quiet 2>/dev/null
+  fi
+
+  mkdir -p "$DESK_DIR/state" 2>/dev/null
+  echo "$rec" >> "$DESK_DIR/state/runs.jsonl" 2>/dev/null
+
+  if git add -- "$DESK_DIR/state/runs.jsonl" 2>/dev/null \
+     && ! git diff --cached --quiet 2>/dev/null \
+     && git commit -q -m "$agent: כשל $(date -u +%Y-%m-%d) - ${reason:0:80}" 2>/dev/null; then
+    local attempt=0 delay=2
+    until git push -u origin "$LOG_BRANCH" --quiet 2>/dev/null; do
+      attempt=$((attempt+1)); [ "$attempt" -ge 4 ] && break
+      sleep "$delay"; delay=$((delay*2))
+    done
+  fi
+
+  echo "$rec"
+  return 0
+}
+
 case "${1:-}" in
   start)  shift; cmd_start  "${1:?חסר שם סוכן}" ;;
   finish) shift; cmd_finish "${1:?חסר שם סוכן}" "${@:2}" ;;
   check)  shift; cmd_check  "${1:?חסר שם סוכן}" ;;
-  *) echo "שימוש: desk.sh {start|finish|check} <agent>"; exit 2 ;;
+  fail)   shift; cmd_fail   "${1:?חסר שם סוכן}" "${@:2}" ;;
+  *) echo "שימוש: desk.sh {start|finish|check|fail} <agent>"; exit 2 ;;
 esac

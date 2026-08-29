@@ -36,12 +36,15 @@ allowed_paths() {
     auditor)        echo "aviad-desk/audit" ;;
     producer)       echo "aviad-desk/drafts" ;;
     amplifier)      echo "aviad-desk/amplify" ;;
+    gateway)        echo "aviad-desk/inbox aviad-desk/config/telegram.json aviad-desk/state/telegram_offset.txt aviad-desk/state/telegram_audit.jsonl aviad-desk/state/pending_approvals.json aviad-desk/feedback/queue" ;;
     *)              die "סוכן לא מוכר: $1" ;;
   esac
 }
 
 # קבצי ההקשר שהסוכן רשאי לטעון, מתוך ה-frontmatter שלו. מדיניות: context/LOADING.md
+# gateway אינו סוכן (GATEWAY.md), אין לו agents/*.md ואין לו רשימת context קבועה - מדלג
 context_files() {
+  [ "$1" = "gateway" ] && return 0
   local f="$DESK_DIR/agents/$1.md"
   [ -f "$f" ] || die "אין הגדרת סוכן: agents/$1.md"
   awk '/^---$/{c++; next} c==1' "$f" | grep -E '^context_(base|role):' \
@@ -83,6 +86,27 @@ cmd_start() {
     fi
   else
     git checkout -f -B "$LOG_BRANCH" "$sys" --quiet || die "checkout ל-$LOG_BRANCH נכשל"
+  fi
+
+  if [ "$agent" = "gateway" ]; then
+    cat <<EOF
+
+=========================== בריף ריצה ===========================
+סוכן:            gateway (שכבת ממשק - אינו agent תוכן, ראה GATEWAY.md)
+ענף מערכת:       $sys
+ענף תוצרים:      $LOG_BRANCH
+תאריך {DATE}:    $(date -u +%Y-%m-%d)
+
+קרא GATEWAY.md ופעל לפיו. אין רשימת context קבועה - זו שכבת ניתוב, לא סוכן תוכן.
+
+מותר לכתוב אך ורק ל:
+$(allowed_paths "$agent" | tr ' ' '\n' | sed 's/^/  - /')
+
+בעבודת עומק על סוכן קיים (למשל advocate) - קרא/כתוב דרך desk.sh start/finish <agent>
+בנפרד, עם הבידוד והתקרות של אותו סוכן עצמו.
+=================================================================
+EOF
+    return 0
   fi
 
   local ns; ns="$(grep -A1 "^  - id: $agent$" "$DESK_DIR/manifest.yaml" | grep namespace | awk '{print $2}')"

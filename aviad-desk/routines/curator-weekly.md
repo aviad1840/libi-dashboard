@@ -17,7 +17,14 @@ bash aviad-desk/scripts/desk.sh start curator
 
 **אתה לא מייצר תוכן. אתה משפר את המערכת על בסיס ראיות.**
 
-1. אסוף אותות מ-`aviad-desk/feedback/`, משינויי סטטוס ב-`radar/open.json`, ומ-**`state/runs.jsonl`** - שם רשומה כל ריצה.
+1. אסוף אותות מ-`aviad-desk/feedback/` (כולל `feedback/queue/*.jsonl` - פידבק גולמי שנכנס דרך
+   ה-gateway בטלגרם, מסווג ל-six קטגוריות: `output_feedback`/`correction`/`preference`/
+   `context_change_request`/`decision_change`/`temp_instruction`. **קפל אותו לתוך אותם מדדים כמו
+   הפידבק החודשי הרגיל - אל תתייחס אליו כמקור נפרד**), משינויי סטטוס ב-`radar/open.json`,
+   ומ-**`state/runs.jsonl`** - שם רשומה כל ריצה.
+   **`context_change_request` ו-`decision_change` מהתור מקבלים טיפול נפרד:** אלה בקשות מפורשות
+   של אביעד לשנות context/decision, לא איתות שגרתי. סמן אותן בבירור ב-`patches/{WEEK}.md` -
+   עדיין הצעה בלבד, **אתה לא מחיל אותן** - אבל הבלטה גבוהה יותר מפידבק אימוג'י רגיל.
 2. חשב ל-`aviad-desk/curator/metrics.md`, מגמת 8 שבועות: Precision = `(+ ו-!!) / סך הפריטים` |
    **עלות לממצא מועיל** ו**עלות לממצא חדש** - אלה המדדים הראשיים | דקות אנוש לממצא מועיל | יחס L0/L1/L2.
    **המערכת לא נמדדת על מספר ריצות, פריטים או טוקנים.**

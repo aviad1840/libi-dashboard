@@ -16,6 +16,28 @@
 | advocate - תיק ראיות | `trig_01D3qZy625L3T7G2BPkHQVUh` | `0 4 * * 2` | 07:00 שלישי | מייל | **מושהה - שלב 3** |
 | rival - מפת שחקנים | `trig_01UViTw7qqyFfuqyhB74fkic` | `0 4 * * 3` | 07:00 רביעי | מייל | **מושהה - שלב 4** |
 | relations - מפת כוח | `trig_01EMxSuiX9MzUrCRScRaKfNB` | `0 4 * * 4` | 07:00 חמישי | מייל | **מושהה - שלב 4** |
+| gateway - טלגרם/מייל | `trig_01AiasrTtQ23dpM27eky2ESt` | `6 * * * *` | כל שעה, ב-06 דקות | - | **מושהה - ראה למטה** |
+
+**עמודת "התראה" בטבלה למעלה היא ה-push/email של Claude Code עצמו** (התראה שסשן הסתיים) -
+**לא** ערוץ Telegram/Email של aviad-desk. שני מנגנונים נפרדים, מכוונים במקומות שונים.
+תוכן בפועל (בריף, דגלים, דוחות שבועיים) יוצא דרך `scripts/telegram_send.py` / `scripts/email_notify.py`,
+מוגדר ב-`RUN.md` סעיף 7.5 ותלוי ב-`TELEGRAM_BOT_TOKEN` / `EMAIL_SMTP_*` שהוגדרו.
+
+## gateway - למה מושהה, ואיך מפעילים
+
+`gateway` נוצר אך **מושהה עד שיש `TELEGRAM_BOT_TOKEN` אמיתי** - בלי טוקן הוא רק בודק ויוצא כל שעה,
+בזבוז מכסה בלי תועלת. סדר ההפעלה:
+
+1. צור בוט מול `@BotFather` בטלגרם (`/newbot`), קבל טוקן
+2. הגדר `TELEGRAM_BOT_TOKEN` ו-`TELEGRAM_SETUP_CODE` (מחרוזת סוד לבחירתך) כמשתני סביבה ברמת
+   ה-Claude Code environment - לא בקוד, לא ב-`.env` שנדחף. ראה `.env.example` לרשימה המלאה
+3. הפעל את הרוטין (enable ב-trigger `trig_01AiasrTtQ23dpM27eky2ESt`)
+4. שלח לבוט `/start <TELEGRAM_SETUP_CODE>` - זה מקשר את ה-`chat_id` שלך ב-`config/telegram.json`.
+   מרגע זה, כל הודעה משולח אחר תידחה בשקט - ראה `GATEWAY.md`
+
+**מגבלת זמן אמת:** `gateway` בודק הודעות **פעם בשעה בלבד** - זה הפער המקסימלי שרוטין יכול לירות בו
+בפלטפורמה הזו, נבדק ישירות (ניסיון ליצור טריגר כל 5 דקות נדחה: "minimum interval is 1 hour").
+תגובה תוך שניות דורשת webhook חיצוני שרץ תמיד, מחוץ לריפו - לא נבנה כאן. ראה `GATEWAY.md`.
 
 ## למה שלושה מושהים
 

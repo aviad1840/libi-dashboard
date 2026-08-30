@@ -49,6 +49,7 @@
 | advocate | claims, proof-points, doctrine, operating-model, sources |
 | auditor | claims, proof-points, decision-style, voice |
 | chief-of-staff | portfolio, people, calendar, anti-patterns, open-questions |
+| amplifier | voice, proof-points, channels, positioning |
 | curator | הכל |
 
 **אל תטען קבצים מעבר לרשימה.** כל קובץ עולה מכסה בכל ריצה.

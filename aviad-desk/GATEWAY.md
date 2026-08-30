@@ -103,6 +103,23 @@ bash aviad-desk/scripts/desk.sh start advocate      # namespace ותקציב ש�
 bash aviad-desk/scripts/desk.sh finish advocate --note "..."
 ```
 
+#### ג.2 בקשת תוצר - מפעיל producer (ואולי amplifier אחריו)
+
+טריגר: "תכין תוצר על X", "תכין לי חומר ל-Y", "תפיק את זה". **X/Y חייב להיות מפורש** - נושא,
+טענה או הזדמנות שכבר קיימת ב-`intel/`/`advocate/`/`radar/open.json`. עמום מדי ("תכין לי משהו") -
+בקש פירוט, אל תנחש.
+
+**אין שער תקציב L2 כאן** - producer הוא cost_class B, לא C, ואינו כרוך בגלישה. הפעל ישירות:
+
+```bash
+bash aviad-desk/scripts/desk.sh start producer
+# ... בצע לפי routines/producer.md + agents/producer.md, {TOPIC} = X ...
+bash aviad-desk/scripts/desk.sh finish producer --note "..."
+```
+
+producer עצמו מפעיל Auditor (חובה) ולעיתים Amplifier (רק על אישור Auditor) - ראה `routines/producer.md`.
+ענה מיד "בטיפול" - אל תבטיח מהירות, זו ריצה עם שלוש שכבות אפשריות (producer→auditor→amplifier).
+
 ענה מיד "בטיפול, התוצאה המלאה תיכנס ל-git ותסוכם כאן" - **אל תבטיח מהירות שאין**.
 
 #### ג.5 כפתורי הבריף היומי (`callback_data: opt:*`)
@@ -117,7 +134,7 @@ bash aviad-desk/scripts/desk.sh finish advocate --note "..."
 | `opt:project` | תוכן `/projects` (קריאה זולה) |
 | `opt:people` | תוכן `/people` (קריאה זולה) |
 | `opt:claims` | תוכן `/claims` (קריאה זולה) |
-| `opt:content` | "אין תוכן פעיל כרגע - producer/amplifier על-פי-דרישה בלבד, שלב 3 טרם הופעל" |
+| `opt:content` | "אין הזדמנות/ממצא ממתין להפוך לתוצר כרגע. יש כזה? כתוב 'תכין תוצר על X' - זה מפעיל producer" |
 | `opt:everything` | תוכן `/status` (קריאה זולה) |
 
 #### ד. פידבק
@@ -136,6 +153,17 @@ bash aviad-desk/scripts/desk.sh finish advocate --note "..."
 **אסור לך לשנות שום קובץ ב-`context/` ישירות.** curator הוא היחיד שמכייל, ורק עם ראיה חוזרת -
 **אסור להסיק העדפה קבועה מאירוע יחיד.** זה חל גם על "שים יותר דגש על X" - זה נכנס לתור כ-`preference`,
 לא הופך את `filter.md` באותו רגע.
+
+#### ד.5 פידבק בכפתור (`callback_data: fb:up:<id>` / `fb:down:<id>`)
+
+כשממצא מוצג בטלגרם עם כפתורי 👍/👎 (ראה `routines/brief-daily.md` - chief-of-staff מצרף אותם
+לממצאים המשמעותיים ביותר), לחיצה מגיעה כ-`callback_query` עם `data` בפורמט הזה. `<id>` הוא
+מזהה הפריט המדויק (`I-YYYYMMDD-NN`, `op-YYYY-NNN` וכו').
+
+**זה מסלול מקוצר לאותו תור פידבק, לא מנגנון נפרד:** כתוב שורה ל-`feedback/queue/<תאריך>.jsonl`
+בדיוק כמו בסעיף ד' - `feedback_type: "output_feedback"`, `raw_feedback: "👍"` או `"👎"`,
+`artifact: <id>`, `confidence: "high"` (לחיצת כפתור היא חד-משמעית, אין ספק בסיווג).
+ענה ל-callback עם `answerCallbackQuery` (טקסט קצר: "תודה, נרשם") כדי שהכפתור לא יישאר "טוען".
 
 #### ה. קובץ / קישור / הודעה מועברת
 

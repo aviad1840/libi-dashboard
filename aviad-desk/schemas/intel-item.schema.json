@@ -9,10 +9,13 @@
     "classification",
     "source_url",
     "relevance",
+    "relevance_score",
     "test_question",
     "action",
     "tier",
-    "novelty"
+    "novelty",
+    "actionability",
+    "confidence"
   ],
   "properties": {
     "id": {
@@ -59,7 +62,20 @@
       "type": "string"
     },
     "relevance": {
-      "type": "string"
+      "type": "string",
+      "description": "משפט אחד - למה זה נוגע לאביעד, מסלול או טענה ספציפיים"
+    },
+    "relevance_score": {
+      "enum": ["low", "medium", "high"],
+      "description": "חובה. דירוג רלוונטיות - לא רק הסבר טקסטואלי"
+    },
+    "actionability": {
+      "enum": ["low", "medium", "high"],
+      "description": "חובה. עד כמה ניתן לפעול על הפריט הזה עכשיו, לא רק לקרוא"
+    },
+    "confidence": {
+      "enum": ["low", "medium", "high"],
+      "description": "חובה. ביטחון הסוכן בשיפוט relevance/actionability שלו. שונה מ-evidence_level - זה דירוג הראיה עצמה, זה דירוג השיפוט"
     },
     "test_question": {
       "type": "array",

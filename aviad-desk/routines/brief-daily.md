@@ -21,6 +21,8 @@ bash aviad-desk/scripts/desk.sh start chief-of-staff
    **`inbox/` בענן מכיל רק מה שאביעד דחף במפורש. ריק זה תקין** - אל תמציא סטטוס, המשך לסעיף 2.
 2. קרא את מה שהעובדים האחרים ייצרו מאז אתמול: `intel/`, `radar/open.json`, `landscape/`, `advocate/`, `people/`.
    **קרא רק קבצים שהשתנו ב-48 שעות האחרונות** (`git log --since=48.hours --name-only`). אל תסרוק את כל ההיסטוריה.
+   **דרג ובחר** לפי `agents/chief-of-staff.md` סעיף 5 - `relevance_score × actionability × confidence`.
+   קח 2-3 עליונים בלבד. **זה מה שיוצג כ"מה לעשות" - לא רשימה מלאה של כל מה שקרה.**
 3. עדכן `aviad-desk/desk/state.json` לפי `schemas/portfolio-state.schema.json`.
    מסלול שלא עודכן - `"לא עודכן מאז DD/MM"`. **אל תמציא סטטוס.**
 4. כתוב `aviad-desk/desk/brief-{DATE}.md` בסדר הזה:
@@ -48,13 +50,14 @@ bash aviad-desk/scripts/desk.sh finish chief-of-staff --items N --note "שורה
 🌅 AI DESK - MORNING BRIEF
 
 1. 🔴 דורש ממני היום
-[מה מהבריף שכתבת בשלב 4 דורש החלטה שלי היום - או "אין"]
+[פריט ה-headline משלב 2 (`relevance_score=high` + `actionability≠low`, עבר בדיקת מקור) -
+נוסח כפעולה ("תחליט אם X" / "תדחוף מול Y"), לא כדיווח ("Z קרה"). אין כזה - "אין"]
 
 2. 🟠 השתנה מאז אתמול
 [הפרש בלבד - מה שונה מהריצה הקודמת, לא סיכום מצב. מ-`git log --since=24.hours` על intel/radar/people/landscape/advocate]
 
-3. 🟢 ממצאים חדשים
-[מ-intel/ שנכתב מאז אתמול - עד 3 שורות]
+3. 🟢 ממצאים חדשים - המלצת פעולה, לא רשימת פעילות
+[2-3 הפריטים המדורגים משלב 2, כל אחד כ"מה לעשות עם זה" בשורה אחת - לא "X מצא Y". ריק - "אין מועמד שעבר את הסף"]
 
 4. 👥 אנשים/קשרים שדורשים תשומת לב
 [מ-people/weekly-*.md אם קיים - סף התקררות שחצה, או "אין"]
@@ -75,5 +78,17 @@ bash aviad-desk/scripts/desk.sh finish chief-of-staff --items N --note "שורה
 `Deep Research` (`callback_data: opt:deep_research`) | `Project` (`opt:project`) |
 `People` (`opt:people`) | `Claims` (`opt:claims`) | `Content` (`opt:content`) | `Everything` (`opt:everything`).
 לחיצה נענית ב-gateway בירייה הבאה (ראה `GATEWAY.md`) - **אתה לא מחכה לתגובה, זה rotation אחר.**
+
+## שלב 5.5 - הודעת פידבק לכל פריט שנבחר
+
+**אחרי הבריף הראשי, שלח הודעה קצרה נפרדת לכל אחד מ-2-3 הפריטים שבחרת בשלב 2** (לא לכל
+הממצאים - רק לאלה שהוצגו). כל הודעה: כותרת הפריט + מזהה (`I-YYYYMMDD-NN` וכו') + מקלדת:
+
+```
+--keyboard '{"inline_keyboard":[[{"text":"👍","callback_data":"fb:up:<id>"},{"text":"👎","callback_data":"fb:down:<id>"}]]}'
+```
+
+זה מה שממלא את `feedback/queue/` בפידבק אמיתי, לא רק טקסט חופשי - ראה `GATEWAY.md` ד.5.
+**אל תשלח יותר מ-3 הודעות פידבק ביום** - זה בדיוק הרעש שהמערכת אמורה למנוע.
 
 **אם TELEGRAM_BOT_TOKEN לא מוגדר** - הסקריפט מדלג בשקט, זה תקין. הבריף עדיין נכתב ל-git כרגיל.

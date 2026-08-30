@@ -17,6 +17,9 @@
 | rival - מפת שחקנים | `trig_01UViTw7qqyFfuqyhB74fkic` | `0 4 * * 3` | 07:00 רביעי | מייל | **מושהה - שלב 4** |
 | relations - מפת כוח | `trig_01EMxSuiX9MzUrCRScRaKfNB` | `0 4 * * 4` | 07:00 חמישי | מייל | **מושהה - שלב 4** |
 | gateway - טלגרם/מייל | `trig_01AiasrTtQ23dpM27eky2ESt` | `6 * * * *` | כל שעה, ב-06 דקות | - | **מושהה - ראה למטה** |
+| auditor - בודק | אין Routine | on-demand | - | - | **פעיל, inline בלבד** - מופעל מתוך producer או gateway |
+| producer - מפיק | אין Routine | on-demand | - | - | **פעיל, inline בלבד** - מופעל מתוך gateway ("תכין תוצר על X") |
+| amplifier - מגבר | אין Routine | event-driven | - | - | **פעיל, inline בלבד** - מופעל מתוך producer, רק אחרי אישור auditor |
 
 **עמודת "התראה" בטבלה למעלה היא ה-push/email של Claude Code עצמו** (התראה שסשן הסתיים) -
 **לא** ערוץ Telegram/Email של aviad-desk. שני מנגנונים נפרדים, מכוונים במקומות שונים.

@@ -44,7 +44,14 @@ bash aviad-desk/scripts/desk.sh finish chief-of-staff --items N --note "שורה
 **זה לא דוח נוסף - זו ההודעה שאביעד קורא בפועל בבוקר.** קצר. אם אין משהו משמעותי בסעיף -
 כתוב "אין" ועבור הלאה. **אסור לייצר רעש רק כדי למלא סעיף.**
 
-שלח דרך `scripts/telegram_send.py` בפורמט הזה בדיוק, עם כותרות האימוג'י:
+**אתה לא שולח בעצמך.** אתה מתייק לתור היוצא, ו-gateway שולח בירייה הקרובה (עד שעה):
+
+```bash
+python3 aviad-desk/scripts/outbox_put.py chief-of-staff "<הבריף המלא>" --keyboard '<json>'
+```
+
+זה עובד גם בלי טוקן ובלי גישת רשת בסביבה שלך - זו בדיוק המטרה. הבריף נכתב ב-03:15
+ומגיע לטלפון עד 04:06. הפורמט, בדיוק, עם כותרות האימוג'י:
 
 ```
 🌅 AI DESK - MORNING BRIEF
@@ -74,15 +81,16 @@ bash aviad-desk/scripts/desk.sh finish chief-of-staff --items N --note "שורה
 מה תרצה שאבדוק?
 ```
 
-בסוף ההודעה - מקלדת inline עם שש אפשרויות, דרך `--keyboard` ב-`telegram_send.py`:
+בסוף ההודעה - מקלדת inline עם שש אפשרויות, דרך `--keyboard` ב-`outbox_put.py`:
 `Deep Research` (`callback_data: opt:deep_research`) | `Project` (`opt:project`) |
 `People` (`opt:people`) | `Claims` (`opt:claims`) | `Content` (`opt:content`) | `Everything` (`opt:everything`).
 לחיצה נענית ב-gateway בירייה הבאה (ראה `GATEWAY.md`) - **אתה לא מחכה לתגובה, זה rotation אחר.**
 
 ## שלב 5.5 - הודעת פידבק לכל פריט שנבחר
 
-**אחרי הבריף הראשי, שלח הודעה קצרה נפרדת לכל אחד מ-2-3 הפריטים שבחרת בשלב 2** (לא לכל
-הממצאים - רק לאלה שהוצגו). כל הודעה: כותרת הפריט + מזהה (`I-YYYYMMDD-NN` וכו') + מקלדת:
+**אחרי הבריף הראשי, תייק הודעה קצרה נפרדת לכל אחד מ-2-3 הפריטים שבחרת בשלב 2** (לא לכל
+הממצאים - רק לאלה שהוצגו), באותו `outbox_put.py chief-of-staff`.
+כל הודעה: כותרת הפריט + מזהה (`I-YYYYMMDD-NN` וכו') + מקלדת:
 
 ```
 --keyboard '{"inline_keyboard":[[{"text":"👍","callback_data":"fb:up:<id>"},{"text":"👎","callback_data":"fb:down:<id>"}]]}'
@@ -91,4 +99,5 @@ bash aviad-desk/scripts/desk.sh finish chief-of-staff --items N --note "שורה
 זה מה שממלא את `feedback/queue/` בפידבק אמיתי, לא רק טקסט חופשי - ראה `GATEWAY.md` ד.5.
 **אל תשלח יותר מ-3 הודעות פידבק ביום** - זה בדיוק הרעש שהמערכת אמורה למנוע.
 
-**אם TELEGRAM_BOT_TOKEN לא מוגדר** - הסקריפט מדלג בשקט, זה תקין. הבריף עדיין נכתב ל-git כרגיל.
+**אין לך טוקן ואתה לא צריך אחד.** `outbox_put.py` רק מתייק קובץ. אם ל-gateway אין טוקן
+בירייה שלו, ההודעה נשארת בתור ותישלח כשיהיה - שום דבר לא הולך לאיבוד.

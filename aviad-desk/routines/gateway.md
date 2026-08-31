@@ -27,6 +27,18 @@ python3 aviad-desk/scripts/telegram_fetch.py
 **זכור: קריאה זולה כברירת מחדל. עבודת עומק (הרצת סוכן קיים) רק על בקשה מפורשת ("בדוק לעומק"/"תעמיק").**
 לפני הפעלה - שער תקציב: `python3 aviad-desk/scripts/agent_status.py --l2-remaining`. ראה `GATEWAY.md` סעיף ג'.
 
+## שלב 3.2 - רוקן את התור היוצא. **חובה, גם בירייה ריקה, גם לפני כל דבר אחר.**
+
+```bash
+python3 aviad-desk/scripts/outbox_send.py
+```
+
+זה שולח את מה שסוכני התוכן תייקו מאז הירייה הקודמת - הבריף היומי, דגלים, דדליינים.
+**אתה הרכיב היחיד במערכת שמחובר לערוץ יציאה, ולכן זו האחריות שלך ואין לה תחליף.**
+
+הפלט הוא JSON. `"no_token": true` - ההודעות נשארו בתור, זה לא כשל, ציין זאת ב-`--note`.
+`failed` גדול מאפס - ציין את המספר ב-`--note`. אל תנסה לשלוח ידנית ואל תמחק קבצים מהתור.
+
 ## שלב 3.5 - בדיקה יזומה: יש learning candidate שממתין?
 
 **גם בלי הודעה נכנסת מאביעד.** בדוק אם קיים `curator/patches/{WEEK הנוכחי}.md` שעדיין לא נשלח
@@ -37,7 +49,7 @@ python3 aviad-desk/scripts/telegram_fetch.py
 ## שלב 4 - סגירה
 
 ```bash
-bash aviad-desk/scripts/desk.sh finish gateway --note "N הודעות, N פקודות, N פידבק, N חסומות"
+bash aviad-desk/scripts/desk.sh finish gateway --note "N נשלחו מהתור, N הודעות, N פקודות, N פידבק, N חסומות"
 ```
 
 **גם ירייה ריקה מסתיימת ב-finish** - זה מקדם offset ו-audit גם בלי הודעות חדשות.

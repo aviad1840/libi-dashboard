@@ -24,19 +24,21 @@ info() { echo "$*"; }
 
 # ------------------------------------------------------------------ namespaces
 # בידוד כתיבה. סוכן כותב אך ורק לנתיבים שלו. חריג יחיד: curator.
+# כל סוכן רשאי לתייק הודעה יוצאת ל-aviad-desk/outbox, אך ורק בקובץ ששמו מתחיל
+# במזהה שלו. gateway הוא היחיד ששולח בפועל ומזיז ל-outbox/sent. ראה cmd_check.
 allowed_paths() {
   case "$1" in
-    scout)          echo "aviad-desk/intel aviad-desk/state/seen.json" ;;
-    radar)          echo "aviad-desk/radar aviad-desk/state/seen.json" ;;
-    rival)          echo "aviad-desk/landscape aviad-desk/state/seen.json" ;;
-    advocate)       echo "aviad-desk/advocate aviad-desk/state/seen.json" ;;
-    relations)      echo "aviad-desk/people aviad-desk/state/seen.json" ;;
-    chief-of-staff) echo "aviad-desk/desk aviad-desk/inbox" ;;
-    curator)        echo "aviad-desk/curator aviad-desk/context/sources.md aviad-desk/context/filter.md aviad-desk/state/sources.json aviad-desk/state/tempo.json" ;;
-    auditor)        echo "aviad-desk/audit" ;;
-    producer)       echo "aviad-desk/drafts" ;;
-    amplifier)      echo "aviad-desk/amplify" ;;
-    gateway)        echo "aviad-desk/inbox aviad-desk/config/telegram.json aviad-desk/state/telegram_offset.txt aviad-desk/state/telegram_audit.jsonl aviad-desk/state/pending_approvals.json aviad-desk/feedback/queue" ;;
+    scout)          echo "aviad-desk/intel aviad-desk/state/seen.json aviad-desk/outbox" ;;
+    radar)          echo "aviad-desk/radar aviad-desk/state/seen.json aviad-desk/outbox" ;;
+    rival)          echo "aviad-desk/landscape aviad-desk/state/seen.json aviad-desk/outbox" ;;
+    advocate)       echo "aviad-desk/advocate aviad-desk/state/seen.json aviad-desk/outbox" ;;
+    relations)      echo "aviad-desk/people aviad-desk/state/seen.json aviad-desk/outbox" ;;
+    chief-of-staff) echo "aviad-desk/desk aviad-desk/inbox aviad-desk/outbox" ;;
+    curator)        echo "aviad-desk/curator aviad-desk/context/sources.md aviad-desk/context/filter.md aviad-desk/state/sources.json aviad-desk/state/tempo.json aviad-desk/outbox" ;;
+    auditor)        echo "aviad-desk/audit aviad-desk/outbox" ;;
+    producer)       echo "aviad-desk/drafts aviad-desk/outbox" ;;
+    amplifier)      echo "aviad-desk/amplify aviad-desk/outbox" ;;
+    gateway)        echo "aviad-desk/inbox aviad-desk/config/telegram.json aviad-desk/state/telegram_offset.txt aviad-desk/state/telegram_audit.jsonl aviad-desk/state/pending_approvals.json aviad-desk/feedback/queue aviad-desk/outbox" ;;
     *)              die "סוכן לא מוכר: $1" ;;
   esac
 }
@@ -145,14 +147,29 @@ EOF
 cmd_check() {
   local agent="$1" bad=0
   local -a allow; read -r -a allow <<< "$(allowed_paths "$agent")"
-  local changed; changed="$(git status --porcelain | awk '{print $NF}')"
+  # -uall חובה: בלעדיו git מקפל תיקייה לא-מעוקבת לשורה אחת ושם הקובץ ב-outbox לא מגיע לבדיקה
+  local changed; changed="$(git status --porcelain -uall | awk '{print $NF}')"
   [ -z "$changed" ] && { echo "אין שינויים"; return 0; }
-  local f ok p
+  local f ok p base
   while IFS= read -r f; do
     [ -z "$f" ] && continue
     ok=0
     for p in "${allow[@]}"; do case "$f" in "$p"|"$p"/*) ok=1;; esac; done
-    [ "$ok" -eq 0 ] && { echo "הפרת בידוד כתיבה: $f"; bad=1; }
+    [ "$ok" -eq 0 ] && { echo "הפרת בידוד כתיבה: $f"; bad=1; continue; }
+    # outbox משותף אך לא הפקר: סוכן מתייק רק קבצים ששמם מתחיל במזהה שלו.
+    # gateway פטור - הוא זה ששולח ומזיז ל-sent/
+    case "$f" in
+      aviad-desk/outbox/*)
+        if [ "$agent" != "gateway" ]; then
+          base="${f#aviad-desk/outbox/}"
+          case "$base" in
+            sent/*)     echo "הפרת outbox: רק gateway מזיז ל-sent/ - $f"; bad=1 ;;
+            "$agent"-*) ;;
+            *)          echo "הפרת outbox: שם הקובץ חייב להתחיל ב-\"$agent-\" - $f"; bad=1 ;;
+          esac
+        fi
+        ;;
+    esac
   done <<< "$changed"
   [ "$bad" -eq 1 ] && return 1
   echo "בידוד כתיבה תקין"

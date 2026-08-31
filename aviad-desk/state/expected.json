@@ -1,0 +1,51 @@
+{
+  "_doc": "חוזה התזמון. מה שלא רשום כאן - health.py לא שומר עליו. עדכן כאן כשמשנים רוטין.",
+  "_grace_misses": "כמה ירי מתוזמן מותר להחמיץ לפני התראה. 2 = החמצה אחת בודדת אינה התראה",
+  "_barren_limit": "כמה דוחות ריקים ברצף עד שזה נחשב דעיכת תפוקה. null = פטור",
+  "agents": {
+    "gateway": {
+      "cron": ["6 * * * *"],
+      "grace_misses": 3,
+      "barren_limit": null,
+      "why": "שכבת ממשק. 0 הודעות היא תוצאה תקינה, לכן פטור מ-barren"
+    },
+    "scout": {
+      "cron": ["30 2 * * 0-4", "0 6 * * 0"],
+      "grace_misses": 2,
+      "barren_limit": 3,
+      "why": "מודיעין יומי + סינתזה שבועית"
+    },
+    "chief-of-staff": {
+      "cron": ["15 3 * * 0-4"],
+      "grace_misses": 2,
+      "barren_limit": 4,
+      "why": "הבריף היומי"
+    },
+    "radar": {
+      "cron": ["0 4 * * 1,5"],
+      "grace_misses": 2,
+      "barren_limit": 3,
+      "why": "הזדמנויות ודדליינים"
+    },
+    "curator": {
+      "cron": ["30 5 * * 4", "18 5 */3 * *"],
+      "grace_misses": 2,
+      "barren_limit": 4,
+      "why": "כיול שבועי + לולאת למידה תלת-יומית"
+    },
+    "amplifier": {
+      "cron": ["0 6 * * 3"],
+      "grace_misses": 2,
+      "barren_limit": null,
+      "why": "צינור הפרסום. \"אין מועמד שעובר את הסף\" הוא פלט תקין, לכן פטור מ-barren"
+    }
+  },
+  "_lane_invoked": {
+    "_doc": "סוכנים שאין להם טריגר בכוונה. הם נקראים בתוך רוטין קיים לפי נתיב סיכון - ראה context/orchestration.md",
+    "auditor": "R2 ומעלה בתוך amplifier או chief-of-staff",
+    "producer": "לפי בקשה מפורשת של אביעד דרך gateway",
+    "advocate": "שלב 3, מושהה",
+    "rival": "שלב 4, מושהה",
+    "relations": "שלב 4, מושהה"
+  }
+}

@@ -5,6 +5,7 @@
 #   desk.sh finish <agent> [--items N] [--l0 N] [--l1 N] [--l2 N] [--note "..."]
 #                            אכיפת בידוד כתיבה, ולידציה, רישום ריצה, commit, push
 #   desk.sh check  <agent>   בדיקת בידוד כתיבה בלבד, בלי לדחוף
+#   desk.sh health           דוח בריאות המערכת. קוד יציאה 1 כשיש ממצא אדום
 #
 # חוזה: הסקריפט לעולם לא דוחף ל-main. הוא דוחף רק לענף התוצרים.
 set -uo pipefail
@@ -22,6 +23,18 @@ git config user.email >/dev/null 2>&1 || git config user.email "aviad-desk@users
 die()  { echo "DESK-ERROR: $*" >&2; exit 1; }
 info() { echo "$*"; }
 
+# תיוק התראה לתור היוצא. best-effort מוחלט: אם זה נכשל, הריצה ממשיכה.
+# הכלל: כשל שאיש לא יודע עליו גרוע מכשל. לכן זה נקרא גם מ-cmd_fail וגם מ-cmd_finish.
+alert() {
+  local agent="$1" text="$2"
+  python3 "$DESK_DIR/scripts/outbox_put.py" "$agent" "$text" >/dev/null 2>&1 || true
+}
+
+# סיווג הערת ריצה. מקור האמת לסימני הכשל הוא health.py, לא רשימה משוכפלת כאן.
+classify_note() {
+  python3 "$DESK_DIR/scripts/health.py" --classify-note "$1" 2>/dev/null || echo ok
+}
+
 # ------------------------------------------------------------------ namespaces
 # בידוד כתיבה. סוכן כותב אך ורק לנתיבים שלו. חריג יחיד: curator.
 # כל סוכן רשאי לתייק הודעה יוצאת ל-aviad-desk/outbox, אך ורק בקובץ ששמו מתחיל
@@ -38,7 +51,7 @@ allowed_paths() {
     auditor)        echo "aviad-desk/audit aviad-desk/outbox" ;;
     producer)       echo "aviad-desk/drafts aviad-desk/outbox" ;;
     amplifier)      echo "aviad-desk/amplify aviad-desk/outbox" ;;
-    gateway)        echo "aviad-desk/inbox aviad-desk/config/telegram.json aviad-desk/state/telegram_offset.txt aviad-desk/state/telegram_audit.jsonl aviad-desk/state/pending_approvals.json aviad-desk/feedback/queue aviad-desk/outbox" ;;
+    gateway)        echo "aviad-desk/inbox aviad-desk/config/telegram.json aviad-desk/state/telegram_offset.txt aviad-desk/state/telegram_audit.jsonl aviad-desk/state/pending_approvals.json aviad-desk/state/health.json aviad-desk/feedback/queue aviad-desk/outbox" ;;
     *)              die "סוכן לא מוכר: $1" ;;
   esac
 }
@@ -194,17 +207,30 @@ cmd_finish() {
     cat /tmp/desk-validate.txt >&2; die "validate.py נכשל. לא דוחפים"
   fi
 
+  # הסטטוס נגזר מההערה, לא נקבע מראש. ריצה שההערה שלה מודה בכשל טכני נרשמת
+  # degraded ולא ok. בלי זה "telegram_fetch נכשל: HTTP 404" נרשם כהצלחה - זה קרה בפועל.
+  local status; status="$(classify_note "$note")"
+
   # רישום הריצה. זה המקור שממנו curator מחשב עלות לממצא מועיל, וגם /agents ו-/status ב-gateway
-  python3 - "$agent" "${items:-0}" "${l0:-0}" "${l1:-0}" "${l2:-0}" "$note" <<'PY'
+  python3 - "$agent" "${items:-0}" "${l0:-0}" "${l1:-0}" "${l2:-0}" "$note" "$status" <<'PY'
 import json,sys,datetime,pathlib
 p = pathlib.Path("aviad-desk/state/runs.jsonl"); p.parent.mkdir(parents=True, exist_ok=True)
 rec = {"date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
        "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
-       "agent": sys.argv[1], "status": "ok", "items": int(sys.argv[2] or 0),
+       "agent": sys.argv[1], "status": sys.argv[7], "items": int(sys.argv[2] or 0),
        "l0": int(sys.argv[3] or 0), "l1": int(sys.argv[4] or 0), "l2": int(sys.argv[5] or 0),
        "note": sys.argv[6][:200]}
 with p.open("a", encoding="utf-8") as fh: fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
 PY
+
+  # ריצה מדורדרת מתריעה מיד, בלי לחכות לשומר השעתי
+  if [ "$status" = "degraded" ]; then
+    info "אזהרה: הריצה נרשמה degraded - ההערה מכילה סימן כשל טכני"
+    alert "$agent" "$agent: ריצה הסתיימה עם סימן כשל טכני
+$(date -u +%Y-%m-%d\ %H:%M)Z
+$note"
+  fi
+
   git add -- aviad-desk/state/runs.jsonl
 
   local p
@@ -269,8 +295,21 @@ PY
     done
   fi
 
+  # ההתראה עצמה. זו הנקודה שבה כשל הופך לידיעה של אביעד ולא לשורה ביומן שאיש לא קורא.
+  alert "$agent" "כשל: $agent
+$(date -u +%Y-%m-%d\ %H:%M)Z
+${reason:-לא צוינה סיבה}
+
+הריצה נעצרה. אין תוצר."
+
   echo "$rec"
   return 0
+}
+
+# ---------------------------------------------------------------------- health
+# השומר. רץ מ-gateway כל שעה ומ-chief-of-staff בבריף היומי. ראה scripts/health.py
+cmd_health() {
+  python3 "$DESK_DIR/scripts/health.py" "$@"
 }
 
 case "${1:-}" in
@@ -278,5 +317,6 @@ case "${1:-}" in
   finish) shift; cmd_finish "${1:?חסר שם סוכן}" "${@:2}" ;;
   check)  shift; cmd_check  "${1:?חסר שם סוכן}" ;;
   fail)   shift; cmd_fail   "${1:?חסר שם סוכן}" "${@:2}" ;;
-  *) echo "שימוש: desk.sh {start|finish|check|fail} <agent>"; exit 2 ;;
+  health) shift; cmd_health "$@" ;;
+  *) echo "שימוש: desk.sh {start|finish|check|fail} <agent> | desk.sh health"; exit 2 ;;
 esac

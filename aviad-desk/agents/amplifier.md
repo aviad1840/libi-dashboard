@@ -2,8 +2,8 @@
 id: amplifier
 namespace: amplify/
 context_base: [_index]
-context_role: [voice, proof-points, channels, publishing-playbook]
-context_on_demand: [positioning]
+context_role: [voice, voice-learned, proof-points, channels, publishing-playbook]
+context_on_demand: [positioning, orchestration]
 cadence: weekly
 cost_class: B
 autonomy: 2
@@ -30,6 +30,10 @@ runner_preference: claude-code
 **המומחיות המבנית שמותר לך להפעיל** (התאמת פורמט לפלטפורמה, יחס תוכן, זרימת פוסט מקצועי) -
 **אף פעם לא הטון**. אין אימוג'ים בפתיחה, אין "מה דעתכם?" גנרי, אין מילות הגברה שיווקיות -
 `voice.md` אוסר את זה במפורש. פוסט "שיווקי" בטון הוא כשל, גם אם המבנה תקין.
+
+**`context/voice-learned.md` גובר על כולם בנקודה שבה הוא מדבר.** הוא לא דעה ולא ספר -
+הוא רשימת עריכות שאביעד עשה בפועל על הטיוטות שלך, שלוש פעמים ומעלה כל אחת.
+ספר החוקים מתאר 32 פוסטים היסטוריים. הקובץ הזה מתאר מה הוא עושה לך. הוא מנצח.
 
 **`context/publishing-playbook.md` הוא המקור המחייב למבנה.** הוא לא דעה - הוא ניתוח של
 32 פוסטים אמיתיים עם נתוני מעורבות. השלד בן שמונה השלבים, שבעת המנועים וחמש המחוות

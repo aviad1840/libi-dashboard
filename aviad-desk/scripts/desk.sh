@@ -48,7 +48,7 @@ allowed_paths() {
     advocate)       echo "aviad-desk/advocate aviad-desk/state/seen.json aviad-desk/outbox" ;;
     relations)      echo "aviad-desk/people aviad-desk/state/seen.json aviad-desk/outbox" ;;
     chief-of-staff) echo "aviad-desk/desk aviad-desk/inbox aviad-desk/outbox" ;;
-    curator)        echo "aviad-desk/curator aviad-desk/context/sources.md aviad-desk/context/filter.md aviad-desk/state/sources.json aviad-desk/state/tempo.json aviad-desk/outbox" ;;
+    curator)        echo "aviad-desk/curator aviad-desk/context/sources.md aviad-desk/context/filter.md aviad-desk/context/voice-learned.md aviad-desk/state/sources.json aviad-desk/state/tempo.json aviad-desk/state/edits.jsonl aviad-desk/outbox" ;;
     auditor)        echo "aviad-desk/audit aviad-desk/outbox" ;;
     producer)       echo "aviad-desk/drafts aviad-desk/outbox" ;;
     amplifier)      echo "aviad-desk/amplify aviad-desk/outbox" ;;

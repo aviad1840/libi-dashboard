@@ -6,6 +6,7 @@
 #                            אכיפת בידוד כתיבה, ולידציה, רישום ריצה, commit, push
 #   desk.sh check  <agent>   בדיקת בידוד כתיבה בלבד, בלי לדחוף
 #   desk.sh health           דוח בריאות המערכת. קוד יציאה 1 כשיש ממצא אדום
+#   desk.sh verify <agent>   שער הראיות על ה-namespace של הסוכן, בלי לדחוף
 #
 # חוזה: הסקריפט לעולם לא דוחף ל-main. הוא דוחף רק לענף התוצרים.
 set -uo pipefail
@@ -207,6 +208,29 @@ cmd_finish() {
     cat /tmp/desk-validate.txt >&2; die "validate.py נכשל. לא דוחפים"
   fi
 
+  # שער הראיות. נבדקים אך ורק הקבצים שהריצה הזו שינתה, לא כל ההיסטוריה -
+  # אחרת הפרה ישנה אחת חוסמת כל ריצה עתידית לנצח, והשער נהיה מכשול במקום שער.
+  local -a touched=()
+  while IFS= read -r cf; do
+    [ -z "$cf" ] && continue
+    case "$cf" in
+      aviad-desk/outbox/*|aviad-desk/state/*|*.gitkeep) continue ;;
+      *.md|*.json) [ -f "$cf" ] && touched+=("$cf") ;;
+    esac
+  done <<< "$(git status --porcelain -uall | awk '{print $NF}')"
+
+  if [ "${#touched[@]}" -gt 0 ]; then
+    if ! python3 "$DESK_DIR/scripts/verify.py" "${touched[@]}" >/tmp/desk-verify.txt 2>&1; then
+      cat /tmp/desk-verify.txt >&2
+      echo "" >&2
+      echo "שער הראיות חסם את הריצה. הקבצים שלך על הדיסק ולא אבדו." >&2
+      echo "תקן את ההפרות למעלה והרץ finish שוב. אין ראיה - כתוב \"לא נמצאה ראיה\"," >&2
+      echo "הורד את הסיווג ל-CLAIM, או הסר את הממצא. אל תעקוף את השער." >&2
+      die "ריצה נעצרה בשער הראיות"
+    fi
+    cat /tmp/desk-verify.txt
+  fi
+
   # הסטטוס נגזר מההערה, לא נקבע מראש. ריצה שההערה שלה מודה בכשל טכני נרשמת
   # degraded ולא ok. בלי זה "telegram_fetch נכשל: HTTP 404" נרשם כהצלחה - זה קרה בפועל.
   local status; status="$(classify_note "$note")"
@@ -312,11 +336,18 @@ cmd_health() {
   python3 "$DESK_DIR/scripts/health.py" "$@"
 }
 
+# ---------------------------------------------------------------------- verify
+# שער הראיות על דרישה. ב-finish הוא רץ אוטומטית על הקבצים שהשתנו בלבד.
+cmd_verify() {
+  python3 "$DESK_DIR/scripts/verify.py" --agent "$@"
+}
+
 case "${1:-}" in
   start)  shift; cmd_start  "${1:?חסר שם סוכן}" ;;
   finish) shift; cmd_finish "${1:?חסר שם סוכן}" "${@:2}" ;;
   check)  shift; cmd_check  "${1:?חסר שם סוכן}" ;;
   fail)   shift; cmd_fail   "${1:?חסר שם סוכן}" "${@:2}" ;;
   health) shift; cmd_health "$@" ;;
-  *) echo "שימוש: desk.sh {start|finish|check|fail} <agent> | desk.sh health"; exit 2 ;;
+  verify) shift; cmd_verify "${1:?חסר שם סוכן}" "${@:2}" ;;
+  *) echo "שימוש: desk.sh {start|finish|check|fail|verify} <agent> | desk.sh health"; exit 2 ;;
 esac

@@ -191,13 +191,54 @@ def collect(paths):
             except json.JSONDecodeError:
                 findings.append({"_id": "קובץ פגום", "_path": rel, "_raw": "", "_broken": True})
         else:
-            findings += from_markdown(text, rel)
+            items = from_markdown(text, rel)
+            if not items:
+                # אין בלוקי ### - זה כנראה טיוטת פרסום (amplify/) או מסמך חופשי אחר.
+                # בלי זה, טענה מפוברקת בטיוטה עוברת את השער בשקט מוחלט - זה קרה בבדיקה
+                items = [{"_id": os.path.basename(f), "_path": rel, "_raw": text, "_freeform": True}]
+            findings += items
     return findings, seen_files
 
 
 # ------------------------------------------------------------------------ rules
+def check_freeform(rec):
+    """מסמך פרוזה בלי מבנה ### (בעיקר amplify/draft-*.md).
+
+    אין כאן classification/evidence_level לכל טענה בנפרד - זו לא הכתובת.
+    הבדיקה גסה בכוונה: אם יש בקובץ כולו מספר או ציטוט, וב-כל הקובץ
+    אין ולו URL אחד ואין הודאה מפורשת שאין ראיה - זה חוסם. תנאי מינימלי,
+    לא מלא, אבל בלי זה הכיסוי היה אפס לגמרי על בדיוק סוג הקובץ הכי מסוכן."""
+    out = []
+    def bad(level, rule, msg):
+        out.append({"level": level, "rule": rule, "id": rec.get("_id"),
+                    "path": rec.get("_path"), "detail": msg})
+
+    blob = str(rec.get("_raw", ""))
+    has_url = bool(URL.search(blob))
+    said_no_evidence = any(p in blob for p in NO_EVIDENCE)
+
+    if EM_DASH.search(blob):
+        bad("BLOCK", "R8", "נמצא em dash. הכלל הוא מקף רגיל בלבד")
+
+    if not has_url and not said_no_evidence:
+        nums = QUANT.findall(blob)
+        if nums:
+            shown = next(g for t in nums for g in t if g)
+            bad("BLOCK", "R11", f"טענה כמותית ({shown}) במסמך פרוזה בלי URL כלשהו בקובץ ובלי הודאה שאין ראיה")
+        quotes = QUOTED.findall(blob)
+        # ציטוט קצר מדי לרוב הוא הדגשה, לא ציטוט אמיתי - מסנן false positive
+        real_quotes = [q for q in quotes if len(q.split()) >= 4]
+        if real_quotes:
+            bad("BLOCK", "R12", f"ציטוט (\"{real_quotes[0][:45]}...\") במסמך פרוזה בלי URL כלשהו בקובץ")
+
+    return out
+
+
 def check(rec):
     """עשרה כללים. כל אחד מחזיר (רמה, כלל, הסבר)."""
+    if rec.get("_freeform"):
+        return check_freeform(rec)
+
     out = []
     def bad(level, rule, msg):
         out.append({"level": level, "rule": rule, "id": rec.get("_id"),

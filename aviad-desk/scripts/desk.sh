@@ -137,8 +137,22 @@ cmd_start() {
   if git rev-parse -q --verify "origin/$LOG_BRANCH" >/dev/null 2>&1; then
     git checkout -f -B "$LOG_BRANCH" "origin/$LOG_BRANCH" --quiet || die "checkout ל-$LOG_BRANCH נכשל"
     if ! git merge --no-edit -q "$sys" 2>/dev/null; then
-      git merge --abort 2>/dev/null
-      die "התנגשות מיזוג בין $LOG_BRANCH ל-$sys. עצור, אל תכריע. דווח ולא תכתוב"
+      # קונפליקט מוכר וחד-פעמי: aviad-desk/state/runs.jsonl הוא יומן production
+      # שקיים רק על $LOG_BRANCH ולעולם לא היה אמור להיות מעוקב על ענף המערכת.
+      # אחרי שהוא הוסר משם (git rm --cached), המיזוג הראשון בין הענפים מפיק
+      # modify/delete conflict - אבל התשובה תמיד ידועה מראש: לשמר את גרסת
+      # $LOG_BRANCH. פתרון אוטומטי מוגבל אך ורק לנתיב הבודד הזה. כל קונפליקט
+      # אחר, או קונפליקט שכולל עוד קבצים, עדיין עוצר ומדווח כרגיל - בלי הכרעה.
+      local conflicts; conflicts="$(git diff --name-only --diff-filter=U 2>/dev/null)"
+      if [ "$conflicts" = "aviad-desk/state/runs.jsonl" ] \
+         && git checkout --ours -- aviad-desk/state/runs.jsonl 2>/dev/null \
+         && git add -- aviad-desk/state/runs.jsonl 2>/dev/null \
+         && git commit --no-edit -q 2>/dev/null; then
+        info "מיזוג: קונפליקט ידוע ב-state/runs.jsonl נפתר אוטומטית (נשמרה גרסת $LOG_BRANCH)"
+      else
+        git merge --abort 2>/dev/null
+        die "התנגשות מיזוג בין $LOG_BRANCH ל-$sys. עצור, אל תכריע. דווח ולא תכתוב"
+      fi
     fi
   else
     git checkout -f -B "$LOG_BRANCH" "$sys" --quiet || die "checkout ל-$LOG_BRANCH נכשל"

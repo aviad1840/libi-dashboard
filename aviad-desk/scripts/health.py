@@ -5,12 +5,20 @@
 אלא כי כשל לא יכול לתעד את עצמו. רוטין שמת לפני desk.sh לא כותב כלום, וריצה
 שנכשלה באמצע נרשמה status=ok עם הערה שאומרת "נכשל".
 
-ארבעה בדיקות, כל אחת נגד כשל שקרה בפועל:
+שבע בדיקות, כל אחת נגד כשל שקרה בפועל או נגד פער שהודגם בפועל:
 
-  1. missed   - ירי מתוזמן שלא הותיר רשומה. תופס מוות לפני desk.sh start
-  2. hidden   - רשומת ok שההערה שלה מכילה סימן כשל. תופס דיווח כוזב
-  3. barren   - רצף דוחות ריקים. תופס דעיכת תפוקה לפני שהיא הופכת לשקט מוחלט
-  4. stuck    - הודעה שתקועה ב-outbox מעבר לחלון. תופס gateway שלא מנקז
+  1. missed        - ירי מתוזמן שלא הותיר רשומה. תופס מוות לפני desk.sh start,
+                      אחרי ש-grace_misses ירי נגמר (שעות עד ימים, לפי תדירות)
+  2. hung          - heartbeat פתוחה מעל max_minutes בלי finish/fail תואם.
+                      אותו כשל בדיוק כמו missed, מזוהה תוך דקות במקום ימים
+  3. hidden        - רשומת ok שההערה שלה מכילה סימן כשל. תופס דיווח כוזב
+  4. barren        - רצף דוחות ריקים. תופס דעיכת תפוקה לפני שקט מוחלט
+  5. stuck         - הודעה שתקועה ב-outbox מעבר לחלון. תופס gateway שלא מנקז
+  6. stale_source  - מקור ש-chief-of-staff מציג לא עודכן בזמן. לפי git log,
+                      לא mtime - checkout טרי מאפס mtime בלי קשר לגיל האמיתי
+  7. retry         - לא בדיקה עצמאית, אלא הקשר שנוסף ל-missed/hidden: כמה נסיונות
+                      רצופים נכשלו, ומתי הניסיון הבא (retry הוא הירי המתוזמן הבא,
+                      אין רענון-מיידי בפלטפורמה הזו - זה מתועד כאן ולא מוסתר)
 
 שימוש:
     health.py                 דוח מלא, טקסט עברי
@@ -25,14 +33,17 @@
 """
 import json
 import os
+import subprocess
 import sys
 import datetime as dt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_ROOT = os.path.dirname(ROOT)
 RUNS = os.path.join(ROOT, "state", "runs.jsonl")
 EXPECTED = os.path.join(ROOT, "state", "expected.json")
 OUTBOX = os.path.join(ROOT, "outbox")
 HEALTH = os.path.join(ROOT, "state", "health.json")
+HEARTBEAT_DIR = os.path.join(ROOT, "state", "heartbeat")
 
 # סימני כשל בתוך הערת ריצה שנרשמה כ-ok. מבוסס על כשלים אמיתיים מהיומן,
 # לא על ניחוש: "telegram_fetch נכשל: HTTP 404" נרשם כ-ok ב-30.8
@@ -142,6 +153,24 @@ def fires_between(crons, start, end):
     return count
 
 
+def next_fire_after(crons, start, horizon_days=14):
+    """הירי המתוזמן הבא. זה ה-retry האמיתי בפלטפורמה הזו - אין רענון-מיידי
+    לרוטין שנכשל, ולכן retry הוא כנה רק אם הוא מדווח את הזמן האמיתי הזה,
+    לא מעמיד פנים שיש ניסיון חוזר תוך דקות כשאין."""
+    cur = start.replace(second=0, microsecond=0) + dt.timedelta(minutes=1)
+    limit = start + dt.timedelta(days=horizon_days)
+    while cur <= limit:
+        if any(cron_matches(c, cur) for c in crons):
+            return cur
+        cur += dt.timedelta(minutes=1)
+    return None
+
+
+def next_fire_str(crons, now):
+    nxt = next_fire_after(crons, now)
+    return f"{nxt:%d.%m %H:%M}Z" if nxt else "לא נמצא בטווח הקרוב"
+
+
 # ----------------------------------------------------------------------- input
 def load_runs():
     runs = []
@@ -169,6 +198,51 @@ def load_expected():
         return {}
 
 
+def load_stale_sources():
+    if not os.path.exists(EXPECTED):
+        return {}
+    try:
+        with open(EXPECTED, encoding="utf-8") as fh:
+            d = json.load(fh)
+        return {k: v for k, v in d.get("stale_sources", {}).items() if not k.startswith("_")}
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def load_heartbeats():
+    out = {}
+    if not os.path.isdir(HEARTBEAT_DIR):
+        return out
+    for name in os.listdir(HEARTBEAT_DIR):
+        if not name.endswith(".json"):
+            continue
+        try:
+            with open(os.path.join(HEARTBEAT_DIR, name), encoding="utf-8") as fh:
+                rec = json.load(fh)
+        except (json.JSONDecodeError, OSError):
+            continue
+        out[rec.get("agent") or name[:-5]] = rec
+    return out
+
+
+def _true_ok(rec):
+    """סטטוס ok אמיתי - לא רק status=='ok', גם ההערה חייבת להיות נקייה מסימני כשל.
+    בלי זה סטריק הכשלים לא ייעצר על רשומה שדווחה ok אך היא בעצם hidden failure."""
+    return rec.get("status") == "ok" and classify_note(rec.get("note") or "") == "ok"
+
+
+def consecutive_non_ok(runs, agent):
+    """כמה רשומות רצופות אחרונות של הסוכן אינן ok אמיתי. זה מונה ה-retry."""
+    agent_runs = sorted([r for r in runs if r.get("agent") == agent],
+                        key=lambda r: str(r.get("ts") or ""))
+    streak = 0
+    for r in reversed(agent_runs):
+        if _true_ok(r):
+            break
+        streak += 1
+    return streak
+
+
 # ---------------------------------------------------------------------- checks
 def check_missed(runs, expected, now):
     """ירי מתוזמן שלא הותיר רשומה. זה הבדיקה שתופסת מוות לפני desk.sh."""
@@ -187,9 +261,12 @@ def check_missed(runs, expected, now):
         missed = fires_between(crons, since, now)
         if missed >= grace:
             age = "מעולם לא רץ" if not last else f"אחרון: {last:%d.%m %H:%M}Z"
+            streak = consecutive_non_ok(runs, agent)
+            retry_note = f" ועוד {streak} רשומות כשל רצופות לפניו" if streak else ""
             out.append({
                 "level": "RED", "check": "missed", "agent": agent,
-                "detail": f"{agent}: {missed} ירי מתוזמן ללא רשומה ({age})",
+                "detail": (f"{agent}: {missed} ירי מתוזמן ללא רשומה ({age}){retry_note}. "
+                          f"retry - הירי המתוזמן הבא: {next_fire_str(crons, now)}"),
             })
         elif missed == 1 and grace > 1:
             out.append({
@@ -199,25 +276,49 @@ def check_missed(runs, expected, now):
     return out
 
 
-def check_hidden(runs, now, window_hours=26):
-    """רשומת ok שההערה שלה מודה בכשל."""
+def check_hidden(runs, expected, now, window_hours=26):
+    """רשומת ok שההערה שלה מודה בכשל, או רשומת failed מפורשת.
+
+    מדווח רשומה אחת בלבד לכל סוכן - האחרונה בחלון - עם מונה הסטריק המצטבר.
+    שלושה כשלים רצופים של אותו סוכן הם אירוע אחד מתמשך, לא שלוש התראות זהות -
+    בלעדי זה, fingerprint (check:agent זהה לשלושתן) גם ככה מקפל אותן לירייה
+    אחת בדדופ, אבל הדוח המלא (health.py בלי --alert) היה מציג שלוש שורות
+    כמעט זהות על אותה תקלה עצמה. זה רעש, לא מידע.
+    """
     out = []
     cutoff = now - dt.timedelta(hours=window_hours)
+    latest = {}
     for r in runs:
         ts = parse_ts(r.get("ts"))
         if not ts or ts < cutoff:
             continue
+        agent = r.get("agent")
         note = str(r.get("note") or "")
         hit = next((m for m in FAILURE_MARKERS if m in scrub(note)), None)
+        if r.get("status") != "failed" and not hit:
+            continue
+        prev = latest.get(agent)
+        if prev is None or ts > prev[0]:
+            latest[agent] = (ts, r, hit)
+
+    for agent, (ts, r, hit) in latest.items():
+        note = str(r.get("note") or "")
+        streak = consecutive_non_ok(runs, agent)
+        crons = (expected.get(agent) or {}).get("cron") or []
+        retry_txt = f" retry - הירי המתוזמן הבא: {next_fire_str(crons, now)}" if crons else ""
+        escalate = "כשל חוזר. " if streak >= 3 else ""
+
         if r.get("status") == "failed":
             out.append({
-                "level": "RED", "check": "failed", "agent": r.get("agent"),
-                "detail": f"{r.get('agent')} נכשל ב-{ts:%d.%m %H:%M}Z: {str(r.get('reason') or note)[:120]}",
+                "level": "RED", "check": "failed", "agent": agent,
+                "detail": (f"{escalate}{agent} נכשל ב-{ts:%d.%m %H:%M}Z "
+                          f"(נסיון {streak} ברצף): {str(r.get('reason') or note)[:120]}.{retry_txt}"),
             })
-        elif hit:
+        else:
             out.append({
-                "level": "RED", "check": "hidden", "agent": r.get("agent"),
-                "detail": f"{r.get('agent')} נרשם ok אך ההערה מכילה \"{hit}\" ({ts:%d.%m %H:%M}Z): {note[:120]}",
+                "level": "RED", "check": "hidden", "agent": agent,
+                "detail": (f"{escalate}{agent} נרשם ok אך ההערה מכילה \"{hit}\" "
+                          f"({ts:%d.%m %H:%M}Z, נסיון {streak} ברצף): {note[:120]}.{retry_txt}"),
             })
     return out
 
@@ -250,6 +351,70 @@ def check_barren(runs, expected):
     return out
 
 
+def check_hung(runs, expected, now):
+    """heartbeat פתוחה מעל max_minutes בלי finish/fail תואם - תהליך תקוע או מת.
+
+    זה תחליף מהיר בהרבה ל-missed: לא מחכה שכל ה-grace_misses של הירי המתוזמן
+    ייגמרו (שעות עד ימים), רק שחלף זמן ריצה סביר מאז ש-cmd_start כתב heartbeat.
+    """
+    out = []
+    for agent, hb in load_heartbeats().items():
+        started = parse_ts(hb.get("started_at"))
+        if not started:
+            continue
+        ceiling = int((expected.get(agent) or {}).get("max_minutes", 30))
+        age_min = (now - started).total_seconds() / 60.0
+        if age_min < ceiling:
+            continue
+        agent_runs = [r for r in runs if r.get("agent") == agent]
+        finished_after = any(
+            parse_ts(r.get("ts")) and parse_ts(r.get("ts")) >= started for r in agent_runs
+        )
+        if finished_after:
+            # heartbeat נשארה על הדיסק מריצה קודמת, אבל runs.jsonl כבר מוכיח סיום.
+            # לא תקוע - רק שאריות שלא נמחקו, לא באג פעיל
+            continue
+        out.append({
+            "level": "RED", "check": "hung", "agent": agent,
+            "detail": (f"{agent}: החל ריצה ב-{started:%d.%m %H:%M}Z ולא סיים אחרי "
+                      f"{age_min:.0f} דקות (תקרה: {ceiling}). ייתכן שהתהליך מת באמצע"),
+        })
+    return out
+
+
+def check_stale_sources(now):
+    """מקור ש-chief-of-staff מציג לא עודכן. לפי git log -1 על הנתיב, לא mtime -
+    checkout טרי מאפס mtime של כל קובץ בלי קשר לגיל האמיתי שלו בהיסטוריית הגיט."""
+    out = []
+    for rel, spec in load_stale_sources().items():
+        max_hours = float(spec.get("max_hours", 48))
+        try:
+            proc = subprocess.run(
+                ["git", "log", "-1", "--format=%cI", "--", rel],
+                cwd=REPO_ROOT, capture_output=True, text=True, timeout=10,
+            )
+            last = parse_ts(proc.stdout.strip()) if proc.returncode == 0 else None
+        except (OSError, subprocess.SubprocessError):
+            last = None
+
+        label = rel.rsplit("/", 1)[-1]
+        if last is None:
+            out.append({
+                "level": "YELLOW", "check": "stale_source", "agent": label,
+                "detail": f"{rel}: אין היסטוריית git על הנתיב, לא ניתן לבדוק עדכניות",
+            })
+            continue
+        age_h = (now - last).total_seconds() / 3600.0
+        if age_h >= max_hours:
+            out.append({
+                "level": "RED", "check": "stale_source", "agent": label,
+                "detail": (f"{rel}: לא עודכן {age_h:.0f} שעות (סף {max_hours:.0f}). "
+                          f"עדכון אחרון: {last:%d.%m %H:%M}Z. chief-of-staff חייב לציין "
+                          f"זאת בבריף ולא להציג את המצב כעדכני"),
+            })
+    return out
+
+
 def check_stuck(now):
     """הודעה שתקועה בתור. אם gateway לא מנקז, אביעד לא יודע כלום."""
     out = []
@@ -275,8 +440,10 @@ def build(now=None):
     expected = load_expected()
     findings = (
         check_missed(runs, expected, now)
-        + check_hidden(runs, now)
+        + check_hung(runs, expected, now)
+        + check_hidden(runs, expected, now)
         + check_barren(runs, expected)
+        + check_stale_sources(now)
         + check_stuck(now)
     )
     red = [f for f in findings if f["level"] == "RED"]

@@ -36,6 +36,46 @@ classify_note() {
   python3 "$DESK_DIR/scripts/health.py" --classify-note "$1" 2>/dev/null || echo ok
 }
 
+# --------------------------------------------------------------------- heartbeat
+# הוכחת "אני חי", עצמאית מ-runs.jsonl. נכתבת ונדחפת מיד ב-start, לפני שהסוכן
+# נוגע בעבודה בפועל. אם התהליך מת בלי להגיע ל-finish/fail - אין רשומת runs.jsonl
+# בכלל, אבל יש heartbeat. health.py משווה גיל שלה מול max_minutes ומזהה תקיעה
+# תוך דקות, לא רק אחרי שכל ה-grace_misses של הירי המתוזמן נגמר (שעות עד ימים).
+# best-effort לחלוטין: כשל בדחיפה לא עוצר את הריצה, רק מדפיס אזהרה.
+heartbeat_start() {
+  local agent="$1" dir="$DESK_DIR/state/heartbeat"
+  mkdir -p "$dir" 2>/dev/null
+  python3 - "$agent" "$dir/$agent.json" <<'PY' 2>/dev/null
+import json, sys, datetime
+with open(sys.argv[2], "w", encoding="utf-8") as fh:
+    json.dump({"agent": sys.argv[1],
+               "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")},
+              fh, ensure_ascii=False)
+    fh.write("\n")
+PY
+  git add -- "$dir/$agent.json" 2>/dev/null
+  git diff --cached --quiet -- "$dir/$agent.json" 2>/dev/null && return 0
+  git commit -q -m "$agent: heartbeat $(date -u +%Y-%m-%dT%H:%M:%SZ)" 2>/dev/null || return 0
+  local attempt=0 delay=2
+  until git push -u origin "$LOG_BRANCH" --quiet 2>/dev/null; do
+    attempt=$((attempt+1))
+    if [ "$attempt" -ge 3 ]; then info "אזהרה: דחיפת heartbeat נכשלה, ממשיכים בלעדיה"; break; fi
+    git fetch origin "$LOG_BRANCH" --quiet 2>/dev/null
+    git rebase "origin/$LOG_BRANCH" --quiet 2>/dev/null || git rebase --abort 2>/dev/null
+    sleep "$delay"; delay=$((delay*2))
+  done
+}
+
+# מוחקת את heartbeat בסיום ריצה - הצלחה או כשל כאחד. נכנס לאותו commit של
+# finish/fail, לא דוחף בנפרד. זו ההוכחה ש"הריצה הזו הסתיימה בפועל", לא רק שדה חי.
+heartbeat_clear() {
+  local agent="$1"
+  local f="$DESK_DIR/state/heartbeat/$agent.json"
+  [ -f "$f" ] || return 0
+  rm -f "$f"
+  git add -- "$f" 2>/dev/null
+}
+
 # ------------------------------------------------------------------ namespaces
 # בידוד כתיבה. סוכן כותב אך ורק לנתיבים שלו. חריג יחיד: curator.
 # כל סוכן רשאי לתייק הודעה יוצאת ל-aviad-desk/outbox, אך ורק בקובץ ששמו מתחיל
@@ -103,6 +143,8 @@ cmd_start() {
   else
     git checkout -f -B "$LOG_BRANCH" "$sys" --quiet || die "checkout ל-$LOG_BRANCH נכשל"
   fi
+
+  heartbeat_start "$agent"
 
   if [ "$agent" = "gateway" ]; then
     cat <<EOF
@@ -256,6 +298,7 @@ $note"
   fi
 
   git add -- aviad-desk/state/runs.jsonl
+  heartbeat_clear "$agent"
 
   local p
   for p in $(allowed_paths "$agent"); do git add -A -- "$p" 2>/dev/null; done
@@ -308,6 +351,7 @@ PY
 
   mkdir -p "$DESK_DIR/state" 2>/dev/null
   echo "$rec" >> "$DESK_DIR/state/runs.jsonl" 2>/dev/null
+  heartbeat_clear "$agent"
 
   if git add -- "$DESK_DIR/state/runs.jsonl" 2>/dev/null \
      && ! git diff --cached --quiet 2>/dev/null \

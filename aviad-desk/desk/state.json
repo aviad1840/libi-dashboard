@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-01",
+  "updated": "2026-09-02",
   "tracks": [
     {
       "id": "T2",
@@ -10,7 +10,7 @@
       "next_action": "לדחוף מול אשר דולב ישירות",
       "blocker": "חשש שצוות 11 נסחף להכשרות הון אנושי כלליות במקום מפעל יכולות יישומי",
       "deadline": "2026-09-30",
-      "days_idle": 3,
+      "days_idle": 4,
       "anti_patterns": ["AP4"]
     },
     {
@@ -21,7 +21,7 @@
       "commitment_level": "בעלות",
       "next_action": "הגשת NIIA",
       "deadline": "2026-09-03",
-      "days_idle": 3,
+      "days_idle": 4,
       "anti_patterns": []
     },
     {
@@ -30,7 +30,7 @@
       "status": "לא עודכן מאז 29/08. שלוש הגשות בהכנה: מיצוי זכויות פרואקטיבי, מנוע AI לתביעות סיעוד, עכשיו אני",
       "next_action": "סיום שלוש ההגשות",
       "deadline": "2026-09-17",
-      "days_idle": 3,
+      "days_idle": 4,
       "anti_patterns": []
     }
   ]

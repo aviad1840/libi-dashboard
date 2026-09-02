@@ -13,30 +13,34 @@
 | scout - סינתזה שבועית | `trig_011vNro59jejMbDdUHZej81E` | `0 6 * * 0` | 09:00 ראשון | מייל | **פעיל** |
 | radar - הזדמנויות ודדליינים | `trig_019eDoxiZcLKNZ6qkoSRSxPo` | `0 4 * * 1,5` | 07:00 שני + שישי | דחיפה | **פעיל** |
 | curator - כיול המערכת | `trig_011We76xpfAYRLWnwZz5nCsD` | `30 5 * * 4` | 08:30 חמישי | מייל | **פעיל** |
+| curator - לולאת למידה תלת-יומית | `trig_01DVuQcddSh8NEtbtRRsxixk` | `18 5 */3 * *` | 08:18, כל 3 ימים | - | **דורש חיבור ריפו חד-פעמי דרך ה-UI, ראה למטה** |
+| amplifier - צינור הפרסום | `trig_01B4hMAjSew8wBq8iSkvtBht` | `0 5 * * 3` | 08:00 רביעי | - | **דורש חיבור ריפו חד-פעמי דרך ה-UI, ראה למטה** |
 | advocate - תיק ראיות | `trig_01D3qZy625L3T7G2BPkHQVUh` | `0 4 * * 2` | 07:00 שלישי | מייל | **מושהה - שלב 3** |
 | rival - מפת שחקנים | `trig_01UViTw7qqyFfuqyhB74fkic` | `0 4 * * 3` | 07:00 רביעי | מייל | **מושהה - שלב 4** |
 | relations - מפת כוח | `trig_01EMxSuiX9MzUrCRScRaKfNB` | `0 4 * * 4` | 07:00 חמישי | מייל | **מושהה - שלב 4** |
-| gateway - טלגרם/מייל | `trig_01AiasrTtQ23dpM27eky2ESt` | `6 * * * *` | כל שעה, ב-06 דקות | - | **מושהה - ראה למטה** |
-| auditor - בודק | אין Routine | on-demand | - | - | **פעיל, inline בלבד** - מופעל מתוך producer או gateway |
+| gateway - טלגרם/מייל | `trig_01LwvT1u2ZjyXsGzKVA6HPzg` | `6 * * * *` | כל שעה, ב-06 דקות | - | **פעיל** |
+| auditor - בודק | אין Routine | R2/R3 | - | - | **בדיקות שנקראות בתוך המסלול לפי `context/orchestration.md`, לא סוכן עצמאי** |
 | producer - מפיק | אין Routine | on-demand | - | - | **פעיל, inline בלבד** - מופעל מתוך gateway ("תכין תוצר על X") |
-| amplifier - מגבר | אין Routine | event-driven | - | - | **פעיל, inline בלבד** - מופעל מתוך producer, רק אחרי אישור auditor |
+
+**`amplifier` וגם `curator` (לולאת הלמידה) נוצרו דרך ה-API ולכן ללא ריפו מחובר -
+בדיוק כמו ש-`gateway` היה עד שתוקן.** תיקון חד-פעמי: `claude.ai/code/routines` -> עיפרון על
+הרוטין -> ודא ריפו וסביבה נכונים -> Save. בלי זה שני אלה יורים לתוך קונטיינר ריק ומסתיימים
+תוך שניות בלי לייצר כלום - זה בדיוק מה שקרה ל-`curator` בלולאת הלמידה בירייתה הראשונה
+(01.09, 05:20 UTC): "הצליחה" תוך 55 שניות ולא כתבה שום קובץ.
+
+**`auditor` שונה החל מ-01.09.** הוא לא סוכן שממתין לתורו בשרשרת - הוא סט הבדיקות שנקרא
+בתוך מסלול R2/R3 (ראה `context/orchestration.md`), באותה ריצה של הסוכן שמצא את הפריט.
+אין לו Routine כי הוא לא צריך אחד.
 
 **עמודת "התראה" בטבלה למעלה היא ה-push/email של Claude Code עצמו** (התראה שסשן הסתיים) -
 **לא** ערוץ Telegram/Email של aviad-desk. שני מנגנונים נפרדים, מכוונים במקומות שונים.
 תוכן בפועל (בריף, דגלים, דוחות שבועיים) יוצא דרך `scripts/telegram_send.py` / `scripts/email_notify.py`,
 מוגדר ב-`RUN.md` סעיף 7.5 ותלוי ב-`TELEGRAM_BOT_TOKEN` / `EMAIL_SMTP_*` שהוגדרו.
 
-## gateway - למה מושהה, ואיך מפעילים
+## gateway - פעיל מ-30.8
 
-`gateway` נוצר אך **מושהה עד שיש `TELEGRAM_BOT_TOKEN` אמיתי** - בלי טוקן הוא רק בודק ויוצא כל שעה,
-בזבוז מכסה בלי תועלת. סדר ההפעלה:
-
-1. צור בוט מול `@BotFather` בטלגרם (`/newbot`), קבל טוקן
-2. הגדר `TELEGRAM_BOT_TOKEN` ו-`TELEGRAM_SETUP_CODE` (מחרוזת סוד לבחירתך) כמשתני סביבה ברמת
-   ה-Claude Code environment - לא בקוד, לא ב-`.env` שנדחף. ראה `.env.example` לרשימה המלאה
-3. הפעל את הרוטין (enable ב-trigger `trig_01AiasrTtQ23dpM27eky2ESt`)
-4. שלח לבוט `/start <TELEGRAM_SETUP_CODE>` - זה מקשר את ה-`chat_id` שלך ב-`config/telegram.json`.
-   מרגע זה, כל הודעה משולח אחר תידחה בשקט - ראה `GATEWAY.md`
+`TELEGRAM_BOT_TOKEN` הוגדר ו-`config/telegram.json` מקושר. `gateway` רץ כל שעה, מנקז את
+`outbox/` (שלב 3.2), מריץ את השומר (שלב 3.4), ומגיב להודעות נכנסות. ראה `GATEWAY.md`.
 
 **מגבלת זמן אמת:** `gateway` בודק הודעות **פעם בשעה בלבד** - זה הפער המקסימלי שרוטין יכול לירות בו
 בפלטפורמה הזו, נבדק ישירות (ניסיון ליצור טריגר כל 5 דקות נדחה: "minimum interval is 1 hour").

@@ -2,7 +2,7 @@
 id: scout
 namespace: intel/
 context_base: [_index]
-context_role: [sources, filter]
+context_role: [sources, filter, queries]
 context_on_demand: [claims, open-questions]
 cadence: daily + weekly
 cost_class: A (daily) / B (weekly)

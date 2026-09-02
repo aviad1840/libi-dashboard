@@ -15,7 +15,9 @@
     "tier",
     "novelty",
     "actionability",
-    "confidence"
+    "confidence",
+    "evidence_level",
+    "source_date"
   ],
   "properties": {
     "id": {
@@ -53,28 +55,42 @@
         "E4",
         "E5",
         "E6"
-      ]
+      ],
+      "description": "חובה. E0-E6 לפי context/claims.md. FACT דורש E3 ומעלה, ציטוט דורש E3 ומעלה, מספר דורש E2 ומעלה, ו-E0/E1 דורש unverified=true. נאכף על ידי scripts/verify.py"
     },
     "source_url": {
       "type": "string"
     },
     "source_date": {
-      "type": "string"
+      "type": "string",
+      "description": "חובה. תאריך פרסום המקור. לא נמצא - כתוב במפורש \"לא נמצאה ראיה\". שתיקה אינה אפשרות"
     },
     "relevance": {
       "type": "string",
       "description": "משפט אחד - למה זה נוגע לאביעד, מסלול או טענה ספציפיים"
     },
     "relevance_score": {
-      "enum": ["low", "medium", "high"],
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
       "description": "חובה. דירוג רלוונטיות - לא רק הסבר טקסטואלי"
     },
     "actionability": {
-      "enum": ["low", "medium", "high"],
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
       "description": "חובה. עד כמה ניתן לפעול על הפריט הזה עכשיו, לא רק לקרוא"
     },
     "confidence": {
-      "enum": ["low", "medium", "high"],
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
       "description": "חובה. ביטחון הסוכן בשיפוט relevance/actionability שלו. שונה מ-evidence_level - זה דירוג הראיה עצמה, זה דירוג השיפוט"
     },
     "test_question": {

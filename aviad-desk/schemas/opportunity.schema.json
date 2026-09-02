@@ -11,7 +11,9 @@
     "novelty",
     "actionability",
     "confidence",
-    "status"
+    "status",
+    "source_url",
+    "evidence_level"
   ],
   "properties": {
     "id": {
@@ -55,15 +57,26 @@
       "type": "string"
     },
     "novelty": {
-      "enum": ["new", "material-change"],
+      "enum": [
+        "new",
+        "material-change"
+      ],
       "description": "חובה. הזדמנות שאינה חדשה ואין בה שינוי מהותי - לא נכנסת (זהה לכלל ב-intel-item)"
     },
     "actionability": {
-      "enum": ["low", "medium", "high"],
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
       "description": "חובה. עד כמה ניתן לפעול על זה עכשיו"
     },
     "confidence": {
-      "enum": ["low", "medium", "high"],
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
       "description": "חובה. ביטחון הסוכן בשיפוט הרלוונטיות/actionability"
     },
     "effort_estimate": {
@@ -91,6 +104,18 @@
         "נדחה",
         "הוגש"
       ]
+    },
+    "evidence_level": {
+      "enum": [
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6"
+      ],
+      "description": "חובה. עד כמה המועד והתנאים מאומתים. קול קורא רשמי הוא E3, שמועה היא E1"
     }
   }
 }

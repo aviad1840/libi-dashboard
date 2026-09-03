@@ -1,0 +1,17 @@
+.DS_Store
+*.tmp
+__pycache__/
+*.pyc
+inbox/*
+!inbox/.gitkeep
+!inbox/README.md
+!inbox/processed/.gitkeep
+!inbox/unclear/.gitkeep
+!inbox/telegram/
+
+# state/runs.jsonl הוא יומן production שגדל אך ורק על desk/log, לעולם לא על ענף
+# מערכת. עותק שנתקע כאן (למשל מ-git add -A שרץ בטעות אחרי בדיקה מקומית) יוצר
+# בהכרח קונפליקט מיזוג ב-desk.sh start בכל ריצה עתידית - זה קרה בפועל ב-01.09
+# וגרם לפער של 23 שעות בלי שום רשומת ריצה. הענף הזה לא כותב אליו בכלל.
+aviad-desk/state/runs.jsonl
+aviad-desk/state/heartbeat/

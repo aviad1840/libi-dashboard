@@ -17,7 +17,9 @@
     "actionability",
     "confidence",
     "evidence_level",
-    "source_date"
+    "source_date",
+    "why_it_matters",
+    "what_is_new"
   ],
   "properties": {
     "id": {
@@ -59,7 +61,8 @@
       "description": "חובה. E0-E6 לפי context/claims.md. FACT דורש E3 ומעלה, ציטוט דורש E3 ומעלה, מספר דורש E2 ומעלה, ו-E0/E1 דורש unverified=true. נאכף על ידי scripts/verify.py"
     },
     "source_url": {
-      "type": "string"
+      "type": "string",
+      "description": "חובה. כתובת ישירה בת-פתיחה. \"מצטט את הדוח\" או \"לפי תקצירי חיפוש\" אינם קישור. אין קישור - הפריט לא נכנס לדוח"
     },
     "source_date": {
       "type": "string",
@@ -137,6 +140,26 @@
     "escalation_trigger": {
       "type": "string",
       "description": "חובה כאשר tier=L2"
+    },
+    "why_it_matters": {
+      "type": "string",
+      "maxLength": 400,
+      "description": "חובה. המשמעות בפועל למהלך של אביעד, בשפה של בן אדם. לא שם טענה. ניסוח גנרי (\"מעניין\", \"כדאי לעקוב\") פוסל את הפריט"
+    },
+    "what_is_new": {
+      "type": "string",
+      "maxLength": 300,
+      "description": "חובה. מה חדש ביחס לידוע: מחזק / סותר / ראשון מסוגו / מספר שלא היה"
+    },
+    "publish_ready": {
+      "type": "string",
+      "maxLength": 600,
+      "description": "נוסח קצר להעתקה ללינקדאין או ל-GOV.AI, או \"לא רלוונטי\". אסור שיכיל עובדה שאינה ב-summary ובמקור"
+    },
+    "why_now": {
+      "type": "string",
+      "maxLength": 300,
+      "description": "חובה לפריטי TOP בלבד. מה הופך את זה לרלוונטי היום ולא בעוד חודש"
     }
   }
 }

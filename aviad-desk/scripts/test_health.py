@@ -109,6 +109,55 @@ check("connected=false הוא YELLOW NOT CONNECTED, לא כשל runtime",
 res = h.check_missed([], {"scout": {"cron": ["30 2 * * 0-4"], "grace_misses": 2}}, NOW)
 check("סוכן מחובר שלא הותיר רשומה הוא RED", [x["level"] for x in res], ["RED"])
 
+print("\nalert_if_new - התראה רק במעבר, לא תזכורת מחזורית")
+import io as _io
+import tempfile
+
+
+def rep(status, red=0):
+    findings = [{"level": "RED", "check": "missed", "agent": "x", "detail": "x"}] * red
+    return {"checked_at": NOW.isoformat(timespec="seconds"), "status": status,
+            "red": red, "yellow": 0, "runs_seen": 1, "agents_watched": 1, "findings": findings}
+
+
+def with_temp_health(fn):
+    """מריץ fn מול קובץ state זמני ונקי, כדי לא לגעת ב-state/health.json האמיתי."""
+    fd, path = tempfile.mkstemp()
+    os.close(fd)
+    os.remove(path)
+    orig = h.HEALTH
+    h.HEALTH = path
+    try:
+        return fn()
+    finally:
+        h.HEALTH = orig
+        if os.path.exists(path):
+            os.remove(path)
+
+
+def scenario(*statuses):
+    """alert_if_new ברצף על סטטוסים עוקבים, על אותו קובץ state. מחזיר את הפלטים לכל ריצה."""
+    return with_temp_health(
+        lambda: [h.alert_if_new(rep(st, red=1 if st == "RED" else 0)) for st in statuses])
+
+
+RECOVERED = "בריאות המערכת: חזר לתקין. כל הממצאים האדומים נסגרו"
+
+check("GREEN ראשוני - בלי היסטוריה - לא מתריע", scenario("GREEN"), [""])
+check("GREEN -> GREEN -> GREEN: אף ריצה לא שולחת התראה",
+      scenario("GREEN", "GREEN", "GREEN"), ["", "", ""])
+check("GREEN -> RED שולח פעם אחת, RED -> RED הבא שותק - אין תזכורת מחזורית",
+      [x != "" for x in scenario("GREEN", "RED", "RED", "RED")], [False, True, False, False])
+check("RED -> GREEN שולח הודעת החלמה פעם אחת", scenario("GREEN", "RED", "GREEN")[2], RECOVERED)
+check("אחרי ההחלמה, GREEN נוסף חוזר לשתוק",
+      scenario("GREEN", "RED", "GREEN", "GREEN")[3], "")
+check("YELLOW -> YELLOW: לא RED, לא מתריע", scenario("YELLOW", "YELLOW"), ["", ""])
+check("RED -> YELLOW נחשב יציאה מ-RED, שולח הודעת החלמה אחת",
+      scenario("GREEN", "RED", "YELLOW")[2], RECOVERED)
+check("קובץ state פגום לא מפיל - מתייחס כאילו אין היסטוריה", with_temp_health(lambda: (
+    _io.open(h.HEALTH, "w", encoding="utf-8").write("{שבור"),
+    h.alert_if_new(rep("GREEN")))[-1]), "")
+
 print()
 if fails:
     print(f"נכשלו {len(fails)} בדיקות:\n")

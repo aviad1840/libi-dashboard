@@ -46,6 +46,22 @@
       "title": "GovTech סינגפור - רישום סוכני AI ופלטפורמת AI Assistant Desk לעובדי ציבור",
       "agent": "scout",
       "tier": "L1"
+    },
+    {
+      "event_id": "dcace7af43b5",
+      "date": "2026-09-03",
+      "item": "I-20260903-01",
+      "title": "McKinsey State of AI 2026 - domain-based programs מגיעות לייצור פי 2.3 יותר מ-use-case",
+      "agent": "scout",
+      "tier": "L1"
+    },
+    {
+      "event_id": "7c9e442d05f6",
+      "date": "2026-09-03",
+      "item": "I-20260903-02",
+      "title": "איחוד האמירויות מקימה Federal Authority for AI and Data, כפופה לקבינט",
+      "agent": "scout",
+      "tier": "L1"
     }
   ]
 }

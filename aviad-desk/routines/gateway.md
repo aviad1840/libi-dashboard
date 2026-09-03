@@ -73,7 +73,7 @@ python3 aviad-desk/scripts/outbox_put.py gateway "<הפלט המלא של health
 ## שלב 4 - סגירה
 
 ```bash
-bash aviad-desk/scripts/desk.sh finish gateway --note "N נשלחו מהתור, N הודעות, N פקודות, N פידבק, N חסומות, שומר: תקין/N אדום"
+bash aviad-desk/scripts/desk.sh finish gateway --failures N --note "N נשלחו מהתור, N הודעות, N פקודות, N פידבק, N חסומות, שומר: תקין/N אדום"
 ```
 
 **גם ירייה ריקה מסתיימת ב-finish** - זה מקדם offset ו-audit גם בלי הודעות חדשות.

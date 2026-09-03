@@ -2,7 +2,7 @@
 # desk.sh - שכבת הרנר התפעולית. מה שתלוי בפלטפורמה יושב כאן, לא ב-agents/.
 #
 #   desk.sh start  <agent>   הכנת סביבת ריצה: fetch, בחירת ענף, מיזוג מערכת, הדפסת בריף ריצה
-#   desk.sh finish <agent> [--items N] [--l0 N] [--l1 N] [--l2 N] [--note "..."]
+#   desk.sh finish <agent> [--items N] [--failures N] [--l0 N] [--l1 N] [--l2 N] [--note "..."]
 #                            אכיפת בידוד כתיבה, ולידציה, רישום ריצה, commit, push
 #   desk.sh check  <agent>   בדיקת בידוד כתיבה בלבד, בלי לדחוף
 #   desk.sh health           דוח בריאות המערכת. קוד יציאה 1 כשיש ממצא אדום
@@ -29,12 +29,6 @@ info() { echo "$*"; }
 alert() {
   local agent="$1" text="$2"
   python3 "$DESK_DIR/scripts/outbox_put.py" "$agent" "$text" >/dev/null 2>&1 || true
-}
-
-# סיווג הערת ריצה. מקור האמת לסימני הכשל הוא health.py, לא רשימה משוכפלת כאן.
-# הארגומנט השני הוא מספר הפריטים. ריצה שהפיקה תוצר למרות מקור חסום אינה מדורדרת.
-classify_note() {
-  python3 "$DESK_DIR/scripts/health.py" --classify-note "$1" "${2:-0}" 2>/dev/null || echo ok
 }
 
 # --------------------------------------------------------------------- heartbeat
@@ -250,14 +244,17 @@ cmd_check() {
 # ---------------------------------------------------------------------- finish
 cmd_finish() {
   local agent="$1"; shift
-  local items="" l0="" l1="" l2="" note=""
+  local items="" l0="" l1="" l2="" note="" failures=""
   while [ $# -gt 0 ]; do
     case "$1" in
       --items) items="$2"; shift 2;; --l0) l0="$2"; shift 2;;
       --l1) l1="$2"; shift 2;;     --l2) l2="$2"; shift 2;;
-      --note) note="$2"; shift 2;; *) shift;;
+      --note) note="$2"; shift 2;;
+      --failures) failures="$2"; shift 2;;
+      *) shift;;
     esac
   done
+  case "${failures:-0}" in *[!0-9]*) die "--failures מקבל מספר שלם בלבד";; esac
 
   cmd_check "$agent" || die "ריצה נעצרה. סוכן כתב מחוץ ל-namespace שלו"
 
@@ -288,26 +285,30 @@ cmd_finish() {
     cat /tmp/desk-verify.txt
   fi
 
-  # הסטטוס נגזר מההערה, לא נקבע מראש. ריצה שההערה שלה מודה בכשל טכני נרשמת
-  # degraded ולא ok. בלי זה "telegram_fetch נכשל: HTTP 404" נרשם כהצלחה - זה קרה בפועל.
-  local status; status="$(classify_note "$note" "${items:-0}")"
+  # הסטטוס נקבע משדה תוצאה מפורש, לא מחיפוש מילים בהערה. סוכן שסיים עם כשלים
+  # מדווח --failures N, ואפס כשלים הוא הצלחה. ההערה נשמרת כלשונה לצורכי audit
+  # בלבד ואינה משפיעה על הסטטוס: "0 כשלים" היא דיווח הצלחה, "1 נשלח" היא דיווח
+  # הצלחה, ושום סריקת מחרוזות לא מבחינה ביניהן לבין כשל. קרה בפועל ב-03.09 08:09.
+  local failed_n="${failures:-0}"
+  local status="ok"; [ "$failed_n" -gt 0 ] && status="degraded"
 
   # רישום הריצה. זה המקור שממנו curator מחשב עלות לממצא מועיל, וגם /agents ו-/status ב-gateway
-  python3 - "$agent" "${items:-0}" "${l0:-0}" "${l1:-0}" "${l2:-0}" "$note" "$status" <<'PY'
+  python3 - "$agent" "${items:-0}" "${l0:-0}" "${l1:-0}" "${l2:-0}" "$note" "$status" "$failed_n" <<'PY'
 import json,sys,datetime,pathlib
 p = pathlib.Path("aviad-desk/state/runs.jsonl"); p.parent.mkdir(parents=True, exist_ok=True)
 rec = {"date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
        "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
        "agent": sys.argv[1], "status": sys.argv[7], "items": int(sys.argv[2] or 0),
+       "failures": int(sys.argv[8] or 0),
        "l0": int(sys.argv[3] or 0), "l1": int(sys.argv[4] or 0), "l2": int(sys.argv[5] or 0),
        "note": sys.argv[6][:200]}
 with p.open("a", encoding="utf-8") as fh: fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
 PY
 
-  # ריצה מדורדרת מתריעה מיד, בלי לחכות לשומר השעתי
+  # ריצה עם כשלים מתריעה מיד, בלי לחכות לשומר השעתי
   if [ "$status" = "degraded" ]; then
-    info "אזהרה: הריצה נרשמה degraded - ההערה מכילה סימן כשל טכני"
-    alert "$agent" "$agent: ריצה הסתיימה עם סימן כשל טכני
+    info "אזהרה: הריצה נרשמה degraded - $failed_n כשלים דווחו"
+    alert "$agent" "$agent: ריצה הסתיימה עם $failed_n כשלים
 $(date -u +%Y-%m-%d\ %H:%M)Z
 $note"
   fi

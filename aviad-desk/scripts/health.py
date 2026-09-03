@@ -3,7 +3,7 @@
 
 הבעיה שזה פותר: ב-46 הריצות הראשונות לא נרשם ולו כשל אחד. לא כי לא היו כשלים,
 אלא כי כשל לא יכול לתעד את עצמו. רוטין שמת לפני desk.sh לא כותב כלום, וריצה
-שנכשלה באמצע נרשמה status=ok עם הערה שאומרת "נכשל".
+שנכשלה באמצע נרשמה status=ok. הסוכן מדווח כשלים במפורש דרך --failures.
 
 שבע בדיקות, כל אחת נגד כשל שקרה בפועל או נגד פער שהודגם בפועל:
 
@@ -11,12 +11,13 @@
                       אחרי ש-grace_misses ירי נגמר (שעות עד ימים, לפי תדירות)
   2. hung          - heartbeat פתוחה מעל max_minutes בלי finish/fail תואם.
                       אותו כשל בדיוק כמו missed, מזוהה תוך דקות במקום ימים
-  3. hidden        - רשומת ok שההערה שלה מכילה סימן כשל. תופס דיווח כוזב
+  3. failed        - ריצה שהוכרזה failed או שדיווחה failures>0. לפי שדות
+                      התוצאה של הריצה, לא לפי חיפוש מילים בהערה
   4. barren        - רצף דוחות ריקים. תופס דעיכת תפוקה לפני שקט מוחלט
   5. stuck         - הודעה שתקועה ב-outbox מעבר לחלון. תופס gateway שלא מנקז
   6. stale_source  - מקור ש-chief-of-staff מציג לא עודכן בזמן. לפי git log,
                       לא mtime - checkout טרי מאפס mtime בלי קשר לגיל האמיתי
-  7. retry         - לא בדיקה עצמאית, אלא הקשר שנוסף ל-missed/hidden: כמה נסיונות
+  7. retry         - לא בדיקה עצמאית, אלא הקשר שנוסף ל-missed/failed: כמה נסיונות
                       רצופים נכשלו, ומתי הניסיון הבא (retry הוא הירי המתוזמן הבא,
                       אין רענון-מיידי בפלטפורמה הזו - זה מתועד כאן ולא מוסתר)
 
@@ -25,7 +26,6 @@
     health.py --json          פלט מכונה
     health.py --alert-text    רק שורות ההתראה, ריק אם הכל תקין
     health.py --alert-if-new  כמו --alert-text אך עם דדופ. זה מה ש-gateway מריץ
-    health.py --classify-note "<note>"   ok או degraded, לפי סימני כשל בהערה
     health.py --quiet         בלי פלט, רק קוד יציאה
 
 קוד יציאה: 0 תקין או צהוב · 1 יש RED · 2 שגיאת הרצה
@@ -33,7 +33,6 @@
 """
 import json
 import os
-import re
 import subprocess
 import sys
 import datetime as dt
@@ -46,66 +45,19 @@ OUTBOX = os.path.join(ROOT, "outbox")
 HEALTH = os.path.join(ROOT, "state", "health.json")
 HEARTBEAT_DIR = os.path.join(ROOT, "state", "heartbeat")
 
-# סימני כשל בתוך הערת ריצה שנרשמה כ-ok. מבוסס על כשלים אמיתיים מהיומן,
-# לא על ניחוש: "telegram_fetch נכשל: HTTP 404" נרשם כ-ok ב-30.8
-FAILURE_MARKERS = (
-    "נכשל", "כשל", "שגיאה", "חסום", "לא הצלחתי", "לא זמין", "תקוע",
-    "HTTP 4", "HTTP 5", "error", "Error", "ERROR", "timeout", "Traceback",
-    "refused", "denied", "unauthorized", "forbidden",
-)
-
-# ניסוחים שנשמעים ככשל אך הם תוצאה עסקית תקינה. מוסרים מההערה לפני הסריקה.
-# בלי זה "נכשלו בשער הערך" - שהיא בדיוק ההתנהגות הרצויה - נספרת כתקלה,
-# והשומר מאבד אמון תוך יומיים. שומר שצועק על הצלחה מכבים אותו, ובצדק.
-BENIGN_PHRASES = (
-    "נכשלו בשער הערך", "נכשל בשער הערך",
-    "נכשלו בשער הדדופ", "נכשל בשער הדדופ",
-    "נכשלו בשער", "נכשל בשער",
-    "נכשלו בסף", "נכשל בסף",
-    "נכשלו באימות הראיה", "נכשל באימות הראיה",
-    # "מה תקוע" הוא סעיף קבוע בבריף (brief-daily.md / chief-of-staff.md) - chief-of-staff
-    # כותב "אין דגל/תקוע חדש" בכל ריצה רגילה. בלי זה, הדיווח התקין ביותר האפשרי
-    # (שום דבר לא תקוע) נתפס כרשומת כשל, כל יום. נמצא בפועל ב-01.09 03:19Z.
-    "אין דגל/תקוע חדש", "אין תקוע חדש", "אין דגל חדש/תקוע חדש",
-)
-
-
-# מקטע שמדווח על חסימת מקור חיצוני. לפי חוזה scout (filter.md) חסימה היא שגרה
-# מוצהרת ולא תקלה, והדוח חייב לתעד אותה. ריצה שהפיקה ממצאים למרות חסימה היא
-# בדיוק ההתנהגות הרצויה - לא ריצה מדורדרת. קרה ב-03.09: scout מצא 2 ממצאים
-# תקינים, כתב "mckinsey.com חסום HTTP 503", ונרשם degraded.
-BLOCKED_CLAUSE = re.compile(r"[^,.;|]*חסום[^,.;|]*")
-
-
-# הפניה מטא: מקטע שמצטט הערה קודמת או התראת שומר, במקום לדווח על כשל בריצה
-# הנוכחית. gateway מדווח בכל ריצה את מצב השומר, ולכן ההערה שלו נושאת את מילות
-# הכשל של הריצה שלפניה. בלי זה כשל בודד שכבר טופל מנציח את עצמו: כל ריצה
-# מצטטת את הקודמת ונרשמת degraded, לנצח. נמצא בפועל ב-03.09 06:06 -
-# "שומר: 1 אדום - תויק לתור (gateway note קודם הכיל מילת נכשל)", ריצה תקינה
-# לחלוטין שניקזה את התור. דיווח על כשל אינו כשל.
-META_REFERENCE = (
-    "note קודם", "note קודמת", "הערה קודמת", "ההערה הקודמת",
-    "ריצה קודמת", "הריצה הקודמת", "הכיל מילת", "מילת כשל", "התראת שומר",
-)
-PAREN = re.compile(r"\([^()]*\)")
-
-
-def _is_meta(seg):
-    return any(k in seg for k in META_REFERENCE)
-
-
-def drop_meta(note):
-    """מסיר ציטוט של הערה קודמת - בסוגריים או כמקטע מופרד - לפני הסריקה."""
-    note = PAREN.sub(lambda m: "" if _is_meta(m.group(0)) else m.group(0), note)
-    parts = re.split(r"([,.;|])", note)
-    return "".join(p for p in parts if not _is_meta(p))
-
-
-def scrub(note):
-    """מסיר ניסוחי תוצאה עסקית וציטוטי עבר לפני חיפוש סימני כשל טכני."""
-    for phrase in BENIGN_PHRASES:
-        note = note.replace(phrase, "")
-    return drop_meta(note)
+# הסטטוס נקבע משדות התוצאה של הריצה, לא מחיפוש מילים בהערה.
+#
+# החיפוש בהערה נוסה ונכשל. הוא תפס דיווחי הצלחה ככשלים, כל אחד מהם דרש חריג
+# משלו, והחריגים עצמם ייצרו חריגים: "נכשלו בשער הערך" (סינון תקין), "אין
+# דגל/תקוע חדש" (סעיף קבוע בבריף), "מקור חסום" בריצה שהפיקה ממצאים, ציטוט של
+# הערה קודמת, ולבסוף "0 כשלים" - הודעה שאומרת במפורש שאין כשלים ונרשמה ככשל
+# (03.09 08:09Z, gateway: 1 נשלח, 0 כשלים, שומר תקין). מחרוזת אינה מבחינה בין
+# דיווח על כשל לבין כשל, ואף רשימת חריגים לא תגרום לה להבחין.
+#
+# מקור האמת: status ו-failures, ששניהם נכתבים במפורש על ידי desk.sh בסיום.
+#   status=failed   - cmd_fail, כשל מוצהר עם reason
+#   failures > 0    - הסוכן דיווח --failures N
+# ההערה נשמרת ברשומה כלשונה ומוצגת בהתראה, לצורכי audit בלבד.
 STUCK_HOURS = 3          # הודעה בתור מעבר לזה = gateway לא מנקז
 MISSED_LOOKBACK_DAYS = 14
 REPEAT_ALERT_HOURS = 12  # אותה התראה בדיוק לא נשלחת שוב לפני זה
@@ -261,17 +213,21 @@ def load_heartbeats():
     return out
 
 
-def _true_ok(rec):
-    """סטטוס ok אמיתי. classify_note הוא מקור האמת, לא שדה status הקפוא ברשומה.
+def _failures(rec):
+    """מספר הכשלים שהריצה דיווחה. רשומה ישנה בלי השדה נחשבת אפס.
 
-    שני הכיוונים חייבים לעבוד. רשומה שנכתבה ok וההערה שלה מודה בכשל אינה ok -
-    זה ה-hidden failure. אבל גם ההפך: status הוא נגזרת של ההערה שהוקפאה ברגע
-    הכתיבה, ולכן רשומה שנכתבה degraded על ידי מסווג שתוקן מאז נשארת degraded
-    לנצח ומרעילה את מונה הסטריק. רק status=failed הוא הצהרה מפורשת של cmd_fail
-    עם reason משלו - אותו לא גוזרים מחדש מההערה.
+    רשומות מלפני שדה failures נשאו status=degraded שנגזר מסריקת מחרוזות,
+    ולכן הן לא ראיה לכשל. status=failed, שנכתב מפורשות, כן נשאר מחייב.
     """
-    return (rec.get("status") != "failed"
-            and classify_note(rec.get("note") or "", rec.get("items")) == "ok")
+    try:
+        return int(rec.get("failures") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _true_ok(rec):
+    """ריצה מוצלחת: לא הוכרזה failed, ולא דיווחה ולו כשל אחד."""
+    return rec.get("status") != "failed" and _failures(rec) == 0
 
 
 def consecutive_non_ok(runs, agent):
@@ -329,23 +285,21 @@ def check_missed(runs, expected, now):
     return out
 
 
-def check_hidden(runs, expected, now, window_hours=26):
-    """רשומת ok שההערה שלה מודה בכשל, או רשומת failed מפורשת.
+def check_failures(runs, expected, now, window_hours=26):
+    """ריצה שהוכרזה failed או שדיווחה failures>0. שדות בלבד, לא טקסט ההערה.
 
     מדווח רשומה אחת בלבד לכל סוכן - האחרונה בחלון - עם מונה הסטריק המצטבר.
-    שלושה כשלים רצופים של אותו סוכן הם אירוע אחד מתמשך, לא שלוש התראות זהות -
-    בלעדי זה, fingerprint (check:agent זהה לשלושתן) גם ככה מקפל אותן לירייה
-    אחת בדדופ, אבל הדוח המלא (health.py בלי --alert) היה מציג שלוש שורות
-    כמעט זהות על אותה תקלה עצמה. זה רעש, לא מידע.
+    שלושה כשלים רצופים של אותו סוכן הם אירוע אחד מתמשך, לא שלוש התראות זהות.
+
+    ההערה מצורפת לפרטי ההתראה כדי שיהיה מה לקרוא, אך אין לה שום משקל בהחלטה
+    אם זו התראה מלכתחילה.
     """
     out = []
     cutoff = now - dt.timedelta(hours=window_hours)
 
     # ריצה תקינה מאוחרת יותר של אותו סוכן פירושה שה-retry הצליח והכשל נפתר.
     # הוא עדיין מוצג, אך כצהוב: אדום פירושו "שבור עכשיו". כשל שהריצה הבאה כבר
-    # תיקנה, ונשאר אדום עד שהחלון פג, הוא נכון היסטורית ושקרי בהווה - וזו בדיוק
-    # ההתראה שמאבדת אמון. קרה ב-03.09: gateway תוקן ב-06:09 והכשל של 05:09
-    # המשיך לצעוק.
+    # תיקנה, ונשאר אדום עד שהחלון פג, הוא נכון היסטורית ושקרי בהווה.
     healed_at = {}
     for r in runs:
         ts = parse_ts(r.get("ts"))
@@ -357,19 +311,14 @@ def check_hidden(runs, expected, now, window_hours=26):
     latest = {}
     for r in runs:
         ts = parse_ts(r.get("ts"))
-        if not ts or ts < cutoff:
+        if not ts or ts < cutoff or _true_ok(r):
             continue
         agent = r.get("agent")
-        note = str(r.get("note") or "")
-        degraded = classify_note(note, r.get("items")) == "degraded"
-        hit = next((m for m in FAILURE_MARKERS if m in scrub(note)), None) if degraded else None
-        if r.get("status") != "failed" and not hit:
-            continue
         prev = latest.get(agent)
         if prev is None or ts > prev[0]:
-            latest[agent] = (ts, r, hit)
+            latest[agent] = (ts, r)
 
-    for agent, (ts, r, hit) in latest.items():
+    for agent, (ts, r) in latest.items():
         note = str(r.get("note") or "")
         healed = healed_at.get(agent)
         healed = healed if healed and healed > ts else None
@@ -386,17 +335,16 @@ def check_hidden(runs, expected, now, window_hours=26):
             streak_txt = f" (נסיון {streak} ברצף)"
 
         if r.get("status") == "failed":
-            out.append({
-                "level": level, "check": "failed", "agent": agent,
-                "detail": (f"{escalate}{agent} נכשל ב-{ts:%d.%m %H:%M}Z"
-                          f"{streak_txt}: {str(r.get('reason') or note)[:120]}.{tail}"),
-            })
+            what = f"{agent} נכשל ב-{ts:%d.%m %H:%M}Z"
+            body = str(r.get("reason") or note)[:120]
         else:
-            out.append({
-                "level": level, "check": "hidden", "agent": agent,
-                "detail": (f"{escalate}{agent} נרשם ok אך ההערה מכילה \"{hit}\" "
-                          f"({ts:%d.%m %H:%M}Z){streak_txt}: {note[:120]}.{tail}"),
-            })
+            n = _failures(r)
+            what = f"{agent} דיווח {n} כשלים ב-{ts:%d.%m %H:%M}Z"
+            body = note[:120]
+        out.append({
+            "level": level, "check": "failed", "agent": agent,
+            "detail": f"{escalate}{what}{streak_txt}: {body}.{tail}",
+        })
     return out
 
 
@@ -518,7 +466,7 @@ def build(now=None):
     findings = (
         check_missed(runs, expected, now)
         + check_hung(runs, expected, now)
-        + check_hidden(runs, expected, now)
+        + check_failures(runs, expected, now)
         + check_barren(runs, expected)
         + check_stale_sources(now)
         + check_stuck(now)
@@ -608,32 +556,8 @@ def _save_health(state):
         pass  # השומר לא מפיל את הריצה בגלל קובץ מצב
 
 
-def classify_note(note, items=None):
-    """ok או degraded. מקור אמת יחיד לסימני הכשל, כדי ש-desk.sh לא ישכפל רשימה.
-
-    items מאפשר את ההבחנה היחידה שחסרה: ריצה שהפיקה ממצאים למרות מקור חסום
-    אינה מדורדרת. ריצה שלא הפיקה כלום ומדווחת חסימה - כן, שם החסימה היא הסיבה.
-    """
-    text = scrub(str(note or ""))
-    try:
-        produced = items is not None and int(items) > 0
-    except (TypeError, ValueError):
-        produced = False
-    if produced:
-        text = BLOCKED_CLAUSE.sub("", text)
-    return "degraded" if any(m in text for m in FAILURE_MARKERS) else "ok"
-
-
 def main():
     args = set(sys.argv[1:])
-
-    # מצב עצמאי: סיווג הערת ריצה. לא נוגע ביומן ולא בשומר
-    if "--classify-note" in sys.argv:
-        i = sys.argv.index("--classify-note")
-        note = sys.argv[i + 1] if i + 1 < len(sys.argv) else ""
-        items = sys.argv[i + 2] if i + 2 < len(sys.argv) else None
-        print(classify_note(note, items))
-        return 0
 
     try:
         rep = build()

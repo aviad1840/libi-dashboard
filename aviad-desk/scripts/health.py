@@ -25,7 +25,7 @@
     health.py                 דוח מלא, טקסט עברי
     health.py --json          פלט מכונה
     health.py --alert-text    רק שורות ההתראה, ריק אם הכל תקין
-    health.py --alert-if-new  כמו --alert-text אך עם דדופ. זה מה ש-gateway מריץ
+    health.py --alert-if-new  כמו --alert-text, אך רק במעבר RED <-> not-RED. זה מה ש-gateway מריץ
     health.py --quiet         בלי פלט, רק קוד יציאה
 
 קוד יציאה: 0 תקין או צהוב · 1 יש RED · 2 שגיאת הרצה
@@ -60,7 +60,6 @@ HEARTBEAT_DIR = os.path.join(ROOT, "state", "heartbeat")
 # ההערה נשמרת ברשומה כלשונה ומוצגת בהתראה, לצורכי audit בלבד.
 STUCK_HOURS = 3          # הודעה בתור מעבר לזה = gateway לא מנקז
 MISSED_LOOKBACK_DAYS = 14
-REPEAT_ALERT_HOURS = 12  # אותה התראה בדיוק לא נשלחת שוב לפני זה
 
 
 def now_utc():
@@ -501,16 +500,13 @@ def as_text(rep, alert_only=False):
     return "\n".join(lines)
 
 
-def fingerprint(rep):
-    """טביעת אצבע של מצב האדום. משתנה רק כשמשהו אמיתי משתנה."""
-    keys = sorted(f"{f['check']}:{f['agent']}" for f in rep["findings"] if f["level"] == "RED")
-    return "|".join(keys)
-
-
 def alert_if_new(rep, now=None):
-    """מחזיר טקסט התראה רק אם המצב חדש, או אם עברו REPEAT_ALERT_HOURS.
+    """מחזיר טקסט התראה רק כשמצב הבריאות עובר בין RED ל-not-RED (YELLOW/GREEN).
 
-    בלי זה אותה התראה נשלחת 24 פעם ביום, אביעד משתיק את הבוט, והשומר מת.
+    לא תזכורת מחזורית, לא לפי שינוי בממצא הספציפי - רק המעבר הבינארי עצמו.
+    RED שנשאר RED, גם אם הממצא שגרם לו התחלף באחר, לא שולח שוב. זה בכוונה:
+    זו בדיוק הבקשה - הודעה אחת בכניסה ל-RED, הודעה אחת בחזרה משם, ותו לא.
+    בלי זה אותה התראה נשלחת שוב ושוב, אביעד משתיק את הבוט, והשומר מת בשקט.
     """
     now = now or now_utc()
     state = {}
@@ -521,29 +517,16 @@ def alert_if_new(rep, now=None):
         except (json.JSONDecodeError, OSError):
             state = {}
 
-    fp = fingerprint(rep)
-    prev_fp = state.get("last_alert_fingerprint", "")
-    prev_at = parse_ts(state.get("last_alert_at"))
+    was_red = bool(state.get("was_red"))
+    is_red = rep["status"] == "RED"
 
-    if rep["status"] != "RED":
-        # התאוששות: היה אדום, כבר לא. זה שווה הודעה אחת
-        recovered = bool(prev_fp)
-        state = {"last_status": rep["status"], "last_checked_at": now.isoformat(timespec="seconds"),
-                 "last_alert_fingerprint": "", "last_alert_at": state.get("last_alert_at")}
-        _save_health(state)
-        return "בריאות המערכת: חזר לתקין. כל הממצאים האדומים נסגרו" if recovered else ""
-
-    stale = prev_at is None or (now - prev_at) >= dt.timedelta(hours=REPEAT_ALERT_HOURS)
-    if fp == prev_fp and not stale:
-        state["last_checked_at"] = now.isoformat(timespec="seconds")
-        _save_health(state)
-        return ""
-
-    state = {"last_status": "RED", "last_checked_at": now.isoformat(timespec="seconds"),
-             "last_alert_fingerprint": fp, "last_alert_at": now.isoformat(timespec="seconds")}
+    state = {"last_status": rep["status"], "last_checked_at": now.isoformat(timespec="seconds"),
+             "was_red": is_red}
     _save_health(state)
-    prefix = "" if fp != prev_fp else "עדיין פתוח. "
-    return prefix + as_text(rep, alert_only=True)
+
+    if is_red == was_red:
+        return ""
+    return as_text(rep, alert_only=True) if is_red else "בריאות המערכת: חזר לתקין. כל הממצאים האדומים נסגרו"
 
 
 def _save_health(state):

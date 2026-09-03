@@ -77,11 +77,35 @@ BENIGN_PHRASES = (
 BLOCKED_CLAUSE = re.compile(r"[^,.;|]*חסום[^,.;|]*")
 
 
+# הפניה מטא: מקטע שמצטט הערה קודמת או התראת שומר, במקום לדווח על כשל בריצה
+# הנוכחית. gateway מדווח בכל ריצה את מצב השומר, ולכן ההערה שלו נושאת את מילות
+# הכשל של הריצה שלפניה. בלי זה כשל בודד שכבר טופל מנציח את עצמו: כל ריצה
+# מצטטת את הקודמת ונרשמת degraded, לנצח. נמצא בפועל ב-03.09 06:06 -
+# "שומר: 1 אדום - תויק לתור (gateway note קודם הכיל מילת נכשל)", ריצה תקינה
+# לחלוטין שניקזה את התור. דיווח על כשל אינו כשל.
+META_REFERENCE = (
+    "note קודם", "note קודמת", "הערה קודמת", "ההערה הקודמת",
+    "ריצה קודמת", "הריצה הקודמת", "הכיל מילת", "מילת כשל", "התראת שומר",
+)
+PAREN = re.compile(r"\([^()]*\)")
+
+
+def _is_meta(seg):
+    return any(k in seg for k in META_REFERENCE)
+
+
+def drop_meta(note):
+    """מסיר ציטוט של הערה קודמת - בסוגריים או כמקטע מופרד - לפני הסריקה."""
+    note = PAREN.sub(lambda m: "" if _is_meta(m.group(0)) else m.group(0), note)
+    parts = re.split(r"([,.;|])", note)
+    return "".join(p for p in parts if not _is_meta(p))
+
+
 def scrub(note):
-    """מסיר ניסוחי תוצאה עסקית לפני חיפוש סימני כשל טכני."""
+    """מסיר ניסוחי תוצאה עסקית וציטוטי עבר לפני חיפוש סימני כשל טכני."""
     for phrase in BENIGN_PHRASES:
         note = note.replace(phrase, "")
-    return note
+    return drop_meta(note)
 STUCK_HOURS = 3          # הודעה בתור מעבר לזה = gateway לא מנקז
 MISSED_LOOKBACK_DAYS = 14
 REPEAT_ALERT_HOURS = 12  # אותה התראה בדיוק לא נשלחת שוב לפני זה
@@ -238,9 +262,15 @@ def load_heartbeats():
 
 
 def _true_ok(rec):
-    """סטטוס ok אמיתי - לא רק status=='ok', גם ההערה חייבת להיות נקייה מסימני כשל.
-    בלי זה סטריק הכשלים לא ייעצר על רשומה שדווחה ok אך היא בעצם hidden failure."""
-    return (rec.get("status") == "ok"
+    """סטטוס ok אמיתי. classify_note הוא מקור האמת, לא שדה status הקפוא ברשומה.
+
+    שני הכיוונים חייבים לעבוד. רשומה שנכתבה ok וההערה שלה מודה בכשל אינה ok -
+    זה ה-hidden failure. אבל גם ההפך: status הוא נגזרת של ההערה שהוקפאה ברגע
+    הכתיבה, ולכן רשומה שנכתבה degraded על ידי מסווג שתוקן מאז נשארת degraded
+    לנצח ומרעילה את מונה הסטריק. רק status=failed הוא הצהרה מפורשת של cmd_fail
+    עם reason משלו - אותו לא גוזרים מחדש מההערה.
+    """
+    return (rec.get("status") != "failed"
             and classify_note(rec.get("note") or "", rec.get("items")) == "ok")
 
 
@@ -310,6 +340,20 @@ def check_hidden(runs, expected, now, window_hours=26):
     """
     out = []
     cutoff = now - dt.timedelta(hours=window_hours)
+
+    # ריצה תקינה מאוחרת יותר של אותו סוכן פירושה שה-retry הצליח והכשל נפתר.
+    # הוא עדיין מוצג, אך כצהוב: אדום פירושו "שבור עכשיו". כשל שהריצה הבאה כבר
+    # תיקנה, ונשאר אדום עד שהחלון פג, הוא נכון היסטורית ושקרי בהווה - וזו בדיוק
+    # ההתראה שמאבדת אמון. קרה ב-03.09: gateway תוקן ב-06:09 והכשל של 05:09
+    # המשיך לצעוק.
+    healed_at = {}
+    for r in runs:
+        ts = parse_ts(r.get("ts"))
+        if ts and _true_ok(r):
+            agent = r.get("agent")
+            if ts > healed_at.get(agent, ts - dt.timedelta(seconds=1)):
+                healed_at[agent] = ts
+
     latest = {}
     for r in runs:
         ts = parse_ts(r.get("ts"))
@@ -327,22 +371,31 @@ def check_hidden(runs, expected, now, window_hours=26):
 
     for agent, (ts, r, hit) in latest.items():
         note = str(r.get("note") or "")
-        streak = consecutive_non_ok(runs, agent)
+        healed = healed_at.get(agent)
+        healed = healed if healed and healed > ts else None
+        streak = 0 if healed else consecutive_non_ok(runs, agent)
         crons = (expected.get(agent) or {}).get("cron") or []
-        retry_txt = f" retry - הירי המתוזמן הבא: {next_fire_str(crons, now)}" if crons else ""
-        escalate = "כשל חוזר. " if streak >= 3 else ""
+        level = "YELLOW" if healed else "RED"
+        if healed:
+            tail = f" נפתר - ריצה תקינה ב-{healed:%d.%m %H:%M}Z"
+            escalate = ""
+            streak_txt = ""
+        else:
+            tail = f" retry - הירי המתוזמן הבא: {next_fire_str(crons, now)}" if crons else ""
+            escalate = "כשל חוזר. " if streak >= 3 else ""
+            streak_txt = f" (נסיון {streak} ברצף)"
 
         if r.get("status") == "failed":
             out.append({
-                "level": "RED", "check": "failed", "agent": agent,
-                "detail": (f"{escalate}{agent} נכשל ב-{ts:%d.%m %H:%M}Z "
-                          f"(נסיון {streak} ברצף): {str(r.get('reason') or note)[:120]}.{retry_txt}"),
+                "level": level, "check": "failed", "agent": agent,
+                "detail": (f"{escalate}{agent} נכשל ב-{ts:%d.%m %H:%M}Z"
+                          f"{streak_txt}: {str(r.get('reason') or note)[:120]}.{tail}"),
             })
         else:
             out.append({
-                "level": "RED", "check": "hidden", "agent": agent,
+                "level": level, "check": "hidden", "agent": agent,
                 "detail": (f"{escalate}{agent} נרשם ok אך ההערה מכילה \"{hit}\" "
-                          f"({ts:%d.%m %H:%M}Z, נסיון {streak} ברצף): {note[:120]}.{retry_txt}"),
+                          f"({ts:%d.%m %H:%M}Z){streak_txt}: {note[:120]}.{tail}"),
             })
     return out
 

@@ -217,6 +217,105 @@ def collect(paths):
     return findings, seen_files
 
 
+# ------------------------------------------------------------- חוזה הערך TOP
+# filter.md מגדיר את סעיף TOP כמקום היחיד שאביעד קורא בפועל. ההגדרה הייתה
+# פרוזה בלבד: הכללים היו כתובים ואיש לא בדק אותם, ולכן דוח יכול היה לצאת בלי
+# TOP בכלל, או עם ממצא שמפנה למקום אחר במסמך. שער בלי אכיפה אינו שער.
+#
+# מחייב רק מדוחות שנוצרו אחרי כניסת החוזה לתוקף. דוח ישן נכתב לפי חוזה אחר,
+# וחסימה רטרואקטיבית שלו הייתה עוצרת כל ריצה עתידית על היסטוריה שאין לתקן.
+TOP_CONTRACT_FROM = "2026-09-04"
+DATED_REPORT = re.compile(r"(\d{4}-\d{2}-\d{2})\.md$")
+TOP_HEAD = re.compile(r"^##\s+TOP\b.*$", re.M)
+TOP_ENTRY = re.compile(r"^####\s+(\d+)\.\s*(.*)$", re.M)
+
+# שבעת השדות. לכל אחד הניסוחים שמתקבלים - הסוכן כותב עברית, לא שמות שדות
+TOP_FIELDS = (
+    ("מה קרה", ("מה קרה",)),
+    ("למה זה חשוב לך", ("למה זה חשוב לך", "למה זה חשוב לי", "למה זה נוגע לאביעד")),
+    ("מה חדש כאן", ("מה חדש כאן", "מה חדש")),
+    ("מקור", ("מקור",)),
+    ("ביטחון", ("ביטחון", "confidence")),
+    ("מה לעשות עכשיו", ("מה לעשות עכשיו", "פעולה מוצעת", "פעולה")),
+    ("מוכן לפרסום", ("מוכן לפרסום",)),
+)
+
+# שער 2 ב-filter.md: "למה זה חשוב לך" גנרי הוא הודאה שאין משמעות
+GENERIC_WHY = ("מעניין", "רלוונטי לתחום", "כדאי לעקוב", "שווה מעקב",
+               "חשוב לדעת", "כדאי לשים לב", "ראוי לתשומת לב")
+
+
+def _top_section(text):
+    """גוף סעיף TOP בלבד - עד הכותרת הראשית הבאה."""
+    m = TOP_HEAD.search(text)
+    if not m:
+        return None
+    rest = text[m.end():]
+    # הסעיף נגמר בכותרת הבאה מרמה 2 או 3 - כלומר גם בבלוק הפירוט "### [I-...]".
+    # #### הוא ממצא בתוך TOP ולכן אינו סוגר. בלי ההבחנה הזו גוף ה-TOP בולע את
+    # הפירוט, וממצא בלי קישור "עובר" בזכות קישור שיושב מחוץ לסעיף
+    nxt = re.search(r"^#{2,3}\s", rest, flags=re.M)
+    return rest[:nxt.start()] if nxt else rest
+
+
+def check_top(text, rel):
+    """חוזה הערך של סעיף TOP. מסמך שלם, לא ממצא בודד."""
+    out = []
+    def bad(rule, msg, ident="TOP"):
+        out.append({"level": "BLOCK", "rule": rule, "id": ident,
+                    "path": rel, "detail": msg})
+
+    m = DATED_REPORT.search(rel)
+    if not m or m.group(1) < TOP_CONTRACT_FROM:
+        return out
+    if not re.search(r"^#{3,}\s+\[?I-\d{8}-\d{2}", text, flags=re.M):
+        return out  # דוח בלי ממצאים כלל - "אין ממצא שעובר את הסף" הוא פלט תקין
+
+    body = _top_section(text)
+    if body is None:
+        bad("R13", "הדוח מציג ממצאים בלי סעיף TOP. זה הסעיף היחיד שנקרא בפועל")
+        return out
+
+    entries = list(TOP_ENTRY.finditer(body))
+    if not entries:
+        bad("R13", "סעיף TOP קיים אך ריק מממצאים מלאים (אין כותרת '#### N.')")
+        return out
+    if len(entries) > 3:
+        bad("R13", f"{len(entries)} ממצאים ב-TOP. המקסימום הוא 3 - אחד חזק עדיף על שלושה בינוניים")
+
+    for i, e in enumerate(entries):
+        end = entries[i + 1].start() if i + 1 < len(entries) else len(body)
+        blk = body[e.start():end]
+        ident = f"TOP #{e.group(1)} {e.group(2)[:40]}".strip()
+        flat = blk.replace("**", "").replace("__", "")
+
+        # השדה מזוהה בתחילת שורה, עם תבליט או בלי. filter.md כותב את "למה עכשיו"
+        # כשורה מודגשת ואת השאר כתבליטים - שתי הצורות חוקיות
+        def has_field(alts):
+            return any(re.search(r"^\s*[-*]?\s*" + re.escape(a) + r"\s*:", flat, re.M)
+                       for a in alts)
+
+        missing = [name for name, alts in TOP_FIELDS if not has_field(alts)]
+        if missing:
+            bad("R14", "ממצא ב-TOP חסר שדות חובה: " + ", ".join(missing) +
+                       ". ממצא ב-TOP עומד בפני עצמו ולא מפנה למקום אחר במסמך", ident)
+
+        if not has_field(("למה עכשיו",)):
+            bad("R14", 'ממצא ב-TOP בלי "למה עכשיו". בלי חלון זמן אין סיבה שהוא בראש', ident)
+
+        if not URL.search(blk):
+            bad("R15", "ממצא ב-TOP בלי קישור ישיר שאפשר לפתוח. שער 1 ב-filter.md", ident)
+
+        why = re.search(r"^\s*[-*]?\s*למה זה (?:חשוב|נוגע)[^:\n]*:\s*(.+)", flat, re.M)
+        if why:
+            val = why.group(1).strip()
+            if len(val) < 25 or any(g in val and len(val) < 60 for g in GENERIC_WHY):
+                bad("R16", f'"למה זה חשוב לך" גנרי או ריק ("{val[:40]}"). '
+                           "שער 2 ב-filter.md - זו הודאה שאין משמעות", ident)
+
+    return out
+
+
 # ------------------------------------------------------------------------ rules
 def check_freeform(rec):
     """מסמך פרוזה בלי מבנה ### (בעיקר amplify/draft-*.md).
@@ -351,6 +450,15 @@ def run(paths):
     violations = []
     for rec in findings:
         violations += check(rec)
+    # חוזה ה-TOP נבדק ברמת המסמך, לא ברמת הממצא - "אין TOP בכלל" הוא הכשל
+    # שאף בדיקה ברמת ממצא לא יכולה לתפוס
+    for f in files:
+        if not f.endswith(".md"):
+            continue
+        try:
+            violations += check_top(open(f, encoding="utf-8").read(), os.path.relpath(f, ROOT))
+        except (OSError, UnicodeDecodeError):
+            continue
     blocks = [v for v in violations if v["level"] == "BLOCK"]
     warns = [v for v in violations if v["level"] == "WARN"]
     return {

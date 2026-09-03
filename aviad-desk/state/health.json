@@ -1,6 +1,6 @@
 {
   "last_status": "RED",
-  "last_checked_at": "2026-09-03T03:07:33+00:00",
-  "last_alert_fingerprint": "hidden:scout|missed:amplifier|missed:curator",
-  "last_alert_at": "2026-09-03T03:07:29+00:00"
+  "last_checked_at": "2026-09-03T04:08:38+00:00",
+  "last_alert_fingerprint": "hidden:scout|missed:amplifier|missed:curator|stale_source:curator",
+  "last_alert_at": "2026-09-03T04:08:34+00:00"
 }

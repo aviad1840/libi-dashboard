@@ -1,0 +1,39 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-03T06:17:00Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nתשלב את נתון McKinsey (מפעל יכולות מגיע לייצור פי 2.3 יותר מקולות קוראים) כעוגן כמותי במסמך הדוקטרינה ל-C5 - מקור McKinsey עצמו חסום, מאומת דרך Tribune India וכתבים מאששים.\n\n2. 🟠 השתנה מאז אתמול\nScout הריץ סריקה חדשה (2 ממצאים: McKinsey C5, UAE C7). מקור mckinsey.com חסום HTTP 503, טופל דרך מקור חלופי. curator ו-amplifier לא רצו כמתוכנן - סומן בבריאות המערכת.\n\n3. 🟢 ממצאים חדשים\n- McKinsey: לשלב כעוגן כמותי ל-C5 במסמך הדוקטרינה\n- איחוד האמירויות: לקרוא כתקדים השוואתי ל-OQ6 (איזה משרד עוגן)\n\n4. 👥 אנשים/קשרים שדורשים תשומת לב\nאין (אין קובץ people/ שהתעדכן ב-48 השעות האחרונות)\n\n5. 📅 דדליינים / התחייבויות\nהיום (3.9) - הגשת NIIA, סל אישי - סטטוס מוכן\n6.9 (בעוד 3 ימים) - ישיבת צוות 11, הערות במייל לנועה לפני\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nאין מועמד היום (אין ממצא הנוגע ב-C1/C6 או ב-OQ עם דדליין קרוב)\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: 2 ממצאים חדשים, חסימת מקור אחת טופלה. Curator: לא רץ (100+ שעות). Amplifier: לא רץ (מעולם לא). Gateway: תור עיבוד שוטף, ללא הודעות חדשות.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        }
+      ],
+      [
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        },
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        }
+      ],
+      [
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

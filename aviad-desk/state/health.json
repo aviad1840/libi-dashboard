@@ -1,6 +1,6 @@
 {
-  "last_status": "RED",
-  "last_checked_at": "2026-09-03T06:09:25+00:00",
-  "last_alert_fingerprint": "hidden:gateway",
+  "last_status": "YELLOW",
+  "last_checked_at": "2026-09-03T07:09:46+00:00",
+  "last_alert_fingerprint": "",
   "last_alert_at": "2026-09-03T06:09:19+00:00"
 }

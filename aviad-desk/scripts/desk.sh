@@ -32,8 +32,9 @@ alert() {
 }
 
 # סיווג הערת ריצה. מקור האמת לסימני הכשל הוא health.py, לא רשימה משוכפלת כאן.
+# הארגומנט השני הוא מספר הפריטים. ריצה שהפיקה תוצר למרות מקור חסום אינה מדורדרת.
 classify_note() {
-  python3 "$DESK_DIR/scripts/health.py" --classify-note "$1" 2>/dev/null || echo ok
+  python3 "$DESK_DIR/scripts/health.py" --classify-note "$1" "${2:-0}" 2>/dev/null || echo ok
 }
 
 # --------------------------------------------------------------------- heartbeat
@@ -289,7 +290,7 @@ cmd_finish() {
 
   # הסטטוס נגזר מההערה, לא נקבע מראש. ריצה שההערה שלה מודה בכשל טכני נרשמת
   # degraded ולא ok. בלי זה "telegram_fetch נכשל: HTTP 404" נרשם כהצלחה - זה קרה בפועל.
-  local status; status="$(classify_note "$note")"
+  local status; status="$(classify_note "$note" "${items:-0}")"
 
   # רישום הריצה. זה המקור שממנו curator מחשב עלות לממצא מועיל, וגם /agents ו-/status ב-gateway
   python3 - "$agent" "${items:-0}" "${l0:-0}" "${l1:-0}" "${l2:-0}" "$note" "$status" <<'PY'

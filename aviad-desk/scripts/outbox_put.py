@@ -46,6 +46,14 @@ def main():
         print(f"שם סוכן לא תקין: {agent}", file=sys.stderr)
         return 2
 
+    # טקסט ריק יוצר פריט שלא ניתן לשלוח לעולם, והוא נתקע בתור ומכשיל את gateway
+    # בכל שעה מחדש. קרה בפועל ב-03.09: gateway הריץ outbox_put עם פלט ריק של
+    # health.py --alert-if-new (דדופ החזיר כלום) ויצר שני פריטים מתים.
+    # אין מה לשלוח - לא נוצר קובץ. זו הצלחה, לא כשל.
+    if not text or not text.strip():
+        print("אין טקסט לשליחה - לא נוצר פריט בתור", file=sys.stderr)
+        return 0
+
     os.makedirs(OUTBOX, exist_ok=True)
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     name = f"{agent}-{stamp}-{uuid.uuid4().hex[:4]}.json"

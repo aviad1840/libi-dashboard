@@ -33,6 +33,7 @@
 """
 import json
 import os
+import re
 import subprocess
 import sys
 import datetime as dt
@@ -67,6 +68,13 @@ BENIGN_PHRASES = (
     # (שום דבר לא תקוע) נתפס כרשומת כשל, כל יום. נמצא בפועל ב-01.09 03:19Z.
     "אין דגל/תקוע חדש", "אין תקוע חדש", "אין דגל חדש/תקוע חדש",
 )
+
+
+# מקטע שמדווח על חסימת מקור חיצוני. לפי חוזה scout (filter.md) חסימה היא שגרה
+# מוצהרת ולא תקלה, והדוח חייב לתעד אותה. ריצה שהפיקה ממצאים למרות חסימה היא
+# בדיוק ההתנהגות הרצויה - לא ריצה מדורדרת. קרה ב-03.09: scout מצא 2 ממצאים
+# תקינים, כתב "mckinsey.com חסום HTTP 503", ונרשם degraded.
+BLOCKED_CLAUSE = re.compile(r"[^,.;|]*חסום[^,.;|]*")
 
 
 def scrub(note):
@@ -232,7 +240,8 @@ def load_heartbeats():
 def _true_ok(rec):
     """סטטוס ok אמיתי - לא רק status=='ok', גם ההערה חייבת להיות נקייה מסימני כשל.
     בלי זה סטריק הכשלים לא ייעצר על רשומה שדווחה ok אך היא בעצם hidden failure."""
-    return rec.get("status") == "ok" and classify_note(rec.get("note") or "") == "ok"
+    return (rec.get("status") == "ok"
+            and classify_note(rec.get("note") or "", rec.get("items")) == "ok")
 
 
 def consecutive_non_ok(runs, agent):
@@ -255,6 +264,16 @@ def check_missed(runs, expected, now):
     for agent, cfg in expected.items():
         crons = cfg.get("cron") or []
         if not crons:
+            continue
+        # טריגר בלי ריפו מחובר יורה לתוך קונטיינר ריק. זו תצורה חסרה, לא תקלת
+        # runtime, והפתרון היחיד הוא לחיצה של אביעד ב-UI. לספור את זה כאדום
+        # מטשטש כשלים אמיתיים ומייצר התראה שאי אפשר לפעול לפיה מהקוד.
+        if cfg.get("connected") is False:
+            out.append({
+                "level": "YELLOW", "check": "not_connected", "agent": agent,
+                "detail": f"{agent}: NOT CONNECTED - הטריגר קיים אך ללא ריפו מחובר. "
+                          f"דורש חיבור חד-פעמי ב-claude.ai/code/routines. לא כשל runtime",
+            })
             continue
         grace = int(cfg.get("grace_misses", 2))
         agent_runs = [r for r in runs if r.get("agent") == agent]
@@ -298,7 +317,8 @@ def check_hidden(runs, expected, now, window_hours=26):
             continue
         agent = r.get("agent")
         note = str(r.get("note") or "")
-        hit = next((m for m in FAILURE_MARKERS if m in scrub(note)), None)
+        degraded = classify_note(note, r.get("items")) == "degraded"
+        hit = next((m for m in FAILURE_MARKERS if m in scrub(note)), None) if degraded else None
         if r.get("status") != "failed" and not hit:
             continue
         prev = latest.get(agent)
@@ -535,9 +555,20 @@ def _save_health(state):
         pass  # השומר לא מפיל את הריצה בגלל קובץ מצב
 
 
-def classify_note(note):
-    """ok או degraded. מקור אמת יחיד לסימני הכשל, כדי ש-desk.sh לא ישכפל רשימה."""
-    return "degraded" if any(m in scrub(str(note or "")) for m in FAILURE_MARKERS) else "ok"
+def classify_note(note, items=None):
+    """ok או degraded. מקור אמת יחיד לסימני הכשל, כדי ש-desk.sh לא ישכפל רשימה.
+
+    items מאפשר את ההבחנה היחידה שחסרה: ריצה שהפיקה ממצאים למרות מקור חסום
+    אינה מדורדרת. ריצה שלא הפיקה כלום ומדווחת חסימה - כן, שם החסימה היא הסיבה.
+    """
+    text = scrub(str(note or ""))
+    try:
+        produced = items is not None and int(items) > 0
+    except (TypeError, ValueError):
+        produced = False
+    if produced:
+        text = BLOCKED_CLAUSE.sub("", text)
+    return "degraded" if any(m in text for m in FAILURE_MARKERS) else "ok"
 
 
 def main():
@@ -546,7 +577,9 @@ def main():
     # מצב עצמאי: סיווג הערת ריצה. לא נוגע ביומן ולא בשומר
     if "--classify-note" in sys.argv:
         i = sys.argv.index("--classify-note")
-        print(classify_note(sys.argv[i + 1] if i + 1 < len(sys.argv) else ""))
+        note = sys.argv[i + 1] if i + 1 < len(sys.argv) else ""
+        items = sys.argv[i + 2] if i + 2 < len(sys.argv) else None
+        print(classify_note(note, items))
         return 0
 
     try:

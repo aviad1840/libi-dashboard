@@ -22,8 +22,23 @@ import telegram_send  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTBOX = os.path.join(ROOT, "outbox")
 SENT = os.path.join(OUTBOX, "sent")
+DEAD = os.path.join(OUTBOX, "dead")
 
 DEFAULT_LIMIT = 10
+
+
+def _retire(path, name):
+    """פריט שלא ניתן לשלוח לעולם - קובץ פגום או בלי טקסט - עובר ל-outbox/dead.
+
+    בלי זה הוא נשאר בתור ונכשל בכל ירייה, לנצח: gateway נרשם degraded כל שעה,
+    השומר מדווח stuck, והתור אף פעם לא מתנקז. קרה בפועל ב-03.09 עם שני פריטים
+    ריקים. dead/ נשמר ולא נמחק - אפשר לבדוק מה קרה, אבל הוא כבר לא חוסם.
+    """
+    try:
+        os.makedirs(DEAD, exist_ok=True)
+        shutil.move(path, os.path.join(DEAD, name))
+    except OSError:
+        pass
 
 
 def pending_files():
@@ -68,6 +83,7 @@ def main():
     os.makedirs(SENT, exist_ok=True)
     sent = 0
     failed = 0
+    dead = 0
     errors = []
 
     for name in files[:limit]:
@@ -76,14 +92,16 @@ def main():
             with open(path, encoding="utf-8") as f:
                 rec = json.load(f)
         except (json.JSONDecodeError, OSError) as e:
-            failed += 1
-            errors.append(f"{name}: קובץ פגום ({e})")
+            dead += 1
+            errors.append(f"{name}: קובץ פגום, הועבר ל-dead ({e})")
+            _retire(path, name)
             continue
 
         text = rec.get("text")
-        if not text:
-            failed += 1
-            errors.append(f"{name}: אין שדה text")
+        if not text or not str(text).strip():
+            dead += 1
+            errors.append(f"{name}: אין טקסט, הועבר ל-dead")
+            _retire(path, name)
             continue
 
         try:
@@ -107,6 +125,7 @@ def main():
     out = {
         "sent": sent,
         "failed": failed,
+        "dead": dead,
         "pending": len(pending_files()),
         "no_token": False,
     }

@@ -56,6 +56,20 @@ NO_EVIDENCE = ("לא נמצאה ראיה", "לא נמצא מקור", "אין ר�
 # ניסוח שמעמיד פנים שיש מקור. זה מה שאסור
 PLACEHOLDER = ("tbd", "todo", "xxx", "לא ידוע", "יושלם", "n/a", "בקרוב", "example.com")
 
+# מילות placeholder בתוך כתובת, נבדקות כמקטע שלם ולא כתת-מחרוזת. הבדיקה הנאיבית
+# פסלה כתובת אמיתית לגמרי: "govinsider.asia/intl-en/article/..." הכיל "n/a" בתוך
+# "en/article". כל כתובת אנגלית עם סעיף article הייתה נחסמת. קרה בפועל על דוח 01.09.
+PLACEHOLDER_SEGMENTS = {"tbd", "todo", "xxx", "na", "example", "placeholder"}
+
+
+def url_is_placeholder(url):
+    """כתובת מזויפת מזוהה לפי מקטע שלם בנתיב, לא לפי תת-מחרוזת אקראית."""
+    low = url.lower()
+    if "example.com" in low:
+        return True
+    segments = set(re.split(r"[/?&=#._:\-]+", low))
+    return bool(segments & PLACEHOLDER_SEGMENTS)
+
 # טענה כמותית. מכוון לסוג שבאמת מסוכן בפוסט, לא לכל ספרה
 QUANT = re.compile(r"(\d+(?:[.,]\d+)?\s*%)|([₪$€]\s*\d)|(\d+(?:[.,]\d+)?\s*(?:מיליון|מיליארד|אלף|אחוז))")
 QUOTED = re.compile(r"[\"“”«]([^\"“”»\n]{25,})[\"“”»]")
@@ -97,7 +111,10 @@ def truthy(v):
 def from_markdown(text, path):
     """דוח scout: כותרת ### לכל ממצא, ואחריה שורות '- מפתח: ערך'."""
     findings = []
-    blocks = re.split(r"^###\s+", text, flags=re.M)[1:]
+    # בלוק ממצא מזוהה לפי מזהה הפריט, לא לפי רמת הכותרת. סעיף TOP בראש הדוח
+    # מצביע על אותם ממצאים בכותרות משלו - בלי עוגן למזהה, כל מצביע כזה נספר
+    # כממצא נפרד בלי שדות ראיה, ומייצר תשעה חוסמים על דוח תקין לחלוטין. קרה בפועל.
+    blocks = re.split(r"^#{3,}\s+(?=\[?I-\d{8}-\d{2})", text, flags=re.M)[1:]
     for block in blocks:
         lines = block.splitlines()
         rec = {"_id": lines[0].strip()[:70] if lines else "?", "_path": path, "_raw": block}
@@ -282,7 +299,7 @@ def check(rec):
     # R3 - מקור אמיתי או הודאה מפורשת שאין. שתיקה אינה אפשרות
     if not src_url and not said_no_evidence:
         bad("BLOCK", "R3", "אין source_url ואין אמירה מפורשת שלא נמצאה ראיה")
-    if src_url and any(ph in src_url.lower() for ph in PLACEHOLDER):
+    if src_url and any(url_is_placeholder(u) for u in src_url.split()):
         bad("BLOCK", "R3", f"מקור placeholder ולא כתובת אמיתית: {src_url[:60]}")
 
     # R4 - תאריך פרסום. בלי תאריך אי אפשר לדעת אם הידיעה חיה או בת שנתיים

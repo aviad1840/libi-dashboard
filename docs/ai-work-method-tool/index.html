@@ -169,6 +169,90 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
   body{font-size:12px}
   section{page-break-inside:avoid}
 }
+
+/* ===== שדרוגים ===== */
+.note-inline{font-size:13px;color:var(--muted);margin:6px 0 0}
+.todo{background:var(--warn-bg);color:var(--warn);border:1px dashed #e0b84c;border-radius:4px;padding:1px 8px;font-size:13px;font-weight:500;white-space:nowrap;display:inline-block}
+
+/* דוגמה מלאה */
+.ex-meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0 0 16px;font-size:15px;max-width:720px}
+.ex-meta dt{font-weight:600;color:var(--navy)}
+.ex-meta dd{margin:0}
+table.ex th[scope="row"]{white-space:nowrap}
+table.ex td::before{content:none}
+@media(max-width:760px){
+  table.ex thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  table.ex tr{display:block;border:1.5px solid var(--line);border-radius:6px;margin-bottom:12px;background:#fff}
+  table.ex tbody tr:nth-child(even){background:#fff}
+  table.ex th[scope="row"],table.ex td{display:block;border:none;border-bottom:1px solid var(--line);padding:9px 12px;white-space:normal}
+  table.ex tr>:last-child{border-bottom:none}
+  table.ex td::before{content:attr(data-label);display:block;font-weight:600;color:var(--navy);font-size:13px;margin-bottom:2px}
+}
+
+/* משקלים */
+.weights{border:1.5px solid var(--line);border-radius:8px;padding:18px;background:#fff;margin:0 0 18px}
+.wrow{display:grid;grid-template-columns:210px 1fr 62px;gap:6px 14px;align-items:center;margin-bottom:12px}
+.wrow .wlbl{font-weight:600;font-size:15px;color:var(--navy)}
+.wrow output{font-weight:700;font-size:16px;text-align:left;color:var(--navy);font-variant-numeric:tabular-nums}
+.wrow input[type=range]{width:100%;accent-color:var(--blue);height:30px;margin:0}
+@media(max-width:640px){
+  .wrow{grid-template-columns:1fr 62px}
+  .wrow input[type=range]{grid-column:1 / -1}
+}
+.wsum{font-size:14px;color:var(--muted);margin:10px 0 0;font-weight:500}
+
+#resultsWrap{overflow-x:auto;position:relative}
+
+/* דירוג */
+.rank{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+.rank li{border:1.5px solid var(--line);border-right:5px solid var(--blue);border-radius:6px;padding:13px 15px;background:#fff}
+.rank .rtop{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.rank .pos{font-size:15px;font-weight:700;color:var(--navy);min-width:2.4em}
+.rank .nm{font-weight:600;font-size:16px;flex:1 1 150px;min-width:0}
+.rank .sc{font-size:19px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+.rank .gap{font-size:13px;color:var(--muted);margin:5px 0 0}
+.contrib{display:flex;flex-wrap:wrap;gap:3px 16px;margin:8px 0 0;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{display:flex;height:9px;border-radius:4px;overflow:hidden;margin-top:8px;border:1px solid var(--line)}
+.bar span{display:block;height:100%}
+.bar .c1{background:var(--navy)}
+.bar .c2{background:var(--navy-2)}
+.bar .c3{background:var(--blue)}
+.bar .c4{background:var(--light)}
+
+/* סיכום ישיבה */
+.sum-overlay{position:fixed;inset:0;background:var(--bg);z-index:120;overflow:auto;padding:24px;-webkit-overflow-scrolling:touch}
+.sum-inner{max-width:900px;margin:0 auto}
+.sum-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.sum-h{font-size:23px;color:var(--navy);margin:0 0 4px;line-height:1.3}
+.sum-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.sum-line{border:1px solid var(--line);border-radius:5px;min-height:42px;margin:8px 0;background:#fff}
+.sum-fields h3{margin-bottom:4px}
+
+/* עזרה מבוססת AI */
+details.ai{border:1.5px solid var(--line);border-radius:8px;margin:22px 0 0;background:#fff}
+details.ai>summary{cursor:pointer;padding:14px 18px;font-weight:600;color:var(--navy);font-size:16px;list-style:none;border-radius:7px}
+details.ai>summary::-webkit-details-marker{display:none}
+details.ai>summary::before{content:"+";display:inline-block;width:1.3em;font-weight:700;font-size:18px}
+details.ai[open]>summary::before{content:"\2212"}
+details.ai>summary:hover{background:var(--light)}
+.ai-body{padding:4px 18px 18px;border-top:1px solid var(--line)}
+.ai-note{background:var(--warn-bg);border:1.5px solid #e0b84c;border-radius:6px;padding:13px 15px;font-size:14px;color:var(--warn);margin:14px 0}
+.ai-note strong{display:block;margin-bottom:4px}
+.ai-body textarea{width:100%;min-height:110px;font-family:inherit;font-size:15px;line-height:1.6;padding:9px 11px;border:1.5px solid var(--line);border-radius:5px;background:#fff;resize:vertical}
+.ai-body input[type="password"]{width:100%;padding:9px 11px;font-family:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:5px;background:#fff}
+.ai-out{border:1.5px solid var(--blue);border-radius:6px;padding:15px;background:var(--soft);margin-top:14px}
+.ai-out dl{margin:0 0 10px;display:grid;grid-template-columns:170px 1fr;gap:6px 12px;font-size:15px}
+.ai-out dt{font-weight:600;color:var(--navy)}
+.ai-out dd{margin:0}
+@media(max-width:640px){.ai-out dl{grid-template-columns:1fr}.ai-out dt{margin-top:6px}}
+
+@media print{
+  body.sum-open .draft-banner,body.sum-open header.hero,body.sum-open .layout,body.sum-open footer,body.sum-open .toolbar{display:none}
+  body.sum-open .sum-overlay{position:static;padding:0;overflow:visible}
+  .sum-actions{display:none}
+  details.ai{display:none}
+  .rank li{page-break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -196,6 +280,7 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
     <ul>
       <li><a href="#s1">1. התזה</a></li>
       <li><a href="#s2">2. הלולאה</a></li>
+      <li><a href="#s2a">2א. דוגמה מלאה</a></li>
       <li><a href="#s3">3. מנגנון התעדוף</a></li>
       <li><a href="#s4">4. חלוקת אחריות</a></li>
       <li><a href="#s5">5. מדדים</a></li>
@@ -233,9 +318,45 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
       <div class="loop-detail" id="loopDetail" role="region" aria-live="polite" aria-label="פירוט השלב הנבחר"></div>
     </section>
 
+    <section id="s2a" aria-labelledby="h-s2a">
+      <h2 id="h-s2a">2א | דוגמה מלאה - תהליך אחד לאורך הלולאה</h2>
+      <p>הלולאה שלמעלה מתארת את המסלול. המקטע הזה מיועד להראות אותו על תהליך אחד אמיתי, מקצה לקצה, בפורמט אחיד לכל שלב. עד שהצוות ימלא אותו, השדות מסומנים כלהשלמה ואין כאן נתונים לדוגמה.</p>
+      <dl class="ex-meta" id="exMeta"></dl>
+      <div style="overflow-x:auto">
+        <table class="ex">
+          <caption>שמונת שלבי הלולאה על תהליך אחד</caption>
+          <thead>
+            <tr>
+              <th scope="col">שלב</th>
+              <th scope="col">מה היה</th>
+              <th scope="col">מה נעשה</th>
+              <th scope="col">שער היציאה</th>
+              <th scope="col">כמה זמן</th>
+            </tr>
+          </thead>
+          <tbody id="exBody"></tbody>
+        </table>
+      </div>
+      <div class="fill">
+        <strong>להשלמה על ידי הצוות</strong>
+        תוכן הדוגמה יושב במשתנה <code>EXAMPLE</code> בראש הסקריפט, עם הערה בעברית לכל שדה. מילוי שם מתעדכן כאן אוטומטית, בלי לגעת בסימון העמוד.
+      </div>
+    </section>
+
     <section id="s3" aria-labelledby="h-s3">
       <h2 id="h-s3">3 | מנגנון התעדוף</h2>
       <p>לא לפי בשלות הכלי, לא לפי כמות הרעיונות ולא לפי גודל הגוף. ארבעה קריטריונים, בסולם 1 עד 5. הזינו תהליך אחד או יותר וקבלו ציון, מיקום על המטריצה והמלצה לעומק התערבות.</p>
+
+      <div class="weights">
+        <h3 id="w-title" style="margin-top:0">משקלי הקריטריונים</h3>
+        <p class="note-inline">הציון הוא ממוצע משוקלל של ארבעת הקריטריונים. שינוי משקל מעדכן מיד את הציונים, את הדירוג ואת עומק ההתערבות המומלץ. סכום המשקלים נשאר 100 תמיד, וכל שינוי מתחלק בין השאר לפי היחס ביניהם.</p>
+        <div id="weightRows"></div>
+        <p class="wsum" id="wSum" role="status"></p>
+        <div class="btn-row">
+          <button class="btn secondary" type="button" id="wResetBtn">איפוס המשקלים לברירת המחדל</button>
+        </div>
+        <p class="note-inline">המשקלים הם נקודת פתיחה לכיול הצוות ואינם קביעה סגורה. ברירת המחדל: השפעה 35, נפח 20, פוטנציאל שינוי 30, כושר שכפול 15.</p>
+      </div>
 
       <div class="calc">
         <div class="field">
@@ -276,10 +397,11 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
 
         <div class="btn-row">
           <button class="btn" type="button" id="addBtn">הוספה לרשימה</button>
+          <button class="btn secondary" type="button" id="sumBtn">יצירת סיכום ישיבה</button>
           <button class="btn secondary" type="button" id="csvBtn">ייצוא הרשימה לקובץ CSV</button>
           <button class="btn secondary" type="button" id="clearBtn">ניקוי הרשימה</button>
         </div>
-        <p class="hint" style="margin-top:10px;font-size:13px;color:var(--muted)">הנתונים נשמרים בזיכרון הדפדפן בלבד למשך הישיבה ואינם נשלחים לשום מקום.</p>
+        <p class="hint" style="margin-top:10px;font-size:13px;color:var(--muted)">הנתונים נשמרים מקומית בדפדפן שלך בלבד, נשארים זמינים גם אחרי סגירת החלון, ואינם נשלחים לשום מקום. ניקוי הרשימה מוחק אותם.</p>
       </div>
 
       <div id="resultsWrap" aria-live="polite">
@@ -302,9 +424,17 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
         <p id="emptyMsg" style="color:var(--muted);font-size:15px">טרם הוזנו תהליכים.</p>
       </div>
 
+      <div id="rankWrap">
+        <h3 id="rank-title">דירוג מפורש</h3>
+        <p class="note-inline" id="rank-hint">ממוין מהציון הגבוה לנמוך. תחת כל תהליך מוצגת תרומת כל קריטריון לציון, והפער מהתהליך שמעליו.</p>
+        <ol class="rank" id="rankList" aria-labelledby="rank-title"></ol>
+        <p id="rankEmpty" style="color:var(--muted);font-size:15px">טרם הוזנו תהליכים.</p>
+      </div>
+
+
       <div class="matrix-wrap">
         <h3 id="matrix-title">מיקום התהליכים על המטריצה</h3>
-        <p class="axis-y">ציר אנכי: היתכנות (פוטנציאל שינוי + כושר שכפול)</p>
+        <p class="axis-y">ציר אנכי: מינוף (פוטנציאל שינוי + כושר שכפול)</p>
         <div class="matrix" id="matrix" role="img" aria-labelledby="matrix-title" aria-describedby="matrix-desc">
           <div class="q tr">ערך גבוה, מינוף גבוה<br>מועמד ראשון</div>
           <div class="q tl">ערך נמוך, מינוף גבוה<br>מתאים לנכס רוחבי</div>
@@ -314,6 +444,39 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
         <p class="axis-x">ציר אופקי: ערך (השפעה + נפח) - גדל לכיוון ימין</p>
         <p id="matrix-desc" class="sr-only" aria-live="polite">אין עדיין תהליכים על המטריצה.</p>
       </div>
+
+      <details class="ai" id="aiPanel">
+        <summary>עזרה בדירוג באמצעות AI - אופציונלי לחלוטין</summary>
+        <div class="ai-body">
+          <p>הכלי עובד במלואו בלי המקטע הזה. מי שיש לו מפתח API של Anthropic יכול לתאר תהליך במילים ולקבל הצעת דירוג לארבעת הקריטריונים עם נימוק, ואז לאמץ אותה או לשנות אותה ידנית. ההצעה אינה החלטה.</p>
+          <div class="ai-note" role="note">
+            <strong>לפני שימוש - חובה לקרוא</strong>
+            הטקסט שתזינו כאן נשלח לשרתי Anthropic לצורך קבלת ההצעה. אין להזין מידע אישי מזהה, מידע רפואי, פרטי אזרחים או מידע מסווג. תארו את התהליך במונחים כלליים בלבד. מפתח ה-API נשמר בדפדפן שלכם ואינו נשלח לשום גורם מלבד ממשק ה-API של Anthropic.
+          </div>
+
+          <div class="field">
+            <label for="ai-key">מפתח API של Anthropic
+              <span class="hint">נשמר מקומית בדפדפן זה בלבד. אפשר למחוק אותו בכל רגע בכפתור שמתחת.</span>
+            </label>
+            <input type="password" id="ai-key" autocomplete="off" spellcheck="false" aria-describedby="ai-error">
+          </div>
+
+          <div class="field">
+            <label for="ai-desc">תיאור התהליך במילים
+              <span class="hint">לדוגמה: מה התהליך עושה היום, מי מעורב בו, כמה מקרים בשנה, ומה הקושי המרכזי.</span>
+            </label>
+            <textarea id="ai-desc" aria-describedby="ai-error"></textarea>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn" type="button" id="aiBtn">קבלת הצעת דירוג</button>
+            <button class="btn secondary" type="button" id="aiKeyClear">מחיקת המפתח מהדפדפן</button>
+          </div>
+          <span class="error-msg" id="ai-error" role="alert"></span>
+          <p class="note-inline" id="ai-status" role="status"></p>
+          <div id="aiOut"></div>
+        </div>
+      </details>
     </section>
 
     <section id="s4" aria-labelledby="h-s4">
@@ -414,6 +577,30 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
   </main>
 </div>
 
+<div class="sum-overlay" id="sumView" role="dialog" aria-modal="true" aria-labelledby="sum-title" hidden>
+  <div class="sum-inner">
+    <div class="sum-actions">
+      <button class="btn" type="button" id="sumPrint">הדפסה או שמירה כ-PDF</button>
+      <button class="btn secondary" type="button" id="sumClose">חזרה לכלי</button>
+    </div>
+    <h2 class="sum-h" id="sum-title">סיכום ישיבה - תעדוף תהליכים</h2>
+    <p class="sum-sub" id="sumDate"></p>
+    <div id="sumBody"></div>
+    <div class="sum-fields">
+      <h3>החלטות</h3>
+      <p class="note-inline">להשלמה בישיבה.</p>
+      <div class="sum-line"></div>
+      <div class="sum-line"></div>
+      <div class="sum-line"></div>
+      <h3>מי מחזיק</h3>
+      <p class="note-inline">בעלות עסקית מוגדרת לכל תהליך שנבחר, בשם ובתפקיד.</p>
+      <div class="sum-line"></div>
+      <div class="sum-line"></div>
+      <div class="sum-line"></div>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <p>טיוטה לדיון - כלי עבודה לצוות ההון האנושי במגזר הציבורי. הרכיבים, הספים והניסוחים הם נקודת פתיחה לעבודת הצוות ואינם מהווים המלצה סגורה או התחייבות ארגונית.</p>
@@ -423,6 +610,42 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
 <script>
 (function(){
   "use strict";
+
+  /* ============================================================
+     דוגמה מלאה - תוכן למילוי על ידי הצוות
+     ------------------------------------------------------------
+     כל שדה שנשאר מחרוזת ריקה "" מוצג בעמוד כסימון "להשלמה".
+     הכלי לעולם לא ממציא תוכן במקומכם.
+
+     process  - שם התהליך שהדוגמה עוקבת אחריו. ריק = המקטע מציג הודעה שהדוגמה טרם מולאה.
+     body     - הגוף או היחידה שבהם התהליך רץ.
+     baseline - קו הבסיס שנמדד לפני השינוי, במספרים או בתיאור מדיד.
+     outcome  - התוצאה שנמדדה בסוף, מול אותו קו בסיס.
+     steps    - שמונת השלבים, בסדר הלולאה. אין לשנות את שדה stage.
+                before   - מה היה: איך השלב נראה לפני, או מה היה ידוע בכניסה אליו.
+                action   - מה נעשה: הפעולה הקונקרטית שבוצעה בשלב.
+                gate     - שער היציאה: מה היה צריך להתקיים כדי לעבור לשלב הבא.
+                duration - כמה זמן: משך השלב בפועל, למשל "שבועיים" או "3 ימים".
+     ============================================================ */
+  var EXAMPLE = {
+    process: "",
+    body: "",
+    baseline: "",
+    outcome: "",
+    steps: [
+      { stage:"בעיה",        before:"", action:"", gate:"", duration:"" },
+      { stage:"תהליך",       before:"", action:"", gate:"", duration:"" },
+      { stage:"עיצוב מחדש",  before:"", action:"", gate:"", duration:"" },
+      { stage:"בנייה",       before:"", action:"", gate:"", duration:"" },
+      { stage:"הערכה",       before:"", action:"", gate:"", duration:"" },
+      { stage:"ייצור",       before:"", action:"", gate:"", duration:"" },
+      { stage:"אימוץ",       before:"", action:"", gate:"", duration:"" },
+      { stage:"שכפול",       before:"", action:"", gate:"", duration:"" }
+    ]
+  };
+
+  /* מזהה המודל לעזרה מבוססת AI. להחלפה במחרוזת אחת במקרה הצורך. */
+  var AI_MODEL = 'claude-sonnet-4-6';
 
   var LOOP = [
     {t:"בעיה", who:"מוביל עסקי", what:"הגדרת הבעיה במונחי תוצאה ולא במונחי פתרון. מה לא עובד היום ולמי זה עולה.", gate:"בעיה מנוסחת עם קו בסיס מדיד."},
@@ -501,6 +724,7 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
   }
 
   function render(){
+    rows.forEach(function(r){ r.score = scoreOf(r); });
     var tbl = document.getElementById('resultsTable');
     var body = document.getElementById('resultsBody');
     var empty = document.getElementById('emptyMsg');
@@ -523,6 +747,7 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
       });
     }
     drawMatrix();
+    renderRank();
   }
 
   function drawMatrix(){
@@ -543,7 +768,7 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
       desc.textContent = 'אין עדיין תהליכים על המטריצה.';
     } else {
       desc.textContent = 'על המטריצה ' + rows.length + ' תהליכים. ' + rows.map(function(r){
-        return r.name + ', ערך ' + ((r.impact+r.volume)/2).toFixed(1) + ', היתכנות ' + ((r.change+r.repl)/2).toFixed(1) + ', ' + level(r.score).t;
+        return r.name + ', ערך ' + ((r.impact+r.volume)/2).toFixed(1) + ', מינוף ' + ((r.change+r.repl)/2).toFixed(1) + ', ' + level(r.score).t;
       }).join('. ') + '.';
     }
   }
@@ -562,7 +787,7 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
       name:name, impact:val('impact'), volume:val('volume'),
       change:val('change'), repl:val('repl')
     };
-    r.score = (r.impact + r.volume + r.change + r.repl) / 4;
+    r.score = scoreOf(r);
     rows.push(r);
     saveRows();
     nameEl.value = '';
@@ -604,6 +829,427 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
     }, {rootMargin:'-10% 0px -70% 0px'});
     secs.forEach(function(s){ io.observe(s); });
   }
+
+  /* ===================== דוגמה מלאה ===================== */
+  function todo(txt){
+    return txt && String(txt).trim()
+      ? esc(txt)
+      : '<span class="todo">להשלמה<span class="sr-only"> על ידי הצוות</span></span>';
+  }
+
+  function renderExample(){
+    var meta = document.getElementById('exMeta');
+    var body = document.getElementById('exBody');
+    if(!meta || !body) return;
+    meta.innerHTML =
+      '<dt>התהליך</dt><dd>' + todo(EXAMPLE.process) + '</dd>' +
+      '<dt>הגוף או היחידה</dt><dd>' + todo(EXAMPLE.body) + '</dd>' +
+      '<dt>קו הבסיס שנמדד</dt><dd>' + todo(EXAMPLE.baseline) + '</dd>' +
+      '<dt>התוצאה מול קו הבסיס</dt><dd>' + todo(EXAMPLE.outcome) + '</dd>';
+    body.innerHTML = EXAMPLE.steps.map(function(s, i){
+      return '<tr>' +
+        '<th scope="row">' + (i+1) + '. ' + esc(s.stage) + '</th>' +
+        '<td data-label="מה היה">' + todo(s.before) + '</td>' +
+        '<td data-label="מה נעשה">' + todo(s.action) + '</td>' +
+        '<td data-label="שער היציאה">' + todo(s.gate) + '</td>' +
+        '<td data-label="כמה זמן">' + todo(s.duration) + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  /* ===================== משקלים ===================== */
+  var W_KEYS = ['impact','volume','change','repl'];
+  var W_LABEL = {
+    impact:'השפעה על האזרח או על ההחלטה',
+    volume:'נפח המקרים',
+    change:'פוטנציאל שינוי',
+    repl:'כושר שכפול'
+  };
+  var W_DEFAULT = { impact:35, volume:20, change:30, repl:15 };
+  var W_KEY = 'ai-work-method-weights-v1';
+  var W = loadWeights();
+
+  function loadWeights(){
+    var w = { impact:W_DEFAULT.impact, volume:W_DEFAULT.volume, change:W_DEFAULT.change, repl:W_DEFAULT.repl };
+    try {
+      var saved = JSON.parse(localStorage.getItem(W_KEY) || 'null');
+      if(saved){
+        var total = 0, ok = true;
+        W_KEYS.forEach(function(k){
+          var v = saved[k];
+          if(typeof v !== 'number' || !isFinite(v) || v < 0 || v > 100){ ok = false; }
+          else { total += v; }
+        });
+        if(ok && Math.round(total) === 100){
+          W_KEYS.forEach(function(k){ w[k] = Math.round(saved[k]); });
+        }
+      }
+    } catch(e){}
+    return w;
+  }
+  function saveWeights(){
+    try { localStorage.setItem(W_KEY, JSON.stringify(W)); } catch(e){}
+  }
+
+  /* שינוי משקל אחד. היתרה מתחלקת בין השלושה האחרים לפי היחס הקיים ביניהם. */
+  function setWeight(key, v){
+    v = Math.max(0, Math.min(100, Math.round(v)));
+    var others = W_KEYS.filter(function(k){ return k !== key; });
+    var rest = 100 - v;
+    var sumOthers = others.reduce(function(a,k){ return a + W[k]; }, 0);
+    var next = {};
+    if(sumOthers <= 0){
+      others.forEach(function(k){ next[k] = Math.floor(rest / others.length); });
+    } else {
+      others.forEach(function(k){ next[k] = Math.floor(rest * W[k] / sumOthers); });
+    }
+    var used = others.reduce(function(a,k){ return a + next[k]; }, 0);
+    var drift = rest - used;
+    var biggest = others.slice().sort(function(a,b){ return next[b] - next[a]; })[0];
+    next[biggest] += drift;
+    W[key] = v;
+    others.forEach(function(k){ W[k] = next[k]; });
+    saveWeights();
+  }
+
+  function scoreOf(r){
+    return (r.impact * W.impact + r.volume * W.volume + r.change * W.change + r.repl * W.repl) / 100;
+  }
+  function contribOf(r){
+    return {
+      impact: r.impact * W.impact / 100,
+      volume: r.volume * W.volume / 100,
+      change: r.change * W.change / 100,
+      repl:   r.repl   * W.repl   / 100
+    };
+  }
+
+  function buildWeightRows(){
+    var box = document.getElementById('weightRows');
+    if(!box) return;
+    box.innerHTML = W_KEYS.map(function(k){
+      return '<div class="wrow">' +
+        '<label class="wlbl" for="w-' + k + '">' + W_LABEL[k] + '</label>' +
+        '<input type="range" id="w-' + k + '" min="0" max="100" step="1" value="' + W[k] + '" ' +
+          'aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + W[k] + '" ' +
+          'aria-valuetext="' + W[k] + ' אחוזים" data-w="' + k + '">' +
+        '<output for="w-' + k + '" id="wo-' + k + '">' + W[k] + '%</output>' +
+        '</div>';
+    }).join('');
+    box.querySelectorAll('input[type="range"]').forEach(function(inp){
+      inp.addEventListener('input', function(){
+        setWeight(inp.dataset.w, parseInt(inp.value, 10));
+        syncWeightRows();
+        render();
+      });
+    });
+    syncWeightRows();
+  }
+
+  function syncWeightRows(){
+    W_KEYS.forEach(function(k){
+      var inp = document.getElementById('w-' + k);
+      var out = document.getElementById('wo-' + k);
+      if(inp){
+        inp.value = W[k];
+        inp.setAttribute('aria-valuenow', W[k]);
+        inp.setAttribute('aria-valuetext', W[k] + ' אחוזים');
+      }
+      if(out) out.textContent = W[k] + '%';
+    });
+    var sum = document.getElementById('wSum');
+    if(sum){
+      sum.textContent = 'סך המשקלים: ' + W_KEYS.reduce(function(a,k){ return a + W[k]; }, 0) + '%. ' +
+        'המשקלים הנוכחיים: ' + W_KEYS.map(function(k){ return W_LABEL[k] + ' ' + W[k] + '%'; }).join(', ') + '.';
+    }
+  }
+
+  /* ===================== דירוג מפורש ===================== */
+  function renderRank(){
+    var list = document.getElementById('rankList');
+    var empty = document.getElementById('rankEmpty');
+    if(!list || !empty) return;
+    if(rows.length === 0){
+      list.innerHTML = '';
+      list.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    list.style.display = 'grid';
+    empty.style.display = 'none';
+    var sorted = rows.slice().sort(function(a,b){ return b.score - a.score; });
+    list.innerHTML = sorted.map(function(r, i){
+      var l = level(r.score);
+      var c = contribOf(r);
+      var gapTxt = i === 0
+        ? 'הציון הגבוה ביותר ברשימה.'
+        : 'פער של ' + (sorted[i-1].score - r.score).toFixed(2) + ' נקודות מהתהליך שמעליו.';
+      var seg = function(v, cls){
+        var pct = r.score > 0 ? (v / r.score * 100) : 0;
+        return '<span class="' + cls + '" style="width:' + pct.toFixed(1) + '%"></span>';
+      };
+      return '<li>' +
+        '<div class="rtop">' +
+          '<span class="pos">' + (i+1) + '.</span>' +
+          '<span class="nm">' + esc(r.name) + '</span>' +
+          '<span class="sc">' + r.score.toFixed(2) + '</span>' +
+          '<span class="badge ' + l.cls + '">' + l.t + '</span>' +
+        '</div>' +
+        '<p class="contrib">' +
+          '<span>השפעה ' + c.impact.toFixed(2) + '</span>' +
+          '<span>נפח ' + c.volume.toFixed(2) + '</span>' +
+          '<span>פוטנציאל שינוי ' + c.change.toFixed(2) + '</span>' +
+          '<span>כושר שכפול ' + c.repl.toFixed(2) + '</span>' +
+        '</p>' +
+        '<div class="bar" aria-hidden="true">' +
+          seg(c.impact,'c1') + seg(c.volume,'c2') + seg(c.change,'c3') + seg(c.repl,'c4') +
+        '</div>' +
+        '<p class="gap">' + gapTxt + '</p>' +
+      '</li>';
+    }).join('');
+  }
+
+  /* ===================== סיכום ישיבה ===================== */
+  var sumView = document.getElementById('sumView');
+  var sumOpener = null;
+
+  function buildSummary(){
+    var sorted = rows.slice().sort(function(a,b){ return b.score - a.score; });
+    var d = new Date();
+    var dateTxt;
+    try { dateTxt = d.toLocaleDateString('he-IL', {year:'numeric', month:'long', day:'numeric'}); }
+    catch(e){ dateTxt = d.getDate() + '.' + (d.getMonth()+1) + '.' + d.getFullYear(); }
+    document.getElementById('sumDate').textContent =
+      'הופק בתאריך ' + dateTxt + '. טיוטה לדיון - הרכיבים והספים הם נקודת פתיחה לעבודת הצוות.';
+
+    var html = '<h3>המשקלים שנבחרו</h3>' +
+      '<table><caption>משקלי הקריטריונים ששימשו לדירוג</caption>' +
+      '<thead><tr><th scope="col">קריטריון</th><th scope="col">משקל</th></tr></thead><tbody>' +
+      W_KEYS.map(function(k){
+        return '<tr><th scope="row">' + W_LABEL[k] + '</th><td>' + W[k] + '%</td></tr>';
+      }).join('') +
+      '</tbody></table>';
+
+    html += '<h3>דירוג התהליכים</h3>';
+    if(sorted.length === 0){
+      html += '<p style="color:var(--muted)">לא הוזנו תהליכים. יש להזין תהליכים בכלי לפני הפקת הסיכום.</p>';
+    } else {
+      html += '<table><caption>תהליכים לפי סדר יורד של ציון</caption><thead><tr>' +
+        '<th scope="col">#</th><th scope="col">תהליך</th><th scope="col">ציון</th>' +
+        '<th scope="col">עומק מומלץ</th><th scope="col">פער מהתהליך שמעליו</th>' +
+        '</tr></thead><tbody>' +
+        sorted.map(function(r, i){
+          return '<tr><th scope="row">' + (i+1) + '</th><td>' + esc(r.name) + '</td>' +
+            '<td>' + r.score.toFixed(2) + '</td>' +
+            '<td>' + level(r.score).t + '</td>' +
+            '<td>' + (i === 0 ? '-' : (sorted[i-1].score - r.score).toFixed(2)) + '</td></tr>';
+        }).join('') +
+        '</tbody></table>';
+    }
+    document.getElementById('sumBody').innerHTML = html;
+  }
+
+  function openSummary(){
+    if(!sumView) return;
+    sumOpener = document.activeElement;
+    buildSummary();
+    sumView.hidden = false;
+    document.body.classList.add('sum-open');
+    document.getElementById('sumClose').focus();
+  }
+  function closeSummary(){
+    if(!sumView) return;
+    sumView.hidden = true;
+    document.body.classList.remove('sum-open');
+    if(sumOpener && sumOpener.focus) sumOpener.focus();
+  }
+
+  var sumBtn = document.getElementById('sumBtn');
+  if(sumBtn) sumBtn.addEventListener('click', openSummary);
+  var sumCloseBtn = document.getElementById('sumClose');
+  if(sumCloseBtn) sumCloseBtn.addEventListener('click', closeSummary);
+  var sumPrintBtn = document.getElementById('sumPrint');
+  if(sumPrintBtn) sumPrintBtn.addEventListener('click', function(){ window.print(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && sumView && !sumView.hidden) closeSummary();
+  });
+
+  /* ===================== עזרה מבוססת AI - אופציונלית ===================== */
+  var AI_KEY_STORE = 'ai-work-method-anthropic-key-v1';
+  var aiKeyEl = document.getElementById('ai-key');
+  var aiDescEl = document.getElementById('ai-desc');
+  var aiErr = document.getElementById('ai-error');
+  var aiStatus = document.getElementById('ai-status');
+  var aiOut = document.getElementById('aiOut');
+  var aiBtn = document.getElementById('aiBtn');
+
+  if(aiKeyEl){
+    try {
+      var storedKey = localStorage.getItem(AI_KEY_STORE);
+      if(storedKey) aiKeyEl.value = storedKey;
+    } catch(e){}
+    aiKeyEl.addEventListener('change', function(){
+      try {
+        if(aiKeyEl.value.trim()) localStorage.setItem(AI_KEY_STORE, aiKeyEl.value.trim());
+        else localStorage.removeItem(AI_KEY_STORE);
+      } catch(e){}
+    });
+  }
+
+  var aiKeyClear = document.getElementById('aiKeyClear');
+  if(aiKeyClear){
+    aiKeyClear.addEventListener('click', function(){
+      if(aiKeyEl) aiKeyEl.value = '';
+      try { localStorage.removeItem(AI_KEY_STORE); } catch(e){}
+      if(aiStatus) aiStatus.textContent = 'המפתח נמחק מהדפדפן.';
+      if(aiErr) aiErr.textContent = '';
+    });
+  }
+
+  var AI_SYSTEM =
+    'אתה עוזר לצוות בין-משרדי בשירות המדינה לדרג תהליכי עבודה לקראת שינוי בעזרת בינה מלאכותית. ' +
+    'דרג את התהליך שיתואר לך בארבעה קריטריונים, כל אחד בסולם שלם מ-1 עד 5: ' +
+    'impact - השפעה על האזרח או על איכות ההחלטה, כאשר 1 היא השפעה שולית ו-5 השפעה ישירה ומשמעותית. ' +
+    'volume - נפח המקרים או האינטראקציות, כאשר 1 נפח נמוך ו-5 נפח גבוה מאוד. ' +
+    'change - פוטנציאל שינוי, כלומר עד כמה התהליך ניתן לעיצוב מחדש, כאשר 1 ניתן רק להאצה ו-5 ניתן לשנות את שיטת העבודה עצמה. ' +
+    'repl - כושר שכפול, כלומר האם יכולת שנבנתה עוברת לגוף הבא, כאשר 1 ייחודי לגוף אחד ו-5 ניתן לשכפול בעלות שולית. ' +
+    'אם המידע חלקי, דרג לפי מה שנמסר וציין זאת בנימוק. אל תמציא עובדות על הגוף או על התהליך. ' +
+    'החזר אך ורק אובייקט JSON יחיד, בלי טקסט לפניו או אחריו, במבנה: ' +
+    '{"impact":מספר,"volume":מספר,"change":מספר,"repl":מספר,"rationale":"נימוק קצר בעברית, עד שלושה משפטים"}';
+
+  function aiSetBusy(busy){
+    if(aiBtn){
+      aiBtn.disabled = busy;
+      aiBtn.textContent = busy ? 'שולח בקשה...' : 'קבלת הצעת דירוג';
+    }
+  }
+
+  function aiExtractJson(txt){
+    var start = txt.indexOf('{');
+    var end = txt.lastIndexOf('}');
+    if(start === -1 || end === -1 || end <= start) return null;
+    try { return JSON.parse(txt.slice(start, end + 1)); } catch(e){ return null; }
+  }
+
+  function aiClamp(v){
+    var n = Math.round(Number(v));
+    if(!isFinite(n)) return null;
+    return Math.max(1, Math.min(5, n));
+  }
+
+  function aiRenderSuggestion(s){
+    aiOut.innerHTML =
+      '<div class="ai-out">' +
+        '<h4 style="margin:0 0 10px;color:var(--navy);font-size:16px">הצעת דירוג</h4>' +
+        '<dl>' +
+          '<dt>השפעה</dt><dd>' + s.impact + ' מתוך 5</dd>' +
+          '<dt>נפח</dt><dd>' + s.volume + ' מתוך 5</dd>' +
+          '<dt>פוטנציאל שינוי</dt><dd>' + s.change + ' מתוך 5</dd>' +
+          '<dt>כושר שכפול</dt><dd>' + s.repl + ' מתוך 5</dd>' +
+          '<dt>נימוק</dt><dd>' + esc(s.rationale || '') + '</dd>' +
+        '</dl>' +
+        '<div class="btn-row"><button class="btn" type="button" id="aiAdopt">אימוץ הדירוג לטופס</button></div>' +
+        '<p class="note-inline">ההצעה היא נקודת פתיחה בלבד. אחרי האימוץ אפשר לשנות כל ערך ידנית לפני ההוספה לרשימה.</p>' +
+      '</div>';
+    document.getElementById('aiAdopt').addEventListener('click', function(){
+      W_KEYS.forEach(function(k){
+        var el = document.querySelector('input[name="' + k + '"][value="' + s[k] + '"]');
+        if(el) el.checked = true;
+      });
+      aiStatus.textContent = 'הדירוג אומץ לטופס. אפשר לשנות אותו ולהוסיף את התהליך לרשימה.';
+      var nameEl = document.getElementById('p-name');
+      if(nameEl) nameEl.focus();
+    });
+  }
+
+  if(aiBtn){
+    aiBtn.addEventListener('click', function(){
+      var key = aiKeyEl ? aiKeyEl.value.trim() : '';
+      var desc = aiDescEl ? aiDescEl.value.trim() : '';
+      aiErr.textContent = '';
+      aiStatus.textContent = '';
+      aiOut.innerHTML = '';
+      if(!key){
+        aiErr.textContent = 'יש להזין מפתח API כדי להשתמש בעזרה הזו. הכלי עצמו עובד במלואו בלעדיה.';
+        aiKeyEl.focus();
+        return;
+      }
+      if(!desc){
+        aiErr.textContent = 'יש לתאר את התהליך במילים לפני שליחת הבקשה.';
+        aiDescEl.focus();
+        return;
+      }
+      aiSetBusy(true);
+      aiStatus.textContent = 'הבקשה נשלחה. ההמתנה עשויה להימשך מספר שניות.';
+
+      fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: AI_MODEL,
+          max_tokens: 1200,
+          system: AI_SYSTEM,
+          messages: [{ role: 'user', content: desc }]
+        })
+      }).then(function(res){
+        return res.json().then(function(data){ return { ok: res.ok, status: res.status, data: data }; });
+      }).then(function(r){
+        aiSetBusy(false);
+        if(!r.ok){
+          var msg = (r.data && r.data.error && r.data.error.message) ? r.data.error.message : '';
+          if(r.status === 401) aiErr.textContent = 'המפתח נדחה. יש לבדוק שהוא הועתק במלואו ושהוא פעיל.';
+          else if(r.status === 429) aiErr.textContent = 'חריגה ממכסת השימוש בחשבון. יש לנסות שוב מאוחר יותר.';
+          else if(r.status === 400) aiErr.textContent = 'הבקשה נדחתה. ' + (msg || 'ייתכן שמזהה המודל אינו זמין בחשבון זה.');
+          else aiErr.textContent = 'השירות החזיר שגיאה ' + r.status + '. ' + msg;
+          aiStatus.textContent = '';
+          return;
+        }
+        if(r.data.stop_reason === 'refusal'){
+          aiErr.textContent = 'המודל נמנע מלהשיב לבקשה הזו. יש לנסח את תיאור התהליך במונחים כלליים יותר.';
+          aiStatus.textContent = '';
+          return;
+        }
+        var txt = (r.data.content || []).filter(function(b){ return b.type === 'text'; })
+          .map(function(b){ return b.text; }).join('\n');
+        var parsed = aiExtractJson(txt);
+        var s = parsed ? {
+          impact: aiClamp(parsed.impact), volume: aiClamp(parsed.volume),
+          change: aiClamp(parsed.change), repl: aiClamp(parsed.repl),
+          rationale: parsed.rationale
+        } : null;
+        if(!s || s.impact === null || s.volume === null || s.change === null || s.repl === null){
+          aiErr.textContent = 'לא ניתן היה לקרוא את ההצעה שהתקבלה. יש לנסות שוב, או לדרג ידנית.';
+          aiStatus.textContent = '';
+          return;
+        }
+        aiStatus.textContent = 'התקבלה הצעת דירוג.';
+        aiRenderSuggestion(s);
+      }).catch(function(){
+        aiSetBusy(false);
+        aiStatus.textContent = '';
+        aiErr.textContent = 'הבקשה לא הצליחה להגיע לשירות. ייתכן שאין חיבור לאינטרנט, או שרשת הארגון חוסמת את הפנייה. הכלי ממשיך לעבוד במלואו בלי העזרה הזו.';
+      });
+    });
+  }
+
+  var wResetBtn = document.getElementById('wResetBtn');
+  if(wResetBtn){
+    wResetBtn.addEventListener('click', function(){
+      W_KEYS.forEach(function(k){ W[k] = W_DEFAULT[k]; });
+      saveWeights();
+      syncWeightRows();
+      render();
+      if(aiStatus) aiStatus.textContent = '';
+    });
+  }
+
+  renderExample();
+  buildWeightRows();
 
   render();
 })();

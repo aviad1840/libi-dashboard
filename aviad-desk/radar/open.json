@@ -6,7 +6,7 @@
       "type": "תחרות",
       "owner_org": "נציבות שירות המדינה ומשרד החדשנות, המדע והטכנולוגיה",
       "deadline": "2026-09-17",
-      "days_left": 17,
+      "days_left": 13,
       "relevance": "high",
       "why_relevant": "שלוש הגשות מתוכננות: מיצוי זכויות פרואקטיבי, מנוע AI לתביעות סיעוד, עכשיו אני/סל אישי - כבר מתועד ב-context/calendar.md ו-context/portfolio.md",
       "novelty": "new",
@@ -15,7 +15,8 @@
       "effort_estimate": "גבוה",
       "advances": ["OQ8"],
       "source_url": "https://govextra.gov.il/civil-service-commission/innovation-award/home/",
-      "status": "בבדיקה"
+      "status": "בבדיקה",
+      "evidence_level": "E3"
     }
   ]
 }

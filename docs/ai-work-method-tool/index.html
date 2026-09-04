@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מעבודה עם AI לשינוי שיטת העבודה - כלי עבודה לצוות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0c3058; --navy-2:#266794; --blue:#0368b0; --light:#e8f3ff;
+  --bg:#ffffff; --ink:#1a1a1a; --muted:#4a5568; --line:#cbd5e0; --soft:#f5f9ff;
+  --warn:#8a5a00; --warn-bg:#fff8e6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Rubik',Arial,sans-serif; background:var(--bg); color:var(--ink);
+  font-size:16px; line-height:1.65;
+}
+.skip-link{
+  position:absolute; right:-9999px; top:0; background:var(--navy); color:#fff;
+  padding:12px 20px; z-index:200; text-decoration:none; font-weight:600;
+}
+.skip-link:focus{right:8px; top:8px}
+:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
+
+.draft-banner{
+  background:var(--warn-bg); color:var(--warn); border-bottom:2px solid #e0b84c;
+  padding:10px 20px; font-size:14px; font-weight:500; text-align:center;
+}
+header.hero{background:var(--navy); color:#fff; padding:36px 24px}
+.wrap{max-width:1180px; margin:0 auto}
+header.hero h1{margin:0 0 8px; font-size:28px; font-weight:700; line-height:1.3}
+header.hero p{margin:0; color:#bcd8f5; font-size:15px}
+header.hero .meta{margin-top:10px; color:#8fb8dd; font-size:13px}
+
+.layout{display:flex; gap:28px; max-width:1180px; margin:0 auto; padding:24px}
+nav.side{flex:0 0 220px; position:sticky; top:16px; align-self:flex-start}
+nav.side h2{font-size:13px; color:var(--muted); margin:0 0 10px; font-weight:600; letter-spacing:.3px}
+nav.side ul{list-style:none; margin:0; padding:0}
+nav.side li{margin-bottom:2px}
+nav.side a{
+  display:block; padding:9px 12px; color:var(--navy); text-decoration:none;
+  border-radius:6px; font-size:14px; font-weight:500; border-right:3px solid transparent;
+}
+nav.side a:hover{background:var(--light)}
+nav.side a[aria-current="true"]{background:var(--light); border-right-color:var(--blue); font-weight:600}
+main{flex:1; min-width:0}
+
+section{margin-bottom:44px; scroll-margin-top:20px}
+section > h2{
+  background:var(--navy); color:#fff; font-size:17px; font-weight:600;
+  margin:0 0 16px; padding:11px 18px; border-radius:5px;
+}
+h3{font-size:16px; margin:22px 0 8px; color:var(--navy)}
+p{margin:0 0 12px}
+.lead{font-size:17px}
+
+.thesis{
+  background:var(--light); border-right:5px solid var(--blue);
+  padding:20px 22px; border-radius:5px; margin-bottom:16px;
+}
+.thesis .big{font-size:20px; font-weight:600; color:var(--navy); margin:0 0 10px; line-height:1.45}
+.thesis p:last-child{margin:0}
+
+.loop{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0}
+.loop button{
+  font-family:inherit; font-size:14px; cursor:pointer; background:#fff;
+  border:1.5px solid var(--line); border-radius:6px; padding:10px 14px;
+  color:var(--navy); font-weight:500; transition:.12s;
+}
+.loop button:hover{border-color:var(--blue); background:var(--soft)}
+.loop button[aria-pressed="true"]{background:var(--navy); color:#fff; border-color:var(--navy)}
+.loop-detail{
+  border:1.5px solid var(--line); border-radius:6px; padding:16px 18px;
+  background:var(--soft); min-height:96px;
+}
+.loop-detail dl{margin:0; display:grid; grid-template-columns:130px 1fr; gap:6px 12px; font-size:15px}
+.loop-detail dt{font-weight:600; color:var(--navy)}
+.loop-detail dd{margin:0}
+
+table{width:100%; border-collapse:collapse; margin:12px 0; font-size:15px}
+caption{text-align:right; font-weight:600; color:var(--navy); padding-bottom:8px}
+th,td{border:1px solid var(--line); padding:10px 12px; text-align:right; vertical-align:top}
+thead th{background:var(--navy); color:#fff; font-weight:600}
+tbody tr:nth-child(even){background:var(--soft)}
+td.rowhead,th[scope="row"]{font-weight:600; color:var(--navy); background:var(--light)}
+
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:14px 0}
+.card{border:1.5px solid var(--line); border-radius:7px; padding:16px; background:#fff}
+.card h4{margin:0 0 10px; font-size:16px; color:var(--navy)}
+.card .yes,.card .no{font-size:14px; margin:0 0 8px}
+.card .yes strong{color:#1a6b3c}
+.card .no strong{color:#8a2b2b}
+.rule{
+  background:var(--navy); color:#fff; padding:14px 18px; border-radius:6px;
+  font-weight:600; font-size:16px; margin:14px 0;
+}
+
+/* calculator */
+.calc{border:1.5px solid var(--line); border-radius:8px; padding:20px; background:var(--soft)}
+.field{margin-bottom:14px}
+.field label{display:block; font-weight:600; font-size:15px; margin-bottom:5px; color:var(--navy)}
+.field .hint{font-weight:400; font-size:13px; color:var(--muted); display:block; margin-top:2px}
+.field input[type="text"]{
+  width:100%; padding:9px 11px; font-family:inherit; font-size:15px;
+  border:1.5px solid var(--line); border-radius:5px; background:#fff;
+}
+.scale{display:flex; gap:6px; flex-wrap:wrap}
+.scale label{
+  font-weight:500; font-size:14px; border:1.5px solid var(--line); border-radius:5px;
+  padding:7px 14px; cursor:pointer; background:#fff; margin:0; display:inline-block;
+}
+.scale input{position:absolute; opacity:0; width:1px; height:1px}
+.scale input:focus-visible + span{outline:3px solid var(--blue); outline-offset:3px; border-radius:3px}
+.scale label:has(input:checked){background:var(--navy); color:#fff; border-color:var(--navy)}
+.btn{
+  font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;
+  background:var(--blue); color:#fff; border:none; border-radius:6px; padding:11px 22px;
+}
+.btn:hover{background:var(--navy)}
+.btn.secondary{background:#fff; color:var(--navy); border:1.5px solid var(--navy)}
+.btn.secondary:hover{background:var(--light)}
+.btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+.error-msg{color:#8a2b2b; font-size:14px; font-weight:500; display:block; min-height:1px}
+
+.matrix-wrap{margin-top:22px}
+.matrix{position:relative; width:100%; max-width:520px; aspect-ratio:1/1; border:1.5px solid var(--line); background:#fff; border-radius:6px}
+.matrix .q{position:absolute; width:50%; height:50%; box-sizing:border-box; font-size:12px; color:var(--muted); padding:8px}
+.matrix .q.tr{top:0; right:0; background:var(--light)}
+.matrix .q.tl{top:0; left:0}
+.matrix .q.br{bottom:0; right:0}
+.matrix .q.bl{bottom:0; left:0}
+.dot{position:absolute; width:14px; height:14px; border-radius:50%; background:var(--blue); transform:translate(50%,50%); border:2px solid #fff}
+.dot span{position:absolute; right:18px; top:-4px; white-space:nowrap; font-size:12px; color:var(--navy); font-weight:600}
+.axis-x,.axis-y{font-size:13px; color:var(--muted); font-weight:600}
+.axis-x{text-align:center; max-width:520px; margin-top:6px}
+.axis-y{margin-bottom:6px}
+
+.badge{display:inline-block; padding:3px 10px; border-radius:12px; font-size:13px; font-weight:600}
+.b1{background:#eef2f7; color:#3d4d63}
+.b2{background:#d9ecfb; color:#0c4a75}
+.b3{background:var(--navy); color:#fff}
+
+.fill{background:var(--warn-bg); border:1.5px dashed #e0b84c; border-radius:6px; padding:14px 16px; font-size:14px; color:var(--warn); margin:12px 0}
+.fill strong{display:block; margin-bottom:4px}
+
+.metrics{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.metrics > div{border:1.5px solid var(--line); border-radius:7px; padding:16px}
+.metrics h4{margin:0 0 10px; font-size:15px}
+.metrics ul{margin:0; padding-right:18px; font-size:15px}
+.metrics li{margin-bottom:5px}
+.m-out{border-color:var(--blue) !important; background:var(--soft)}
+
+footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--muted); font-size:13px}
+.toolbar{display:flex; gap:10px; justify-content:flex-start; padding:0 24px; max-width:1180px; margin:0 auto}
+
+@media (max-width:900px){
+  .layout{flex-direction:column; padding:16px}
+  nav.side{position:static; flex:auto}
+  nav.side ul{display:flex; flex-wrap:wrap; gap:4px}
+  .metrics{grid-template-columns:1fr}
+  header.hero h1{font-size:22px}
+}
+@media print{
+  nav.side,.toolbar,.btn{display:none}
+  body{font-size:12px}
+  section{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">דלג לתוכן הראשי</a>
+
+<div class="draft-banner" role="note">
+  טיוטה לדיון. הרכיבים והניסוחים הם נקודת פתיחה לעבודת הצוות, ומיועדים להשלמה ולתיקון על ידו.
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>מעבודה עם AI לשינוי שיטת העבודה</h1>
+    <p>כלי עבודה לצוות ההון האנושי במגזר הציבורי</p>
+    <p class="meta">החלטת ממשלה 4255 · לקראת 30.9.2026</p>
+  </div>
+</header>
+
+<div class="toolbar" style="padding-top:14px">
+  <button class="btn secondary" type="button" onclick="window.print()">הדפסה או שמירה כ-PDF</button>
+</div>
+
+<div class="layout">
+  <nav class="side" aria-label="ניווט בין מקטעי המסמך">
+    <h2 id="nav-title">מקטעי הכלי</h2>
+    <ul>
+      <li><a href="#s1">1. התזה</a></li>
+      <li><a href="#s2">2. הלולאה</a></li>
+      <li><a href="#s3">3. מנגנון התעדוף</a></li>
+      <li><a href="#s4">4. חלוקת אחריות</a></li>
+      <li><a href="#s5">5. מדדים</a></li>
+      <li><a href="#s6">6. עומק התערבות</a></li>
+      <li><a href="#s7">7. מה מוצע לאמץ</a></li>
+    </ul>
+  </nav>
+
+  <main id="main-content">
+
+    <section id="s1" aria-labelledby="h-s1">
+      <h2 id="h-s1">1 | התזה</h2>
+      <div class="thesis">
+        <p class="big">אם מכניסים AI לתהליך קיים, מקבלים תהליך קיים עם AI.</p>
+        <p>הערך הגדול נוצר כאשר היכולת החדשה מאפשרת גם לעצב מחדש את התהליך, את אופן העבודה ואת התוצאה. לכן יחידת ההתערבות אינה הפרויקט הטכנולוגי אלא התהליך העסקי שרוצים לשנות. הפרויקט נשאר הדרך שבה מבצעים, אך הוא אינו מה שמודדים.</p>
+      </div>
+      <p>הפלייבוק לשולחן מרכזי שהוצג בצוות עונה היטב על השאלה כיצד ארגון מנהל ומאמץ כלי AI. השאלה המשלימה, שהכלי הזה מנסה לענות עליה, היא כיצד הוא משתמש ב-AI כדי לשנות את שיטת העבודה עצמה.</p>
+      <p>הכלי בנוי לפי חמש השאלות שהועלו בדיון: אופן ההטמעה, מנגנון התעדוף, חלוקת האחריות, מדדי התפוקה והתוצאה, והתשתיות המאפשרות.</p>
+    </section>
+
+    <section id="s2" aria-labelledby="h-s2">
+      <h2 id="h-s2">2 | הלולאה - ההטמעה מתחילה לפני שהכלי נבנה</h2>
+      <p>המודל הרווח הוא כלי, משתמשים, אימוץ. הוא מתאים לכלים רוחביים, אך לא לשינוי תהליך. שני הבדלים מעשיים: העיצוב מחדש קודם לבנייה ולא אחריה, והמעבר לייצור והשכפול הם חלק מהמסלול ולא שלב שמתחיל אחרי שהפיילוט הצליח.</p>
+      <p class="sr-only">בחרו שלב בלולאה כדי לראות את פירוטו.</p>
+      <div class="loop" role="group" aria-label="שמונת שלבי הלולאה">
+        <button type="button" aria-pressed="true" data-i="0">1. בעיה</button>
+        <button type="button" aria-pressed="false" data-i="1">2. תהליך</button>
+        <button type="button" aria-pressed="false" data-i="2">3. עיצוב מחדש</button>
+        <button type="button" aria-pressed="false" data-i="3">4. בנייה</button>
+        <button type="button" aria-pressed="false" data-i="4">5. הערכה</button>
+        <button type="button" aria-pressed="false" data-i="5">6. ייצור</button>
+        <button type="button" aria-pressed="false" data-i="6">7. אימוץ</button>
+        <button type="button" aria-pressed="false" data-i="7">8. שכפול</button>
+      </div>
+      <div class="loop-detail" id="loopDetail" role="region" aria-live="polite" aria-label="פירוט השלב הנבחר"></div>
+    </section>
+
+    <section id="s3" aria-labelledby="h-s3">
+      <h2 id="h-s3">3 | מנגנון התעדוף</h2>
+      <p>לא לפי בשלות הכלי, לא לפי כמות הרעיונות ולא לפי גודל הגוף. ארבעה קריטריונים, בסולם 1 עד 5. הזינו תהליך אחד או יותר וקבלו ציון, מיקום על המטריצה והמלצה לעומק התערבות.</p>
+
+      <div class="calc">
+        <div class="field">
+          <label for="p-name">שם התהליך <span aria-hidden="true">*</span><span class="sr-only">שדה חובה</span>
+            <span class="hint">לדוגמה: טיפול בפנייה, אישור זכאות, הפקת דוח תקופתי</span>
+          </label>
+          <input type="text" id="p-name" aria-required="true" aria-describedby="p-name-error">
+          <span class="error-msg" id="p-name-error" role="alert"></span>
+        </div>
+
+        <div class="field">
+          <span class="label-like" id="lbl-impact" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">השפעה על האזרח או על איכות ההחלטה
+            <span class="hint">1 = השפעה שולית, 5 = השפעה ישירה ומשמעותית</span>
+          </span>
+          <div class="scale" role="radiogroup" aria-labelledby="lbl-impact" id="sc-impact"></div>
+        </div>
+
+        <div class="field">
+          <span id="lbl-volume" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">נפח - כמות המקרים או האינטראקציות
+            <span class="hint">1 = נפח נמוך, 5 = נפח גבוה מאוד</span>
+          </span>
+          <div class="scale" role="radiogroup" aria-labelledby="lbl-volume" id="sc-volume"></div>
+        </div>
+
+        <div class="field">
+          <span id="lbl-change" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">פוטנציאל שינוי - עד כמה התהליך ניתן לעיצוב מחדש
+            <span class="hint">1 = ניתן רק להאצה, 5 = ניתן לשנות את שיטת העבודה עצמה</span>
+          </span>
+          <div class="scale" role="radiogroup" aria-labelledby="lbl-change" id="sc-change"></div>
+        </div>
+
+        <div class="field">
+          <span id="lbl-repl" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">כושר שכפול - האם יכולת שנבנתה עוברת לגוף הבא
+            <span class="hint">1 = ייחודי לגוף אחד, 5 = ניתן לשכפול בעלות שולית</span>
+          </span>
+          <div class="scale" role="radiogroup" aria-labelledby="lbl-repl" id="sc-repl"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" type="button" id="addBtn">הוספה לרשימה</button>
+          <button class="btn secondary" type="button" id="csvBtn">ייצוא הרשימה לקובץ CSV</button>
+          <button class="btn secondary" type="button" id="clearBtn">ניקוי הרשימה</button>
+        </div>
+        <p class="hint" style="margin-top:10px;font-size:13px;color:var(--muted)">הנתונים נשמרים בזיכרון הדפדפן בלבד למשך הישיבה ואינם נשלחים לשום מקום.</p>
+      </div>
+
+      <div id="resultsWrap" aria-live="polite">
+        <table id="resultsTable" style="display:none">
+          <caption>תהליכים שהוזנו ודירוגם</caption>
+          <thead>
+            <tr>
+              <th scope="col">תהליך</th>
+              <th scope="col">השפעה</th>
+              <th scope="col">נפח</th>
+              <th scope="col">פוטנציאל שינוי</th>
+              <th scope="col">שכפול</th>
+              <th scope="col">ציון</th>
+              <th scope="col">עומק מומלץ</th>
+              <th scope="col"><span class="sr-only">פעולות</span></th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+        <p id="emptyMsg" style="color:var(--muted);font-size:15px">טרם הוזנו תהליכים.</p>
+      </div>
+
+      <div class="matrix-wrap">
+        <h3 id="matrix-title">מיקום התהליכים על המטריצה</h3>
+        <p class="axis-y">ציר אנכי: היתכנות (פוטנציאל שינוי + כושר שכפול)</p>
+        <div class="matrix" id="matrix" role="img" aria-labelledby="matrix-title" aria-describedby="matrix-desc">
+          <div class="q tr">ערך גבוה, מינוף גבוה<br>מועמד ראשון</div>
+          <div class="q tl">ערך נמוך, מינוף גבוה<br>מתאים לנכס רוחבי</div>
+          <div class="q br">ערך גבוה, מינוף נמוך<br>שיפור נקודתי</div>
+          <div class="q bl">ערך נמוך, מינוף נמוך<br>לא לתעדוף כעת</div>
+        </div>
+        <p class="axis-x">ציר אופקי: ערך (השפעה + נפח) - גדל לכיוון ימין</p>
+        <p id="matrix-desc" class="sr-only" aria-live="polite">אין עדיין תהליכים על המטריצה.</p>
+      </div>
+    </section>
+
+    <section id="s4" aria-labelledby="h-s4">
+      <h2 id="h-s4">4 | חלוקת אחריות</h2>
+      <div class="rule">הבעלות על הערך ועל שינוי התהליך היא עסקית. הגורם הטכנולוגי אחראי על המימוש, לא על התוצאה.</div>
+      <p>לא נדרש עיסוק חדש. נדרשת חלוקת אחריות ברורה בתוך המבנה הקיים.</p>
+      <div class="cards">
+        <div class="card">
+          <h4>מוביל עסקי</h4>
+          <p class="yes"><strong>אחראי על:</strong> הבעיה, התהליך והתוצאה. שותף פעיל בעיצוב מחדש, בהערכת הפתרון ובהובלת האימוץ.</p>
+          <p class="no"><strong>לא:</strong> רק כותב דרישות ומעביר הלאה.</p>
+        </div>
+        <div class="card">
+          <h4>מט"ד</h4>
+          <p class="yes"><strong>אחראי על:</strong> תכלול הטרנספורמציה ברמת הגוף, בניית היכולת אצל המובילים העסקיים, ומדידת התוצאות.</p>
+          <p class="no"><strong>לא:</strong> מוביל AI יחיד שמחליף את הצד העסקי.</p>
+        </div>
+        <div class="card">
+          <h4>דאטה ובינה מלאכותית</h4>
+          <p class="yes"><strong>אחראי על:</strong> יכולת מקצועית רוחבית, סטנדרטים, ותשתית נתונים, לפי המבנה הקיים בכל גוף.</p>
+          <p class="no"><strong>לא:</strong> שכבת אישורים נוספת לכל מקרה שימוש.</p>
+        </div>
+        <div class="card">
+          <h4>טכנולוגיה</h4>
+          <p class="yes"><strong>אחראי על:</strong> אינטגרציה, אבטחה, ממשל נתונים, מעבר לייצור והרחבה, בפריסה לפי מקרה שימוש.</p>
+          <p class="no"><strong>לא:</strong> בעל הבית היחיד על הבעיה העסקית.</p>
+        </div>
+      </div>
+      <p>בעידן שבו הכלים מאפשרים לבעל מומחיות תחומית להתנסות ולבנות אב-טיפוס, תפקיד היחידות העסקיות אינו מסתיים בהצפת צורך. נדרשת יכולת מעשית מספקת כדי לעבור במהירות מזיהוי בעיה להתנסות, אב-טיפוס והערכה, בהתאם לסביבה המאושרת ולרמת הסיכון. זו ההבחנה בין אוריינות AI לבין יכולת בנייה: הראשונה משפרת את השיח עם הגורם הטכנולוגי, השנייה מאפשרת לגלות מה בכלל אפשרי לפני שמוקצה משאב טכנולוגי משמעותי.</p>
+    </section>
+
+    <section id="s5" aria-labelledby="h-s5">
+      <h2 id="h-s5">5 | מדדים</h2>
+      <p>תמונת המצב הניהולית המקובלת סופרת כלים, פיילוטים ורעיונות. אלה מדדי תפוקה נכונים וחסרים. לצידם נדרשים מדדי תוצאה.</p>
+      <div class="metrics">
+        <div>
+          <h4>מדדי תפוקה - קיימים</h4>
+          <ul>
+            <li>מספר כלים מאושרים</li>
+            <li>מספר פיילוטים פעילים</li>
+            <li>מספר משתמשים</li>
+            <li>מספר רעיונות שהועלו</li>
+          </ul>
+        </div>
+        <div class="m-out">
+          <h4>מדדי תוצאה - נדרשים</h4>
+          <ul>
+            <li>כמה תהליכי עבודה עוצבו מחדש, ולא רק הואצו</li>
+            <li>כמה יכולות עברו לייצור בפועל</li>
+            <li>איזה ערך מדיד נוצר לאזרח מול קו בסיס שהוגדר מראש</li>
+            <li>איזו יכולת נשארה בגוף לאחר סיום הליווי החיצוני</li>
+            <li>כמה מהיר גוף שני מאמץ יכולת שגוף ראשון בנה</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule" style="background:var(--blue)">מדד על: Time to Outcome - הזמן מזיהוי הבעיה עד לשיפור מדיד. לא כמה זמן לקח לבנות.</div>
+      <div class="fill">
+        <strong>להשלמה על ידי הצוות</strong>
+        ערכי היעד לכל מדד, תדירות המדידה, והגורם שמחזיק את הדיווח. לא נקבעו כאן בכוונה.
+      </div>
+    </section>
+
+    <section id="s6" aria-labelledby="h-s6">
+      <h2 id="h-s6">6 | עומק ההתערבות</h2>
+      <p>המגזר הציבורי מגוון, ואחידות תייצר בירוקרטיה מיותרת. התפיסה זהה לכולם; עומק ההתערבות נגזר מפוטנציאל הטרנספורמציה.</p>
+      <table>
+        <caption>שלוש רמות עומק</caption>
+        <thead><tr><th scope="col">רמה</th><th scope="col">מתי מתאימה</th><th scope="col">מה כוללת</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><span class="badge b1">רמה 1</span></th><td>ציון נמוך מ-3</td><td>שימוש ביכולות ובנכסי רוחב משותפים, בלי מנגנון ייעודי בגוף.</td></tr>
+          <tr><th scope="row"><span class="badge b2">רמה 2</span></th><td>ציון 3 עד 3.9</td><td>ליווי ממוקד לתהליך אחד או שניים בעלי ערך גבוה, עם בעלות עסקית מוגדרת.</td></tr>
+          <tr><th scope="row"><span class="badge b3">רמה 3</span></th><td>ציון 4 ומעלה</td><td>מנגנון יישום מלא בגוף, במתכונת ספרינט מוגדר עם שער החלטה בסופו. כאן מפעל יכולות משרדי הוא מודל הפעלה אפשרי.</td></tr>
+        </tbody>
+      </table>
+      <div class="fill">
+        <strong>להשלמה על ידי הצוות</strong>
+        ספי הציון בין הרמות הם נקודת פתיחה. הצוות יכול לכייל אותם לאחר הרצה של מספר תהליכים אמיתיים.
+      </div>
+    </section>
+
+    <section id="s7" aria-labelledby="h-s7">
+      <h2 id="h-s7">7 | מה מוצע שהצוות יאמץ</h2>
+      <table>
+        <caption>ארבע המלצות לקראת 30.9</caption>
+        <tbody>
+          <tr><th scope="row">1 | מסגרת מארגנת</th><td>לאמץ את התפיסה כמסגרת מארגנת להמלצות הצוות, כך שהעבודה על כשירות, תפקידים, דאטה, תשתיות, הטמעה ומדידה תתחבר לשיטת עבודה אחת במקום להיבנות בנפרד.</td></tr>
+          <tr><th scope="row">2 | יחידת ההתערבות</th><td>לקבוע כי ביוזמות בינה מלאכותית משמעותיות יחידת ההתערבות היא התהליך העסקי והתוצאה שמבקשים לשנות, ולא הפרויקט הטכנולוגי בלבד.</td></tr>
+          <tr><th scope="row">3 | בעלות ומדידה</th><td>להמליץ כי לכל יוזמה משמעותית תהיה בעלות עסקית מוגדרת על הערך, על שינוי התהליך, על ההטמעה ועל מדידת התוצאה, וכי ההצלחה תימדד גם ביכולת שעברה לייצור, בערך שנוצר ובמה שנשאר בגוף.</td></tr>
+          <tr><th scope="row">4 | מנגנון יישום</th><td>להמליץ על מפעל יכולות משרדי כמודל הפעלה אפשרי בגופים שבהם נדרש עומק התערבות גבוה, תוך הישענות על היכולות והנכסים הרוחביים הקיימים.</td></tr>
+        </tbody>
+      </table>
+      <div class="fill">
+        <strong>להשלמה על ידי הצוות</strong>
+        מי מחזיק כל אחת מארבע ההמלצות, ומה התוצר הנדרש מכל אחת עד 30.9.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>טיוטה לדיון - כלי עבודה לצוות ההון האנושי במגזר הציבורי. הרכיבים, הספים והניסוחים הם נקודת פתיחה לעבודת הצוות ואינם מהווים המלצה סגורה או התחייבות ארגונית.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var LOOP = [
+    {t:"בעיה", who:"מוביל עסקי", what:"הגדרת הבעיה במונחי תוצאה ולא במונחי פתרון. מה לא עובד היום ולמי זה עולה.", gate:"בעיה מנוסחת עם קו בסיס מדיד."},
+    {t:"תהליך", who:"מוביל עסקי ומט\"ד", what:"מיפוי התהליך הקיים מקצה לקצה, כולל נקודות ההחלטה והמידע שנדרש בכל אחת.", gate:"מפת תהליך מוסכמת."},
+    {t:"עיצוב מחדש", who:"מוביל עסקי ומט\"ד", what:"תכנון התהליך כפי שהוא צריך להיראות עם היכולת החדשה, ולא הוספת כלי מעל המבנה הקיים.", gate:"תהליך יעד מוגדר."},
+    {t:"בנייה", who:"מוביל עסקי, בליווי דאטה וטכנולוגיה", what:"בניית אב-טיפוס בסביבה מאושרת, קרוב ככל האפשר לבעיה.", gate:"אב-טיפוס עובד."},
+    {t:"הערכה", who:"מוביל עסקי ודאטה", what:"בחינה מול משתמשים אמיתיים, מדידת איכות ואיתור מגבלות וסיכונים. ביצוע התאמה או שינוי כיוון.", gate:"ראיות ראשוניות לערך, או החלטה לעצור."},
+    {t:"ייצור", who:"טכנולוגיה", what:"אינטגרציה, אבטחה, ממשל נתונים ומעבר להפעלה ייצורית.", gate:"פתרון פעיל בסביבת ייצור."},
+    {t:"אימוץ", who:"מוביל עסקי", what:"הטמעה בשיטת העבודה בפועל, הכשרה ועדכון נהלים. שינוי מה שאנשים עושים, לא רק מה שזמין להם.", gate:"שיפור מדיד מול קו הבסיס."},
+    {t:"שכפול", who:"מט\"ד ונכסי רוחב", what:"תיעוד מה נבנה, מה למדנו ומה ניתן לשימוש חוזר, והעברה לגוף או ליחידה הבאה.", gate:"נכס שניתן להעביר."}
+  ];
+
+  var detail = document.getElementById('loopDetail');
+  function renderLoop(i){
+    var s = LOOP[i];
+    detail.innerHTML =
+      '<dl><dt>שלב</dt><dd>' + (i+1) + '. ' + s.t + '</dd>' +
+      '<dt>מי מוביל</dt><dd>' + s.who + '</dd>' +
+      '<dt>מה קורה</dt><dd>' + s.what + '</dd>' +
+      '<dt>שער יציאה</dt><dd>' + s.gate + '</dd></dl>';
+  }
+  var loopBtns = document.querySelectorAll('.loop button');
+  loopBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      loopBtns.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      renderLoop(parseInt(b.dataset.i,10));
+    });
+  });
+  renderLoop(0);
+
+  var CRIT = [
+    {id:'impact', name:'sc-impact'},
+    {id:'volume', name:'sc-volume'},
+    {id:'change', name:'sc-change'},
+    {id:'repl',   name:'sc-repl'}
+  ];
+  CRIT.forEach(function(c){
+    var box = document.getElementById(c.name), html='';
+    for(var v=1; v<=5; v++){
+      html += '<label><input type="radio" name="'+c.id+'" value="'+v+'">'+
+              '<span>'+v+'</span></label>';
+    }
+    box.innerHTML = html;
+  });
+
+  function val(id){
+    var el = document.querySelector('input[name="'+id+'"]:checked');
+    return el ? parseInt(el.value,10) : 3;
+  }
+
+  var STORAGE_KEY = 'ai-work-method-prioritization-v1';
+  var rows = loadRows();
+
+  function loadRows(){
+    try {
+      var saved = localStorage.getItem(STORAGE_KEY);
+      var parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) { return []; }
+  }
+  function saveRows(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); } catch(e) {}
+  }
+
+  function level(score){
+    if(score >= 4) return {n:3, cls:'b3', t:'רמה 3'};
+    if(score >= 3) return {n:2, cls:'b2', t:'רמה 2'};
+    return {n:1, cls:'b1', t:'רמה 1'};
+  }
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+    });
+  }
+
+  function render(){
+    var tbl = document.getElementById('resultsTable');
+    var body = document.getElementById('resultsBody');
+    var empty = document.getElementById('emptyMsg');
+    if(rows.length === 0){
+      tbl.style.display='none'; empty.style.display='block';
+    } else {
+      tbl.style.display='table'; empty.style.display='none';
+      body.innerHTML = rows.map(function(r,idx){
+        var l = level(r.score);
+        return '<tr><th scope="row">'+esc(r.name)+'</th>'+
+          '<td>'+r.impact+'</td><td>'+r.volume+'</td><td>'+r.change+'</td><td>'+r.repl+'</td>'+
+          '<td><strong>'+r.score.toFixed(2)+'</strong></td>'+
+          '<td><span class="badge '+l.cls+'">'+l.t+'</span></td>'+
+          '<td><button class="btn secondary" style="padding:5px 12px;font-size:13px" type="button" data-del="'+idx+'" aria-label="הסרת '+esc(r.name)+' מהרשימה">הסרה</button></td></tr>';
+      }).join('');
+      body.querySelectorAll('[data-del]').forEach(function(b){
+        b.addEventListener('click', function(){
+          rows.splice(parseInt(b.dataset.del,10),1); saveRows(); render();
+        });
+      });
+    }
+    drawMatrix();
+  }
+
+  function drawMatrix(){
+    var m = document.getElementById('matrix');
+    m.querySelectorAll('.dot').forEach(function(d){ d.remove(); });
+    rows.forEach(function(r){
+      var x = (r.impact + r.volume) / 2;
+      var y = (r.change + r.repl) / 2;
+      var d = document.createElement('div');
+      d.className = 'dot';
+      d.style.right = ((x-1)/4*88 + 4) + '%';
+      d.style.bottom = ((y-1)/4*88 + 4) + '%';
+      d.innerHTML = '<span>'+esc(r.name)+'</span>';
+      m.appendChild(d);
+    });
+    var desc = document.getElementById('matrix-desc');
+    if(rows.length === 0){
+      desc.textContent = 'אין עדיין תהליכים על המטריצה.';
+    } else {
+      desc.textContent = 'על המטריצה ' + rows.length + ' תהליכים. ' + rows.map(function(r){
+        return r.name + ', ערך ' + ((r.impact+r.volume)/2).toFixed(1) + ', היתכנות ' + ((r.change+r.repl)/2).toFixed(1) + ', ' + level(r.score).t;
+      }).join('. ') + '.';
+    }
+  }
+
+  document.getElementById('addBtn').addEventListener('click', function(){
+    var nameEl = document.getElementById('p-name');
+    var err = document.getElementById('p-name-error');
+    var name = nameEl.value.trim();
+    if(!name){
+      err.textContent = 'יש להזין שם תהליך.';
+      nameEl.focus();
+      return;
+    }
+    err.textContent = '';
+    var r = {
+      name:name, impact:val('impact'), volume:val('volume'),
+      change:val('change'), repl:val('repl')
+    };
+    r.score = (r.impact + r.volume + r.change + r.repl) / 4;
+    rows.push(r);
+    saveRows();
+    nameEl.value = '';
+    render();
+    nameEl.focus();
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    if(rows.length === 0) return;
+    rows = []; saveRows(); render();
+  });
+
+  document.getElementById('csvBtn').addEventListener('click', function(){
+    if(rows.length === 0){ return; }
+    var head = ['תהליך','השפעה','נפח','פוטנציאל שינוי','כושר שכפול','ציון','עומק מומלץ'];
+    var lines = [head.join(',')].concat(rows.map(function(r){
+      return ['"'+r.name.replace(/"/g,'""')+'"', r.impact, r.volume, r.change, r.repl,
+              r.score.toFixed(2), level(r.score).t].join(',');
+    }));
+    var blob = new Blob(['\uFEFF'+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'tiudof-tahalichim.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  });
+
+  var secs = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.side a'));
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(l){ l.removeAttribute('aria-current'); });
+          var active = links.filter(function(l){ return l.getAttribute('href') === '#'+e.target.id; })[0];
+          if(active) active.setAttribute('aria-current','true');
+        }
+      });
+    }, {rootMargin:'-10% 0px -70% 0px'});
+    secs.forEach(function(s){ io.observe(s); });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

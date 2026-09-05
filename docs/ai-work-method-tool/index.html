@@ -173,6 +173,7 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
 /* ===== שדרוגים ===== */
 .note-inline{font-size:13px;color:var(--muted);margin:6px 0 0}
 .todo{background:var(--warn-bg);color:var(--warn);border:1px dashed #e0b84c;border-radius:4px;padding:1px 8px;font-size:13px;font-weight:500;white-space:nowrap;display:inline-block}
+.ph-txt{color:var(--muted);font-size:13px;display:block;margin-top:3px}
 
 /* דוגמה מלאה */
 .ex-meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0 0 16px;font-size:15px;max-width:720px}
@@ -339,7 +340,7 @@ details.ai>summary:hover{background:var(--light)}
       </div>
       <div class="fill">
         <strong>להשלמה על ידי הצוות</strong>
-        תוכן הדוגמה יושב במשתנה <code>EXAMPLE</code> בראש הסקריפט, עם הערה בעברית לכל שדה. מילוי שם מתעדכן כאן אוטומטית, בלי לגעת בסימון העמוד.
+        תוכן הדוגמה יושב במשתנה <code>EXAMPLE</code> בראש הסקריפט, עם הערה בעברית לכל שדה. מילוי שם מתעדכן כאן אוטומטית, בלי לגעת בסימון העמוד. לצד כל שדה ריק מופיע כעת טקסט הנחיה קצר בגוון אפור, המסביר מה נדרש באותו שדה. הטקסט הוא הנחיה בלבד ואינו נתון.
       </div>
     </section>
 
@@ -644,6 +645,56 @@ details.ai>summary:hover{background:var(--light)}
     ]
   };
 
+  /* ============================================================
+     הנחיות למילוי הדוגמה - מוצגות רק ליד שדה ריק ב-EXAMPLE.
+     ------------------------------------------------------------
+     כלל אכיפה, לא לשבור בסקירה: כל הנחיה כאן בציווי, גוף שני רבים
+     ("תארו", "רשמו", "ציינו"), כדי שלעולם לא תיקרא כעובדה. אסור
+     שתכיל ספרה, שם ארגון או שם תהליך - היא מדריכה איך למלא, ואינה
+     נתון בפני עצמה. מבנה זהה למבנה EXAMPLE, כדי שהתאמה בין השניים
+     תישאר פשוטה.
+     ============================================================ */
+  var GUIDE = {
+    process: "רשמו כאן את שם התהליך שבחרתם להדגים, בשפה שהצוות מכיר.",
+    body: "ציינו את הגוף או היחידה שבהם התהליך פועל בפועל.",
+    baseline: "תארו את המצב לפני השינוי במונחים שניתן למדוד.",
+    outcome: "תארו את התוצאה שנמדדה בסוף, מול אותו קו בסיס בדיוק.",
+    steps: [
+      { before:"תארו מה היה ידוע על הבעיה לפני שהתחלתם - מה לא עבד ולמי זה הפריע.",
+        action:"רשמו איך ניסחתם את הבעיה במונחי תוצאה, ולא כפתרון מוכן מראש.",
+        gate:"ציינו איזה קו בסיס מדיד קבעתם לפני שהמשכתם לשלב הבא.",
+        duration:"רשמו כמה זמן לקח לנסח את הבעיה ולהסכים עליה." },
+      { before:"תארו מה ידעתם על התהליך הקיים לפני המיפוי - מה היה ברור ומה לא.",
+        action:"רשמו איך מיפיתם את התהליך מקצה לקצה, כולל נקודות ההחלטה שבו.",
+        gate:"ציינו מתי מפת התהליך נחשבה מוסכמת על המעורבים.",
+        duration:"רשמו כמה זמן ארך המיפוי בפועל." },
+      { before:"תארו איך התהליך נראה לפני העיצוב מחדש, ומה בו ביקשתם לשנות.",
+        action:"רשמו איך תכננתם את התהליך החדש, ולא רק כלי שנוסף מעל הישן.",
+        gate:"ציינו מתי תהליך היעד נחשב מוגדר דיו כדי לעבור לבנייה.",
+        duration:"רשמו כמה זמן ארך שלב העיצוב מחדש." },
+      { before:"תארו באיזו סביבה ובאילו כלים התחלתם לבנות.",
+        action:"רשמו מה בדיוק נבנה, ומי היה מעורב מהצד העסקי והטכנולוגי.",
+        gate:"ציינו מה הראה לכם שאב-הטיפוס עובד ואפשר לעבור להערכה.",
+        duration:"רשמו כמה זמן ארכה הבנייה." },
+      { before:"תארו מול מי בדקתם את אב-הטיפוס ובאילו תנאים.",
+        action:"רשמו מה מדדתם ואילו מגבלות או סיכונים עלו.",
+        gate:"ציינו אילו ראיות ראשוניות לערך הובילו להחלטה להמשיך.",
+        duration:"רשמו כמה זמן ארכה ההערכה." },
+      { before:"תארו מה נדרש כדי שהפתרון יהיה מוכן למעבר לייצור.",
+        action:"רשמו אילו שלבי אינטגרציה, אבטחה וממשל נתונים בוצעו.",
+        gate:"ציינו מתי הפתרון נחשב פעיל בסביבת ייצור.",
+        duration:"רשמו כמה זמן ארך המעבר לייצור." },
+      { before:"תארו איך אנשים עבדו לפני שהפתרון נכנס לשימוש בפועל.",
+        action:"רשמו אילו הכשרות או עדכוני נהלים בוצעו כדי שהשימוש יתקיים בפועל.",
+        gate:"ציינו איזה שיפור מדיד נראה מול קו הבסיס.",
+        duration:"רשמו כמה זמן ארך האימוץ עד שהשימוש התייצב." },
+      { before:"תארו מה עדיין לא היה מתועד לפני שהתחלתם להעביר את הידע הלאה.",
+        action:"רשמו מה תיעדתם ומה הפכתם לניתן לשימוש חוזר.",
+        gate:"ציינו לאיזה גוף או יחידה הועבר הנכס, ובאיזה שלב הוא נחשב מוכן.",
+        duration:"רשמו כמה זמן ארך תהליך התיעוד וההעברה." }
+    ]
+  };
+
   /* מזהה המודל לעזרה מבוססת AI. להחלפה במחרוזת אחת במקרה הצורך. */
   var AI_MODEL = 'claude-sonnet-4-6';
 
@@ -831,10 +882,10 @@ details.ai>summary:hover{background:var(--light)}
   }
 
   /* ===================== דוגמה מלאה ===================== */
-  function todo(txt){
-    return txt && String(txt).trim()
-      ? esc(txt)
-      : '<span class="todo">להשלמה<span class="sr-only"> על ידי הצוות</span></span>';
+  function todo(txt, hint){
+    if(txt && String(txt).trim()) return esc(txt);
+    return '<span class="ph"><span class="todo">להשלמה<span class="sr-only"> על ידי הצוות</span></span>' +
+      (hint ? ' <span class="ph-txt">' + esc(hint) + '</span>' : '') + '</span>';
   }
 
   function renderExample(){
@@ -842,17 +893,18 @@ details.ai>summary:hover{background:var(--light)}
     var body = document.getElementById('exBody');
     if(!meta || !body) return;
     meta.innerHTML =
-      '<dt>התהליך</dt><dd>' + todo(EXAMPLE.process) + '</dd>' +
-      '<dt>הגוף או היחידה</dt><dd>' + todo(EXAMPLE.body) + '</dd>' +
-      '<dt>קו הבסיס שנמדד</dt><dd>' + todo(EXAMPLE.baseline) + '</dd>' +
-      '<dt>התוצאה מול קו הבסיס</dt><dd>' + todo(EXAMPLE.outcome) + '</dd>';
+      '<dt>התהליך</dt><dd>' + todo(EXAMPLE.process, GUIDE.process) + '</dd>' +
+      '<dt>הגוף או היחידה</dt><dd>' + todo(EXAMPLE.body, GUIDE.body) + '</dd>' +
+      '<dt>קו הבסיס שנמדד</dt><dd>' + todo(EXAMPLE.baseline, GUIDE.baseline) + '</dd>' +
+      '<dt>התוצאה מול קו הבסיס</dt><dd>' + todo(EXAMPLE.outcome, GUIDE.outcome) + '</dd>';
     body.innerHTML = EXAMPLE.steps.map(function(s, i){
+      var g = GUIDE.steps[i] || {};
       return '<tr>' +
         '<th scope="row">' + (i+1) + '. ' + esc(s.stage) + '</th>' +
-        '<td data-label="מה היה">' + todo(s.before) + '</td>' +
-        '<td data-label="מה נעשה">' + todo(s.action) + '</td>' +
-        '<td data-label="שער היציאה">' + todo(s.gate) + '</td>' +
-        '<td data-label="כמה זמן">' + todo(s.duration) + '</td>' +
+        '<td data-label="מה היה">' + todo(s.before, g.before) + '</td>' +
+        '<td data-label="מה נעשה">' + todo(s.action, g.action) + '</td>' +
+        '<td data-label="שער היציאה">' + todo(s.gate, g.gate) + '</td>' +
+        '<td data-label="כמה זמן">' + todo(s.duration, g.duration) + '</td>' +
         '</tr>';
     }).join('');
   }

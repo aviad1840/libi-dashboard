@@ -1,0 +1,39 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-08-31T12:24:49Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nאין\n\n2. 🟠 השתנה מאז אתמול\nאין שינוי מהותי. radar עדכן מונה ימים בלבד ל-op-2026-001 (19 -> 17). scout הפיק דוח ריק\n(8 מועמדים נבדקו, כולם נדחו - חסימת מקורות חוזרת ללא ראיה לשינוי).\n\n3. 🟢 ממצאים חדשים - המלצת פעולה, לא רשימת פעילות\nאין מועמד שעבר את הסף\n\n4. 👥 אנשים/קשרים שדורשים תשומת לב\nאין (לא נמצא קובץ people/weekly-*.md)\n\n5. 📅 דדליינים / התחייבויות\n3.9 (בעוד 3 ימים) - הגשת NIIA, סל אישי / מגמלה לצמיחה - מוכן להגשה\n6.9 (בעוד 6 ימים) - ישיבת צוות 11 - הערות במייל לנועה לפני הישיבה\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nאין מועמד היום\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: דוח ריק, 8 מועמדים נבדקו ונדחו. Radar: אין חדש, רק עדכון ימים. Gateway: פעיל לאורך הלילה,\nללא חסימות. Chief-of-staff: ריצה קודמת היום בבוקר - ללא ממצא חדש; ריצה זו היא אימות חד-פעמי\nשל מנגנון ה-outbox, ללא תוכן חדש מעבר לכך.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        }
+      ],
+      [
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        },
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        }
+      ],
+      [
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

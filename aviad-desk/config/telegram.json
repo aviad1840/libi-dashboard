@@ -1,0 +1,5 @@
+{
+  "_doc": "לא סוד. chat_id הוא מזהה, לא credential. הטוקן יושב ב-.env בלבד.",
+  "allowed_chat_id": 437439952,
+  "bound_at": "2026-08-29T21:43:58Z"
+}

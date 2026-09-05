@@ -1,0 +1,67 @@
+{
+  "_doc": "אינדקס אירועים שדווחו. מונע דיווח כפול בין scout/radar/rival/advocate.",
+  "_rules": {
+    "event_id": "hash של: דומיין מקור + ישות/ארגון + סוג אירוע + חודש",
+    "suppression_days": 14,
+    "material_change": "דווח שוב לפני 14 יום רק אם: השתנה תקציב, השתנה בעל תפקיד, השתנה סטטוס החלטה, או פורסם מסמך רשמי שלא היה",
+    "retention_days": 120
+  },
+  "events": [
+    {
+      "event_id": "95b6c6b9c0da",
+      "date": "2026-08-28",
+      "item": "I-20260828-01",
+      "title": "מבקר המדינה - ביקורת מקבילה רב-לאומית להיערכות ממשלתית ל-AI, יוני 2026",
+      "agent": "scout",
+      "tier": "L1"
+    },
+    {
+      "event_id": "0898ada95ddd",
+      "date": "2026-08-28",
+      "item": "I-20260828-02",
+      "title": "החלטה 3375 מ-21.9.2025 - מטה לאומי ל-AI במשרד רה\"מ, מערך הדיגיטל עובר למשרד רה\"מ",
+      "agent": "scout",
+      "tier": "L1"
+    },
+    {
+      "event_id": "ed9a422218ca",
+      "date": "2026-08-29",
+      "item": "op-2026-001",
+      "title": "תחרות החדשנות הממשלתית 2026 - דדליין 17.9.2026",
+      "agent": "radar",
+      "tier": "L1"
+    },
+    {
+      "event_id": "03b01334425d",
+      "date": "2026-08-30",
+      "item": "I-20260830-01",
+      "title": "החלטה 4255 עוברת לביצוע - מכרזים ו-RFI פורסמו למפעל הבינה המלאכותית הלאומי",
+      "agent": "scout",
+      "tier": "L1"
+    },
+    {
+      "event_id": "8943e9a7681c",
+      "date": "2026-09-01",
+      "item": "I-20260901-01",
+      "title": "GovTech סינגפור - רישום סוכני AI ופלטפורמת AI Assistant Desk לעובדי ציבור",
+      "agent": "scout",
+      "tier": "L1"
+    },
+    {
+      "event_id": "dcace7af43b5",
+      "date": "2026-09-03",
+      "item": "I-20260903-01",
+      "title": "McKinsey State of AI 2026 - domain-based programs מגיעות לייצור פי 2.3 יותר מ-use-case",
+      "agent": "scout",
+      "tier": "L1"
+    },
+    {
+      "event_id": "7c9e442d05f6",
+      "date": "2026-09-03",
+      "item": "I-20260903-02",
+      "title": "איחוד האמירויות מקימה Federal Authority for AI and Data, כפופה לקבינט",
+      "agent": "scout",
+      "tier": "L1"
+    }
+  ]
+}

@@ -698,6 +698,215 @@ details.ai>summary:hover{background:var(--light)}
   /* מזהה המודל לעזרה מבוססת AI. להחלפה במחרוזת אחת במקרה הצורך. */
   var AI_MODEL = 'claude-sonnet-4-6';
 
+  /* ============================================================
+     קודק מפגש ופתק - מכשיר ההכרעה הקבוצתי
+     ------------------------------------------------------------
+     קוד טהור בלבד: אין כאן קריאה ל-DOM, ל-localStorage או ל-rows.
+     כל הפונקציות כאן חשופות דרך window.AWM_CODEC לבדיקה ישירה.
+     שלב זה אינו משנה שום התנהגות קיימת בעמוד.
+
+     אלפבית Crockford base32 (ללא I L O U), עם פענוח סלחני:
+     O→0, I/L→1. זה מתקן בדיוק את התווים הדו-משמעיים שמישהו
+     שמעתיק-מדביק או מקליד קוד עלול להתבלבל בהם.
+
+     קישור הישיבה: #s=<base64url(JSON)>.<תגית 4 תווים>
+     JSON = { v, n (nonce, 4 תווים), t (כותרת, מחוץ לחתימה), p (שמות) }
+     ה-nonce אינו אמצעי אבטחה - הוא מונע מיזוג בשוגג בין שני סבבי
+     החלטה שמשתמשים באותה רשימת תהליכים בדיוק.
+
+     פתק המשתתף: גרסה(1) + מספר-תהליכים-פחות-1(1) + תגית-מפגש(4) +
+     דירוגים(2 לתהליך) + ביקורת(2). ראו BALLOT_CRIT למטה - קבוע
+     נפרד מ-W_KEYS בכוונה: אם סדר התצוגה של הקריטריונים ישתנה
+     בעתיד, קודים שכבר הונפקו לא ישתנו במשמעותם.
+     ============================================================ */
+
+  var B32_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+  function b32val(ch){
+    if(!ch) return -1;
+    var c = String(ch).toUpperCase();
+    if(c === 'O') c = '0';
+    else if(c === 'I' || c === 'L') c = '1';
+    return B32_ALPHABET.indexOf(c);
+  }
+  function b32chr(n){ return B32_ALPHABET.charAt(n); }
+  function normalizeCode(raw){
+    return String(raw || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+  }
+  function formatCode(code){
+    return String(code || '').replace(/(.{4})(?=.)/g, '$1-');
+  }
+
+  function fnv1a32(str){
+    var bytes;
+    try { bytes = new TextEncoder().encode(str); }
+    catch(e){
+      bytes = [];
+      for(var k=0;k<str.length;k++) bytes.push(str.charCodeAt(k) & 0xff);
+    }
+    var h = 0x811c9dc5;
+    for(var i=0;i<bytes.length;i++){
+      h ^= bytes[i];
+      h = Math.imul(h, 0x01000193);
+    }
+    return h >>> 0;
+  }
+
+  function utf8ToB64url(str){
+    var bytes = new TextEncoder().encode(str);
+    var bin = '';
+    for(var i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  function b64urlToUtf8(str){
+    try {
+      var b64 = String(str).replace(/-/g,'+').replace(/_/g,'/');
+      while(b64.length % 4) b64 += '=';
+      var bin = atob(b64);
+      var bytes = new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    } catch(e){ return null; }
+  }
+
+  /* לא מנגנון אבטחה - רק הבטחה שלכל מפגש יש זהות משלו, גם כשרשימת
+     התהליכים זהה לחלוטין בין שני סבבים. נפילה ל-Math.random תקינה
+     לצורך הזה בלבד. */
+  function newNonce(){
+    var arr;
+    try { arr = new Uint8Array(4); crypto.getRandomValues(arr); }
+    catch(e){ arr = [Math.random()*256|0, Math.random()*256|0, Math.random()*256|0, Math.random()*256|0]; }
+    var out = '';
+    for(var i=0;i<4;i++) out += b32chr(arr[i] % 32);
+    return out;
+  }
+
+  /* הכותרת (t) נשארת מחוץ לחתימה בכוונה - תיקון שגיאת כתיב בכותרת
+     לא יפסול פתקים שכבר נאספו. */
+  function canonicalSession(s){
+    var names = (s.p || []).map(function(nm){ return String(nm).trim().replace(/\s+/g,' '); });
+    return s.v + '|' + s.n + '|' + names.join('\x1F');
+  }
+  function sessionTag(s){
+    var h = fnv1a32(canonicalSession(s)) & 0xFFFFF;
+    var out = '';
+    for(var shift = 15; shift >= 0; shift -= 5) out += b32chr((h >>> shift) & 31);
+    return out;
+  }
+  function validSession(s){
+    if(!s || typeof s !== 'object') return false;
+    if(s.v !== 1) return false;
+    if(typeof s.n !== 'string' || !/^[0-9A-HJKMNPQRSTVWXYZ]{4}$/.test(s.n)) return false;
+    if(!Array.isArray(s.p) || s.p.length < 1 || s.p.length > 8) return false;
+    for(var i=0;i<s.p.length;i++){
+      if(typeof s.p[i] !== 'string') return false;
+      var trimmed = s.p[i].trim();
+      if(!trimmed || trimmed.length > 40) return false;
+    }
+    if(s.t !== undefined && typeof s.t !== 'string') return false;
+    return true;
+  }
+  function encodeSession(s){
+    var json = JSON.stringify({ v:s.v, n:s.n, t:s.t || '', p:s.p });
+    return utf8ToB64url(json) + '.' + sessionTag(s);
+  }
+  /* מחזירה null בכל מקרה של פסילה, לעולם לא זורקת - ראוטר שקורא
+     לפונקציה הזו לא צריך try/catch משלו כדי להישאר בטוח. */
+  function decodeSession(str){
+    try {
+      var full = String(str || '');
+      var dot = full.lastIndexOf('.');
+      if(dot < 0) return null;
+      var json = b64urlToUtf8(full.slice(0, dot));
+      if(json === null) return null;
+      var obj = JSON.parse(json);
+      if(!validSession(obj)) return null;
+      if(sessionTag(obj) !== full.slice(dot + 1).toUpperCase()) return null;
+      return obj;
+    } catch(e){ return null; }
+  }
+  function buildSessionUrl(s){
+    return location.origin + location.pathname + location.search + '#s=' + encodeSession(s);
+  }
+
+  var BALLOT_CRIT = ['impact','volume','change','repl'];   /* קפוא. לא W_KEYS - ראו הערה למעלה. */
+
+  function ratingsToChars(r){
+    var pv = (r.impact-1)*125 + (r.volume-1)*25 + (r.change-1)*5 + (r.repl-1);
+    return b32chr((pv >> 5) & 31) + b32chr(pv & 31);
+  }
+  function charsToRatings(c1, c2){
+    var v1 = b32val(c1), v2 = b32val(c2);
+    if(v1 < 0 || v2 < 0) return null;
+    var pv = (v1 << 5) | v2;
+    if(pv > 624) return null;
+    var repl = pv % 5; pv = (pv - repl) / 5;
+    var change = pv % 5; pv = (pv - change) / 5;
+    var volume = pv % 5; pv = (pv - volume) / 5;
+    var impact = pv % 5;
+    return { impact: impact+1, volume: volume+1, change: change+1, repl: repl+1 };
+  }
+  /* ביקורת Adler בבסיס 32, מאותחלת ל-1. תופסת כל החלפת תו בודד
+     וכל היפוך שכנים; משאירה כ-1 ל-1024 סיכוי לפספס שיבוש אקראי
+     לגמרי. לא נטען יותר מזה. */
+  function ballotChecksum(body){
+    var s1 = 1, s2 = 1;
+    for(var i=0;i<body.length;i++){
+      var v = b32val(body.charAt(i));
+      if(v < 0) v = 0;
+      s1 = (s1 + v) % 32;
+      s2 = (s2 + s1) % 32;
+    }
+    return b32chr(s2) + b32chr(s1);
+  }
+  function encodeBallot(session, ratings){
+    var n = session.p.length;
+    var body = 'A' + b32chr(n - 1) + sessionTag(session);
+    for(var i=0;i<n;i++) body += ratingsToChars(ratings[i]);
+    return formatCode(body + ballotChecksum(body));
+  }
+  /* סדר הבדיקות קבוע בכוונה: empty, chars, length, checksum,
+     version, count, session, range - כך שקוד מוקלד שגוי לעולם
+     לא ידווח כ"שייך למפגש אחר". */
+  function decodeBallot(code, session){
+    var raw = normalizeCode(code);
+    if(!raw) return { ok:false, err:'empty' };
+    for(var i=0;i<raw.length;i++){
+      if(b32val(raw.charAt(i)) < 0) return { ok:false, err:'chars' };
+    }
+    var n = session.p.length;
+    var expectedLen = 8 + 2*n;
+    if(raw.length !== expectedLen) return { ok:false, err:'length', detail:{expected:expectedLen, got:raw.length} };
+
+    var body = raw.slice(0, raw.length - 2);
+    var sum = raw.slice(raw.length - 2);
+    if(ballotChecksum(body) !== sum) return { ok:false, err:'checksum' };
+
+    if(raw.charAt(0) !== 'A') return { ok:false, err:'version' };
+
+    var declaredN = b32val(raw.charAt(1)) + 1;
+    if(declaredN !== n) return { ok:false, err:'count', detail:{expected:n, got:declaredN} };
+
+    if(raw.slice(2, 6) !== sessionTag(session)) return { ok:false, err:'session' };
+
+    var ratings = [];
+    for(var j=0;j<n;j++){
+      var r = charsToRatings(raw.charAt(6 + j*2), raw.charAt(7 + j*2));
+      if(!r) return { ok:false, err:'range' };
+      ratings.push(r);
+    }
+    return { ok:true, ratings: ratings };
+  }
+
+  window.AWM_CODEC = {
+    b32val: b32val, b32chr: b32chr, normalizeCode: normalizeCode, formatCode: formatCode,
+    fnv1a32: fnv1a32, utf8ToB64url: utf8ToB64url, b64urlToUtf8: b64urlToUtf8,
+    newNonce: newNonce, canonicalSession: canonicalSession, sessionTag: sessionTag,
+    validSession: validSession, encodeSession: encodeSession, decodeSession: decodeSession,
+    buildSessionUrl: buildSessionUrl, BALLOT_CRIT: BALLOT_CRIT,
+    encodeBallot: encodeBallot, decodeBallot: decodeBallot, ballotChecksum: ballotChecksum
+  };
+
   var LOOP = [
     {t:"בעיה", who:"מוביל עסקי", what:"הגדרת הבעיה במונחי תוצאה ולא במונחי פתרון. מה לא עובד היום ולמי זה עולה.", gate:"בעיה מנוסחת עם קו בסיס מדיד."},
     {t:"תהליך", who:"מוביל עסקי ומט\"ד", what:"מיפוי התהליך הקיים מקצה לקצה, כולל נקודות ההחלטה והמידע שנדרש בכל אחת.", gate:"מפת תהליך מוסכמת."},

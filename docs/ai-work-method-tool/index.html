@@ -1185,6 +1185,189 @@ details.ai>summary:hover{background:var(--light)}
     };
   }
 
+  /* ============================================================
+     סטטיסטיקת מחלוקת - קוד מת, מקטע ההכרעה הקבוצתי
+     ------------------------------------------------------------
+     קוד טהור בלבד, חשוף דרך window.AWM_STATS לבדיקה ישירה. שלב זה
+     אינו קורא/כותב DOM ואינו משנה שום התנהגות קיימת.
+
+     ציון קבוצתי = חציון לכל קריטריון, לא ממוצע - לא בגלל דיוק
+     סטטיסטי אלא כי זה מספר שהחדר יכול לקבל בלי שמישהו יגיד
+     "אבל אף אחד לא אמר את זה". חציון אינו קונצנזוס, ולכן בכל מקום
+     שמשתמש בערך הזה יש לכתוב "הציון הקבוצתי מבוסס על חציון
+     הדירוגים" ולא "מייצג את הקונצנזוס".
+
+     אופי המחלוקת (לא "מדד מחלוקת" - זהו סיווג פשוט ושקוף, לא
+     ניסיון למדוד משהו במדויק): span<=1 הסכמה; span>=2 ומיעוט<=1
+     דעה חריגה; span>=2 ומיעוט>=2 פיצול.
+
+     סדר היום מסונן בשני תנאים גם יחד: span>=2 (יש מחלוקת אמיתית,
+     לא רק הבדל דרגה אחת שאנשים שמסכימים לגופו של עניין מייצרים
+     דרך קבע), וגם influence>=threshold (סגירת הפער יכולה בכלל
+     להזיז את התוצאה). span=1 עם משקל גבוה יכול לחצות את סף
+     ה-influence לבד, אבל אינו מחלוקת - ולכן שני התנאים, לא אחד.
+     ============================================================ */
+
+  function medianOf(arr){
+    var s = arr.slice().sort(function(a,b){ return a-b; });
+    var n = s.length, mid = n >> 1;
+    return (n % 2) ? s[mid] : (s[mid-1] + s[mid]) / 2;
+  }
+  function meanOf(arr){
+    return arr.reduce(function(a,b){ return a+b; }, 0) / arr.length;
+  }
+  function fmt1(n){ return (Math.round(n*10)/10).toString(); }
+
+  var SHAPE_LABEL = { agree:'הסכמה', lone:'דעה חריגה', split:'פיצול' };
+
+  function statsFor(values){
+    var lo = Math.min.apply(null, values);
+    var hi = Math.max.apply(null, values);
+    var span = hi - lo;
+    var med = medianOf(values);
+    var mean = meanOf(values);
+    var counts = [0,0,0,0,0];
+    values.forEach(function(v){ counts[v-1]++; });
+    var nLow = 0, nHigh = 0;
+    values.forEach(function(v){
+      if(v <= med - 1) nLow++;
+      else if(v >= med + 1) nHigh++;
+    });
+    var minority = Math.min(nLow, nHigh);
+    var shape = span <= 1 ? 'agree' : (minority <= 1 ? 'lone' : 'split');
+    return { lo:lo, hi:hi, span:span, med:med, mean:mean, counts:counts, nLow:nLow, nHigh:nHigh, minority:minority, shape:shape };
+  }
+
+  /* שורה זהה במבנה לשורת רשימת התעדוף הרגילה - כך שהעברה ל-rows
+     נכנסת ישר ל-scoreOf/contribOf/level/render הקיימים, בלי שורת
+     רינדור חדשה. */
+  function consensusRows(session, ballots){
+    return session.p.map(function(name, pi){
+      var row = { name: name };
+      BALLOT_CRIT.forEach(function(crit){
+        row[crit] = medianOf(ballots.map(function(b){ return b.ratings[pi][crit]; }));
+      });
+      row.score = scoreOf(row);
+      return row;
+    });
+  }
+  function extremeRows(session, ballots, which){
+    return session.p.map(function(name, pi){
+      var row = { name: name };
+      BALLOT_CRIT.forEach(function(crit){
+        var values = ballots.map(function(b){ return b.ratings[pi][crit]; });
+        row[crit] = which === 'lo' ? Math.min.apply(null, values) : Math.max.apply(null, values);
+      });
+      row.score = scoreOf(row);
+      return row;
+    });
+  }
+
+  /* "מה לא הוכרע" - הפלט היקר ביותר. מחזירה גם levelUnsettled לפי
+     תהליך, שנעשה בו שימוש חוזר בסדר היום (ולא מחושב פעם שנייה). */
+  function unsettledFindings(session, ballots){
+    var low = extremeRows(session, ballots, 'lo');
+    var high = extremeRows(session, ballots, 'hi');
+    var cons = consensusRows(session, ballots);
+    var findings = [];
+    var levelUnsettled = {};
+
+    session.p.forEach(function(name, pi){
+      var lvLow = level(low[pi].score), lvHigh = level(high[pi].score);
+      var unsettled = lvLow.t !== lvHigh.t;
+      levelUnsettled[pi] = unsettled;
+      if(unsettled){
+        findings.push({
+          kind:'level', pi:pi,
+          text: 'עומק ההתערבות של "' + name + '" אינו מוכרע. לפי הדירוג הנמוך ביותר הציון הוא ' +
+                low[pi].score.toFixed(2) + ' (' + lvLow.t + ') ולפי הגבוה ביותר ' + high[pi].score.toFixed(2) +
+                ' (' + lvHigh.t + '). נדרשת הכרעה בדיון לפני קביעת עומק.'
+        });
+      }
+    });
+
+    var order = cons.map(function(r, pi){ return { pi:pi, name:r.name, score:r.score }; })
+      .sort(function(a,b){ return b.score - a.score; });
+    for(var i=0;i<order.length-1;i++){
+      var a = order[i], nx = order[i+1];
+      var overlap = low[a.pi].score <= high[nx.pi].score && low[nx.pi].score <= high[a.pi].score;
+      if(overlap){
+        findings.push({
+          kind:'order', pair:[a.pi, nx.pi],
+          text: 'הדירוג בין "' + a.name + '" ל-"' + nx.name + '" אינו מוכרע. טווחי הציון שלהם נחתכים.'
+        });
+      }
+    }
+
+    return { items: findings, levelUnsettled: levelUnsettled };
+  }
+
+  /* סדר יום ממוין לפי השפעה על הציון, לא לפי מחלוקת גולמית. שדה
+     decisionImpact הוא חשיפה בלבד של הדגל שכבר חושב ב-unsettledFindings
+     לאותו תהליך - אין כאן חישוב נוסף. */
+  function disagreementItems(session, ballots, threshold){
+    if(typeof threshold !== 'number') threshold = 0.30;
+    var levelUnsettled = unsettledFindings(session, ballots).levelUnsettled;
+    var items = [];
+    session.p.forEach(function(name, pi){
+      BALLOT_CRIT.forEach(function(crit){
+        var values = ballots.map(function(b){ return b.ratings[pi][crit]; });
+        var st = statsFor(values);
+        var influence = st.span * W[crit] / 100;
+        if(st.span >= 2 && influence >= threshold){
+          items.push({
+            pi:pi, crit:crit, name:name, influence:influence, decisionImpact: !!levelUnsettled[pi],
+            lo:st.lo, hi:st.hi, span:st.span, med:st.med, mean:st.mean,
+            counts:st.counts, nLow:st.nLow, nHigh:st.nHigh, minority:st.minority, shape:st.shape
+          });
+        }
+      });
+    });
+    items.sort(function(a,b){ return b.influence - a.influence; });
+    return items;
+  }
+
+  /* תבניות בלבד. כל תבנית מצטטת מספרים שהגיעו מפתקים (ctx) או שואלת
+     שאלה - אסור לה לקבוע עובדה על ארגון, להכיל ספרה שאינה מוזרקת,
+     או לנקוב בשם גוף. ניתנות לשכתוב על ידי הצוות בלי לגעת בלוגיקה. */
+  var DISAGREE_Q = {
+    impact: {
+      lone: function(ctx){ return 'השפעת התהליך "' + ctx.name + '" על האזרח או על ההחלטה: רוב המשתתפים דירגו סביב ' + fmt1(ctx.med) + ', ומשתתף אחד דירג רחוק מכך (הדירוגים נעו בין ' + ctx.lo + ' ל-' + ctx.hi + '). שאלה לדיון - מה אותו משתתף רואה בתהליך שהאחרים לא רואים?'; },
+      split: function(ctx){ return 'השפעת התהליך "' + ctx.name + '" על האזרח או על ההחלטה: הדירוגים נחלקו בין ' + ctx.lo + ' ל-' + ctx.hi + ', בלי דעה מרכזית ברורה. שאלה לדיון - האם המשתתפים מדברים על אותה השפעה בפועל, או על היבטים שונים של התהליך?'; }
+    },
+    volume: {
+      lone: function(ctx){ return 'נפח המקרים של "' + ctx.name + '": רוב המשתתפים דירגו סביב ' + fmt1(ctx.med) + ', ומשתתף אחד דירג רחוק מכך. נפח הוא הקריטריון היחיד שיש לו תשובה מספרית בפועל - שאלה לדיון: האם למישהו יש את המספר, ומי יכול להביא אותו?'; },
+      split: function(ctx){ return 'נפח המקרים של "' + ctx.name + '": הדירוגים נחלקו בין ' + ctx.lo + ' ל-' + ctx.hi + '. נפח הוא הקריטריון היחיד שיש לו תשובה מספרית בפועל - שאלה לדיון: מי יכול להביא את המספר בפועל לפני שממשיכים?'; }
+    },
+    change: {
+      lone: function(ctx){ return 'פוטנציאל השינוי של "' + ctx.name + '": רוב המשתתפים דירגו סביב ' + fmt1(ctx.med) + ', ומשתתף אחד דירג רחוק מכך. שאלה לדיון - מה אותו משתתף רואה בתהליך שמאפשר עיצוב מחדש, שהאחרים לא רואים?'; },
+      split: function(ctx){ return 'פוטנציאל השינוי של "' + ctx.name + '": חלק מהמשתתפים דירגו קרוב ל-' + ctx.lo + ' וחלק קרוב ל-' + ctx.hi + '. שאלה לדיון - האם שני הצדדים מדברים על אותו חלק בתהליך, או שמישהו מציע לעצב מחדש חלק אחר ממנו?'; }
+    },
+    repl: {
+      lone: function(ctx){ return 'כושר השכפול של "' + ctx.name + '": רוב המשתתפים דירגו סביב ' + fmt1(ctx.med) + ', ומשתתף אחד דירג רחוק מכך. שאלה לדיון - האם אותו משתתף מכיר גוף נוסף שכבר מתמודד עם תהליך דומה?'; },
+      split: function(ctx){ return 'כושר השכפול של "' + ctx.name + '": הדירוגים נחלקו בין ' + ctx.lo + ' ל-' + ctx.hi + '. שאלה לדיון - מה בדיוק היה צריך להיבנות מחדש כדי שגוף אחר יוכל להשתמש ביכולת הזו?'; }
+    }
+  };
+  function questionGeneric(ctx){
+    return W_LABEL[ctx.crit] + ' של "' + ctx.name + '": הדירוגים נעו בין ' + ctx.lo + ' ל-' + ctx.hi + ' (חציון ' + fmt1(ctx.med) + '). שאלה לדיון - ממה נובע הפער, ומה צריך להתברר כדי לצמצם אותו?';
+  }
+  function questionFor(item){
+    var byCrit = DISAGREE_Q[item.crit];
+    var fn = byCrit && byCrit[item.shape];
+    var q = fn ? fn(item) : questionGeneric(item);
+    if(Math.abs(item.mean - item.med) >= 0.5){
+      q += ' שימו לב: הממוצע (' + fmt1(item.mean) + ') והחציון (' + fmt1(item.med) + ') רחוקים זה מזה, סימן לדעה אחת חריגה שמושכת את התמונה.';
+    }
+    return q;
+  }
+
+  window.AWM_STATS = {
+    medianOf: medianOf, meanOf: meanOf, statsFor: statsFor, SHAPE_LABEL: SHAPE_LABEL,
+    consensusRows: consensusRows, extremeRows: extremeRows,
+    unsettledFindings: unsettledFindings, disagreementItems: disagreementItems,
+    DISAGREE_Q: DISAGREE_Q, questionFor: questionFor
+  };
+
   function buildWeightRows(){
     var box = document.getElementById('weightRows');
     if(!box) return;

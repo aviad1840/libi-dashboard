@@ -247,12 +247,27 @@ details.ai>summary:hover{background:var(--light)}
 .ai-out dd{margin:0}
 @media(max-width:640px){.ai-out dl{grid-template-columns:1fr}.ai-out dt{margin-top:6px}}
 
+/* מפגש קבוצתי */
+.sess{border:1.5px solid var(--line);border-radius:8px;padding:20px;background:#fff;margin:0 0 18px}
+.sess h3{margin-top:0}
+.sess .field{margin-bottom:14px}
+.plist{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.plist li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:5px;padding:8px 12px;background:var(--soft)}
+.plist .pname{flex:1 1 auto;min-width:0;overflow-wrap:break-word;font-size:15px}
+.plist .pdel{flex:0 0 auto;padding:4px 10px;font-size:13px}
+.sess-empty{color:var(--muted);font-size:14px;margin:0 0 14px}
+.linkbox{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:10px 0}
+.linkbox input[type="text"]{flex:1 1 260px;min-width:0;padding:9px 11px;font-family:inherit;font-size:14px;border:1.5px solid var(--line);border-radius:5px;background:var(--soft);direction:ltr;text-align:left}
+.sess-confirm{background:var(--warn-bg);border:1.5px solid #e0b84c;border-radius:6px;padding:13px 15px;margin:12px 0}
+.sess-confirm p{margin:0 0 10px}
+
 @media print{
   body.sum-open .draft-banner,body.sum-open header.hero,body.sum-open .layout,body.sum-open footer,body.sum-open .toolbar{display:none}
   body.sum-open .sum-overlay{position:static;padding:0;overflow:visible}
   .sum-actions{display:none}
   details.ai{display:none}
   .rank li{page-break-inside:avoid}
+  .sess,#s3a .no-print{display:none}
 }
 </style>
 </head>
@@ -283,6 +298,7 @@ details.ai>summary:hover{background:var(--light)}
       <li><a href="#s2">2. הלולאה</a></li>
       <li><a href="#s2a">2א. דוגמה מלאה</a></li>
       <li><a href="#s3">3. מנגנון התעדוף</a></li>
+      <li><a href="#s3a">3א. מפת המחלוקת</a></li>
       <li><a href="#s4">4. חלוקת אחריות</a></li>
       <li><a href="#s5">5. מדדים</a></li>
       <li><a href="#s6">6. עומק התערבות</a></li>
@@ -478,6 +494,67 @@ details.ai>summary:hover{background:var(--light)}
           <div id="aiOut"></div>
         </div>
       </details>
+    </section>
+
+    <section id="s3a" aria-labelledby="h-s3a">
+      <h2 id="h-s3a">3א | מפת המחלוקת בין המשתתפים</h2>
+      <p>מנגנון התעדוף שלמעלה מניח אדם אחד שממלא את הטופס. כאן כל משתתף מדרג בעצמו, מהנייד שלו, ובלי לראות את הדירוגים של האחרים. הכלי ממזג את הפתקים לציון קבוצתי, ומראה בנפרד איפה הצוות מסכים ואיפה הוא חלוק - ובעיקר, האם הפער בכלל משנה החלטה.</p>
+
+      <div id="sessIntro">
+        <p class="note-inline">אין מפגש פתוח כרגע בדפדפן הזה.</p>
+        <button class="btn" type="button" id="sessOpenBtn">פתיחת מפגש קבוצתי</button>
+      </div>
+
+      <div class="sess" id="sessBuilder" hidden>
+        <h3>הגדרת המפגש</h3>
+        <div class="field">
+          <label for="sessTitle">כותרת המפגש
+            <span class="hint">אופציונלי. לזיהוי בלבד - לא נשלח לשום מקום ולא משפיע על הדירוגים.</span>
+          </label>
+          <input type="text" id="sessTitle" maxlength="60">
+        </div>
+
+        <div class="field">
+          <label for="sessAddName">שם תהליך
+            <span class="hint">עד 8 תהליכים, עד 40 תווים כל שם. השמות יופיעו בקישור שנשלח למשתתפים.</span>
+          </label>
+          <input type="text" id="sessAddName" maxlength="40" aria-describedby="sessNameErr">
+          <span class="error-msg" id="sessNameErr" role="alert"></span>
+        </div>
+        <div class="btn-row">
+          <button class="btn secondary" type="button" id="sessAddBtn">הוספת תהליך לרשימה</button>
+        </div>
+
+        <p class="note-inline" id="sessCount" role="status" style="margin:14px 0 6px"></p>
+        <ul class="plist" id="sessProcList"></ul>
+        <p class="sess-empty" id="sessEmptyMsg">טרם נוספו תהליכים למפגש.</p>
+
+        <div class="btn-row">
+          <button class="btn" type="button" id="sessCreateBtn">יצירת קישור למפגש</button>
+        </div>
+      </div>
+
+      <div class="sess" id="sessLinkWrap" hidden>
+        <h3>המפגש פתוח</h3>
+        <p class="note-inline" id="sessTitleShow"></p>
+        <div class="linkbox">
+          <input type="text" id="sessLink" readonly aria-label="קישור המפגש">
+          <button class="btn secondary" type="button" id="sessCopyBtn">העתקת הקישור</button>
+        </div>
+        <p class="note-inline" id="sessFileWarn" hidden role="alert">הקובץ נפתח כרגע ישירות מהדיסק, ולכן הקישור הזה לא יעבוד למשתתפים אחרים. יש לפרסם את הכלי בכתובת אינטרנט ואז ליצור את המפגש מחדש משם.</p>
+        <p class="note-inline">כל קישור מפגש מייצג סבב החלטה נפרד, גם אם רשימת התהליכים זהה לחלוטין לסבב קודם. ללא זיהוי אישי בקוד ההצבעה שהמשתתפים ישלחו בחזרה.</p>
+        <div class="btn-row">
+          <button class="btn secondary" type="button" id="sessNamesCopyBtn">העתקת רשימת התהליכים</button>
+          <button class="btn secondary" type="button" id="sessCloseBtn">סגירת המפגש</button>
+        </div>
+        <div class="sess-confirm" id="sessCloseConfirm" hidden>
+          <p>לסגור את המפגש? הקישור יפסיק לקבל דירוגים חדשים בדפדפן הזה.</p>
+          <div class="btn-row">
+            <button class="btn secondary" type="button" id="sessCloseYes">כן, לסגור</button>
+            <button class="btn secondary" type="button" id="sessCloseNo">ביטול</button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="s4" aria-labelledby="h-s4">
@@ -1692,10 +1769,208 @@ details.ai>summary:hover{background:var(--light)}
     });
   }
 
+  /* ============================================================
+     מפגש קבוצתי - בונה המנחה
+     ------------------------------------------------------------
+     שלב זה בונה את רשימת התהליכים ומייצר את קישור המפגש. איסוף
+     הפתקים, הציון הקבוצתי ומפת המחלוקת מתווספים בשלב הבא ומשתמשים
+     ב-window.AWM_STATS שכבר קיים כאן.
+     ============================================================ */
+  var MAX_PROCESSES = 8;
+  var MAX_NAME_LEN = 40;
+  var SESSION_STORAGE_KEY = 'ai-work-method-session-v1';
+
+  function loadSessionState(){
+    try {
+      var raw = localStorage.getItem(SESSION_STORAGE_KEY);
+      if(!raw) return null;
+      var obj = JSON.parse(raw);
+      if(!obj || !validSession(obj.session)) return null;
+      if(!Array.isArray(obj.ballots)) obj.ballots = [];
+      return obj;
+    } catch(e){ return null; }
+  }
+  function saveSessionState(){
+    try {
+      if(sessionState) localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionState));
+      else localStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch(e){}
+  }
+
+  var sessionState = loadSessionState();
+  var draftNames = [];
+
+  var sessOpenBtn = document.getElementById('sessOpenBtn');
+  var sessIntro = document.getElementById('sessIntro');
+  var sessBuilder = document.getElementById('sessBuilder');
+  var sessLinkWrap = document.getElementById('sessLinkWrap');
+
+  function showBase(){
+    if(sessIntro) sessIntro.hidden = false;
+    if(sessBuilder) sessBuilder.hidden = true;
+    if(sessLinkWrap) sessLinkWrap.hidden = true;
+  }
+  function showBuilder(){
+    if(sessIntro) sessIntro.hidden = true;
+    if(sessBuilder) sessBuilder.hidden = false;
+    if(sessLinkWrap) sessLinkWrap.hidden = true;
+    renderProcList();
+  }
+  function showLink(){
+    if(sessIntro) sessIntro.hidden = true;
+    if(sessBuilder) sessBuilder.hidden = true;
+    if(sessLinkWrap) sessLinkWrap.hidden = false;
+    renderLinkBox();
+  }
+
+  function renderProcList(){
+    var ul = document.getElementById('sessProcList');
+    var empty = document.getElementById('sessEmptyMsg');
+    var count = document.getElementById('sessCount');
+    if(!ul) return;
+    if(draftNames.length === 0){
+      ul.innerHTML = '';
+      ul.style.display = 'none';
+      if(empty) empty.style.display = 'block';
+    } else {
+      ul.style.display = 'grid';
+      if(empty) empty.style.display = 'none';
+      ul.innerHTML = draftNames.map(function(name, i){
+        return '<li><span class="pname">' + (i+1) + '. ' + esc(name) + '</span>' +
+          '<button class="btn secondary pdel" type="button" data-idx="' + i + '" aria-label="הסרת ' + esc(name) + ' מהרשימה">הסרה</button></li>';
+      }).join('');
+      ul.querySelectorAll('[data-idx]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          draftNames.splice(parseInt(btn.dataset.idx, 10), 1);
+          renderProcList();
+        });
+      });
+    }
+    if(count) count.textContent = draftNames.length + ' מתוך ' + MAX_PROCESSES + ' תהליכים.';
+  }
+
+  function renderLinkBox(){
+    if(!sessionState) return;
+    var url = buildSessionUrl(sessionState.session);
+    var linkInput = document.getElementById('sessLink');
+    if(linkInput) linkInput.value = url;
+    var titleShow = document.getElementById('sessTitleShow');
+    if(titleShow){
+      titleShow.textContent = sessionState.session.t
+        ? 'כותרת: ' + sessionState.session.t
+        : 'המפגש כולל ' + sessionState.session.p.length + ' תהליכים.';
+    }
+    var warn = document.getElementById('sessFileWarn');
+    if(warn) warn.hidden = location.protocol !== 'file:';
+  }
+
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+  }
+  function copyPlainText(text, btn){
+    var restore = btn.textContent;
+    function done(){ btn.textContent = 'הועתק'; setTimeout(function(){ btn.textContent = restore; }, 1500); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text); done();
+    }
+  }
+
+  if(sessOpenBtn) sessOpenBtn.addEventListener('click', function(){
+    draftNames = [];
+    showBuilder();
+    var nameEl = document.getElementById('sessAddName');
+    if(nameEl) nameEl.focus();
+  });
+
+  var sessAddBtn = document.getElementById('sessAddBtn');
+  if(sessAddBtn) sessAddBtn.addEventListener('click', function(){
+    var nameEl = document.getElementById('sessAddName');
+    var err = document.getElementById('sessNameErr');
+    var name = nameEl.value.trim();
+    err.textContent = '';
+    if(!name){
+      err.textContent = 'יש להזין שם תהליך.';
+      nameEl.focus();
+      return;
+    }
+    if(name.length > MAX_NAME_LEN){
+      err.textContent = 'שם התהליך ארוך מדי - עד ' + MAX_NAME_LEN + ' תווים.';
+      nameEl.focus();
+      return;
+    }
+    if(draftNames.length >= MAX_PROCESSES){
+      err.textContent = 'הגעתם למספר המרבי של ' + MAX_PROCESSES + ' תהליכים במפגש אחד.';
+      return;
+    }
+    draftNames.push(name);
+    nameEl.value = '';
+    renderProcList();
+    nameEl.focus();
+  });
+
+  var sessCreateBtn = document.getElementById('sessCreateBtn');
+  if(sessCreateBtn) sessCreateBtn.addEventListener('click', function(){
+    var err = document.getElementById('sessNameErr');
+    if(draftNames.length === 0){
+      err.textContent = 'יש להוסיף תהליך אחד לפחות לפני יצירת הקישור.';
+      return;
+    }
+    err.textContent = '';
+    var titleEl = document.getElementById('sessTitle');
+    var session = { v:1, n:newNonce(), t:(titleEl ? titleEl.value.trim() : ''), p:draftNames.slice() };
+    sessionState = { tag: sessionTag(session), session: session, ballots: [] };
+    saveSessionState();
+    showLink();
+  });
+
+  var sessCopyBtn = document.getElementById('sessCopyBtn');
+  if(sessCopyBtn) sessCopyBtn.addEventListener('click', function(){
+    var linkInput = document.getElementById('sessLink');
+    if(linkInput) copyPlainText(linkInput.value, sessCopyBtn);
+  });
+  var sessNamesCopyBtn = document.getElementById('sessNamesCopyBtn');
+  if(sessNamesCopyBtn) sessNamesCopyBtn.addEventListener('click', function(){
+    if(!sessionState) return;
+    var text = sessionState.session.p.map(function(n,i){ return (i+1) + '. ' + n; }).join('\n');
+    copyPlainText(text, sessNamesCopyBtn);
+  });
+
+  var sessCloseBtn = document.getElementById('sessCloseBtn');
+  var sessCloseConfirm = document.getElementById('sessCloseConfirm');
+  var sessCloseYes = document.getElementById('sessCloseYes');
+  var sessCloseNo = document.getElementById('sessCloseNo');
+  if(sessCloseBtn) sessCloseBtn.addEventListener('click', function(){
+    if(sessCloseConfirm){ sessCloseConfirm.hidden = false; }
+    if(sessCloseNo) sessCloseNo.focus();
+  });
+  if(sessCloseYes) sessCloseYes.addEventListener('click', function(){
+    sessionState = null;
+    saveSessionState();
+    if(sessCloseConfirm) sessCloseConfirm.hidden = true;
+    showBase();
+    if(sessOpenBtn) sessOpenBtn.focus();
+  });
+  if(sessCloseNo) sessCloseNo.addEventListener('click', function(){
+    if(sessCloseConfirm) sessCloseConfirm.hidden = true;
+    if(sessCloseBtn) sessCloseBtn.focus();
+  });
+
+  function initSession(){
+    if(sessionState) showLink();
+    else showBase();
+  }
+
   renderExample();
   buildWeightRows();
-
   render();
+
+  try { initSession(); } catch(e){}
 })();
 </script>
 </body>

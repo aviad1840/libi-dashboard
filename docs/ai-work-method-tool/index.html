@@ -566,6 +566,73 @@ details.ai>summary:hover{background:var(--light)}
             <button class="btn secondary" type="button" id="sessCloseNo">ביטול</button>
           </div>
         </div>
+
+        <h3>איסוף דירוגים</h3>
+        <p class="note-inline" id="ballotStatus" role="status"></p>
+        <p class="note-inline" id="ballotPrivacyNote" hidden>בקבוצות קטנות ייתכן שהדירוג יהיה ניתן לזיהוי לפי ההקשר.</p>
+        <div class="field">
+          <label for="ballotCodeInput">קוד ההצבעה שהתקבל מהמשתתף
+            <span class="hint">מודבק בדיוק כפי שהתקבל - מקפים, רווחים ותווים דו-משמעיים (O/0, I/1) מתוקנים אוטומטית.</span>
+          </label>
+          <input type="text" id="ballotCodeInput" autocomplete="off" spellcheck="false" aria-describedby="ballotErr">
+        </div>
+        <div class="field">
+          <label for="ballotLabelInput">תווית למשתתף (אופציונלי)
+            <span class="hint">לזיהוי פנימי בלבד, למשל "משתתף 1". ריק כברירת מחדל, לא נשלח לשום מקום ואינו חלק מקוד ההצבעה.</span>
+          </label>
+          <input type="text" id="ballotLabelInput" maxlength="40">
+        </div>
+        <div class="btn-row">
+          <button class="btn secondary" type="button" id="ballotAddBtn">הוספת פתק</button>
+        </div>
+        <span class="error-msg" id="ballotErr" role="alert"></span>
+
+        <div class="sess-confirm" id="ballotDupConfirm" hidden>
+          <p id="ballotDupMsg"></p>
+          <div class="btn-row">
+            <button class="btn secondary" type="button" id="ballotDupYes">הוספה בכל זאת</button>
+            <button class="btn secondary" type="button" id="ballotDupNo">ביטול</button>
+          </div>
+        </div>
+
+        <ul class="plist" id="ballotList" style="display:none"></ul>
+
+        <div class="sess" id="groupView" hidden>
+          <h3>ציון קבוצתי ומפת מחלוקת</h3>
+          <p class="note-inline">מבוסס על <span id="groupBallotCount"></span> פתקים. הציון הקבוצתי מבוסס על חציון הדירוגים, לא על ממוצע ולא על הסכמה.</p>
+          <table id="groupTable">
+            <caption>ציון קבוצתי לכל תהליך</caption>
+            <thead>
+              <tr>
+                <th scope="col">תהליך</th>
+                <th scope="col">השפעה</th>
+                <th scope="col">נפח</th>
+                <th scope="col">פוטנציאל שינוי</th>
+                <th scope="col">שכפול</th>
+                <th scope="col">ציון</th>
+                <th scope="col">עומק מומלץ</th>
+              </tr>
+            </thead>
+            <tbody id="groupBody"></tbody>
+          </table>
+
+          <h4>מה לא הוכרע</h4>
+          <div id="groupFindings"></div>
+
+          <h4 id="h-agenda">סדר יום לדיון</h4>
+          <div class="fill">
+            <strong>להשלמה על ידי הצוות</strong>
+            סף ברירת המחדל (0.30 נקודות ציון) נגזר מפער של שתי דרגות דירוג על קריטריון במשקל 15%. אפשר לכייל אותו לאחר הרצה של מספר מפגשים אמיתיים.
+            <div class="wrow" style="margin-top:10px">
+              <label class="wlbl" for="agendaThresh">סף הכללה בסדר היום</label>
+              <input type="range" id="agendaThresh" min="0" max="2" step="0.05" value="0.3"
+                aria-valuemin="0" aria-valuemax="2" aria-valuenow="0.3" aria-valuetext="0.30 נקודות ציון">
+              <output for="agendaThresh" id="agendaThreshOut">0.30</output>
+            </div>
+          </div>
+          <ol class="rank" id="agendaList" aria-labelledby="h-agenda"></ol>
+        </div>
+        <p class="note-inline" id="groupTooFew" hidden></p>
       </div>
     </section>
 
@@ -1867,6 +1934,16 @@ details.ai>summary:hover{background:var(--light)}
     if(sessBuilder) sessBuilder.hidden = true;
     if(sessLinkWrap) sessLinkWrap.hidden = false;
     renderLinkBox();
+    var codeEl = document.getElementById('ballotCodeInput');
+    var labelEl = document.getElementById('ballotLabelInput');
+    var ballotErrEl = document.getElementById('ballotErr');
+    var dupBox = document.getElementById('ballotDupConfirm');
+    if(codeEl) codeEl.value = '';
+    if(labelEl) labelEl.value = '';
+    if(ballotErrEl) ballotErrEl.textContent = '';
+    if(dupBox) dupBox.hidden = true;
+    pendingBallot = null;
+    renderBallotList();
   }
 
   function renderProcList(){
@@ -2005,6 +2082,213 @@ details.ai>summary:hover{background:var(--light)}
   if(sessCloseNo) sessCloseNo.addEventListener('click', function(){
     if(sessCloseConfirm) sessCloseConfirm.hidden = true;
     if(sessCloseBtn) sessCloseBtn.focus();
+  });
+
+  /* ============================================================
+     איסוף פתקים וציון קבוצתי - שלב 6
+     ------------------------------------------------------------
+     ballots חי אך ורק בתוך sessionState (ראו הפרדת ה-state למעלה).
+     כל שגיאת פענוח מוצגת דרך ballotErr; שני אזורים חיים בלבד
+     נוספים כאן - ballotStatus (status) ו-ballotErr (alert).
+     ============================================================ */
+  var ERR_MSG = {
+    empty: 'יש להזין קוד הצבעה.',
+    chars: 'הקוד מכיל תו שאינו חלק מהאלפבית של הקוד. יש לבדוק ולהעתיק שוב.',
+    length: 'אורך הקוד אינו תואם למספר התהליכים במפגש הזה.',
+    checksum: 'ספרת הביקורת אינה תואמת. ייתכן שתו הוקלד לא נכון בהעתקה - יש לבדוק שוב ולנסות להדביק מחדש.',
+    version: 'הקוד אינו בפורמט המוכר לכלי הזה.',
+    count: 'מספר התהליכים בקוד אינו תואם למספר התהליכים במפגש הזה.',
+    session: 'הקוד שייך למפגש אחר. יש לוודא שהמשתתף דירג את הקישור הנכון.',
+    range: 'אחד הדירוגים בקוד חורג מהטווח האפשרי (1 עד 5).'
+  };
+  var pendingBallot = null;
+  var agendaThreshold = 0.30;
+  var SHAPE_CLS = { agree:'b1', lone:'b2', split:'b3' };
+
+  function formatBallotTime(ts){
+    try { return new Date(ts).toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}); }
+    catch(e){ return ''; }
+  }
+
+  function renderBallotList(){
+    if(!sessionState) return;
+    var ballots = sessionState.ballots;
+    var ul = document.getElementById('ballotList');
+    var status = document.getElementById('ballotStatus');
+    var priv = document.getElementById('ballotPrivacyNote');
+    if(ul){
+      if(ballots.length === 0){
+        ul.innerHTML = '';
+        ul.style.display = 'none';
+      } else {
+        ul.style.display = 'grid';
+        ul.innerHTML = ballots.map(function(b, i){
+          var label = b.label ? esc(b.label) : ('פתק ' + (i+1));
+          return '<li><span class="pname">' + label + ' &middot; ' + formatBallotTime(b.at) + '</span>' +
+            '<button class="btn secondary pdel" type="button" data-idx="' + i + '" aria-label="הסרת פתק ' + (i+1) + '">הסרה</button></li>';
+        }).join('');
+        ul.querySelectorAll('[data-idx]').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            sessionState.ballots.splice(parseInt(btn.dataset.idx, 10), 1);
+            saveSessionState();
+            renderBallotList();
+          });
+        });
+      }
+    }
+    if(status){
+      status.textContent = ballots.length === 0
+        ? 'טרם נאסף אף פתק.'
+        : 'נאספו ' + ballots.length + ' פתקים.';
+    }
+    if(priv) priv.hidden = !(ballots.length >= 1 && ballots.length < 4);
+    renderGroupView();
+  }
+
+  function tryAddBallot(force){
+    var codeEl = document.getElementById('ballotCodeInput');
+    var labelEl = document.getElementById('ballotLabelInput');
+    var err = document.getElementById('ballotErr');
+    if(!sessionState || !codeEl) return;
+    var code = codeEl.value;
+    var label = labelEl ? labelEl.value.trim() : '';
+    var dec = decodeBallot(code, sessionState.session);
+    if(!dec.ok){
+      if(err) err.textContent = ERR_MSG[dec.err] || 'הקוד אינו תקין.';
+      return;
+    }
+    if(err) err.textContent = '';
+    if(!force){
+      var dupIdx = -1;
+      for(var di=0; di<sessionState.ballots.length; di++){
+        if(JSON.stringify(sessionState.ballots[di].ratings) === JSON.stringify(dec.ratings)){ dupIdx = di; break; }
+      }
+      if(dupIdx >= 0){
+        pendingBallot = { code: code.trim(), label: label, ratings: dec.ratings };
+        var msg = document.getElementById('ballotDupMsg');
+        if(msg) msg.textContent = 'פתק עם דירוג זהה כבר קיים ברשימה. להוסיף גם את הפתק הזה?';
+        var dupBox = document.getElementById('ballotDupConfirm');
+        if(dupBox) dupBox.hidden = false;
+        return;
+      }
+    }
+    sessionState.ballots.push({ code: code.trim(), label: label, ratings: dec.ratings, at: Date.now() });
+    saveSessionState();
+    codeEl.value = '';
+    if(labelEl) labelEl.value = '';
+    var confirmBox = document.getElementById('ballotDupConfirm');
+    if(confirmBox) confirmBox.hidden = true;
+    pendingBallot = null;
+    renderBallotList();
+    codeEl.focus();
+  }
+
+  var ballotAddBtn = document.getElementById('ballotAddBtn');
+  if(ballotAddBtn) ballotAddBtn.addEventListener('click', function(){ tryAddBallot(false); });
+
+  var ballotDupYes = document.getElementById('ballotDupYes');
+  var ballotDupNo = document.getElementById('ballotDupNo');
+  if(ballotDupYes) ballotDupYes.addEventListener('click', function(){
+    var codeEl = document.getElementById('ballotCodeInput');
+    var labelEl = document.getElementById('ballotLabelInput');
+    var dupBox = document.getElementById('ballotDupConfirm');
+    if(pendingBallot && sessionState){
+      sessionState.ballots.push({ code: pendingBallot.code, label: pendingBallot.label, ratings: pendingBallot.ratings, at: Date.now() });
+      saveSessionState();
+    }
+    pendingBallot = null;
+    if(dupBox) dupBox.hidden = true;
+    if(codeEl) codeEl.value = '';
+    if(labelEl) labelEl.value = '';
+    renderBallotList();
+    if(codeEl) codeEl.focus();
+  });
+  if(ballotDupNo) ballotDupNo.addEventListener('click', function(){
+    pendingBallot = null;
+    var dupBox = document.getElementById('ballotDupConfirm');
+    if(dupBox) dupBox.hidden = true;
+    var codeEl = document.getElementById('ballotCodeInput');
+    if(codeEl) codeEl.focus();
+  });
+
+  function renderGroupView(){
+    var wrap = document.getElementById('groupView');
+    var tooFew = document.getElementById('groupTooFew');
+    if(!wrap || !sessionState) return;
+    var ballots = sessionState.ballots;
+    if(ballots.length < 3){
+      wrap.hidden = true;
+      if(tooFew){
+        tooFew.hidden = false;
+        tooFew.textContent = ballots.length === 0
+          ? 'טרם נאספו פתקים. ציון קבוצתי ומפת מחלוקת מוצגים רק מ-3 פתקים ומעלה.'
+          : 'נאספו ' + ballots.length + ' פתקים. ציון קבוצתי ומפת מחלוקת מוצגים רק מ-3 פתקים ומעלה.';
+      }
+      return;
+    }
+    if(tooFew) tooFew.hidden = true;
+    wrap.hidden = false;
+
+    var session = sessionState.session;
+    var cons = consensusRows(session, ballots);
+    var countEl = document.getElementById('groupBallotCount');
+    if(countEl) countEl.textContent = String(ballots.length);
+
+    var tbody = document.getElementById('groupBody');
+    if(tbody){
+      tbody.innerHTML = cons.map(function(r){
+        var l = level(r.score);
+        return '<tr><th scope="row">'+esc(r.name)+'</th>'+
+          '<td>'+fmt1(r.impact)+'</td><td>'+fmt1(r.volume)+'</td><td>'+fmt1(r.change)+'</td><td>'+fmt1(r.repl)+'</td>'+
+          '<td><strong>'+r.score.toFixed(2)+'</strong></td>'+
+          '<td><span class="badge '+l.cls+'">'+l.t+'</span></td></tr>';
+      }).join('');
+    }
+
+    var uf = unsettledFindings(session, ballots);
+    var findWrap = document.getElementById('groupFindings');
+    if(findWrap){
+      findWrap.innerHTML = uf.items.length
+        ? '<ul>' + uf.items.map(function(f){ return '<li>'+esc(f.text)+'</li>'; }).join('') + '</ul>'
+        : '<p class="note-inline">לא נמצאו ממצאי אי-הכרעה על סמך הפתקים שנאספו.</p>';
+    }
+
+    renderAgenda();
+  }
+
+  function renderAgenda(){
+    if(!sessionState) return;
+    var ballots = sessionState.ballots;
+    var list = document.getElementById('agendaList');
+    if(!list || ballots.length < 3) return;
+    var items = disagreementItems(sessionState.session, ballots, agendaThreshold);
+    if(items.length === 0){
+      list.innerHTML = '<li>לא נמצאו נושאים שעוברים את סף ההכללה בסדר היום, לפי הדירוגים שנאספו.</li>';
+      return;
+    }
+    list.innerHTML = items.map(function(it){
+      return '<li>' +
+        '<div class="rtop">' +
+          '<span class="nm">' + esc(it.name) + ' &middot; ' + esc(W_LABEL[it.crit]) + '</span>' +
+          '<span class="badge ' + SHAPE_CLS[it.shape] + '">' + esc(SHAPE_LABEL[it.shape]) + '</span>' +
+        '</div>' +
+        '<p class="contrib"><span>טווח הדירוגים ' + it.lo + '–' + it.hi + ', חציון ' + fmt1(it.med) + '</span>' +
+        '<span>השפעה על הציון: ' + fmt1(it.influence) + ' נקודות</span></p>' +
+        '<p class="gap">' + (it.decisionImpact ? 'עשוי לשנות את עומק ההתערבות המומלץ.' : 'אינו משנה את עומק ההתערבות המומלץ.') + '</p>' +
+        '<p>' + esc(questionFor(it)) + '</p>' +
+      '</li>';
+    }).join('');
+  }
+
+  var agendaThreshEl = document.getElementById('agendaThresh');
+  if(agendaThreshEl) agendaThreshEl.addEventListener('input', function(){
+    agendaThreshold = parseFloat(agendaThreshEl.value) || 0;
+    var txt = agendaThreshold.toFixed(2);
+    var out = document.getElementById('agendaThreshOut');
+    if(out) out.textContent = txt;
+    agendaThreshEl.setAttribute('aria-valuenow', agendaThreshold);
+    agendaThreshEl.setAttribute('aria-valuetext', txt + ' נקודות ציון');
+    renderAgenda();
   });
 
   function initSession(){

@@ -600,21 +600,23 @@ details.ai>summary:hover{background:var(--light)}
         <div class="sess" id="groupView" hidden>
           <h3>ציון קבוצתי ומפת מחלוקת</h3>
           <p class="note-inline">מבוסס על <span id="groupBallotCount"></span> פתקים. הציון הקבוצתי מבוסס על חציון הדירוגים, לא על ממוצע ולא על הסכמה.</p>
-          <table id="groupTable">
-            <caption>ציון קבוצתי לכל תהליך</caption>
-            <thead>
-              <tr>
-                <th scope="col">תהליך</th>
-                <th scope="col">השפעה</th>
-                <th scope="col">נפח</th>
-                <th scope="col">פוטנציאל שינוי</th>
-                <th scope="col">שכפול</th>
-                <th scope="col">ציון</th>
-                <th scope="col">עומק מומלץ</th>
-              </tr>
-            </thead>
-            <tbody id="groupBody"></tbody>
-          </table>
+          <div style="overflow-x:auto">
+            <table id="groupTable">
+              <caption>ציון קבוצתי לכל תהליך</caption>
+              <thead>
+                <tr>
+                  <th scope="col">תהליך</th>
+                  <th scope="col">השפעה</th>
+                  <th scope="col">נפח</th>
+                  <th scope="col">פוטנציאל שינוי</th>
+                  <th scope="col">שכפול</th>
+                  <th scope="col">ציון</th>
+                  <th scope="col">עומק מומלץ</th>
+                </tr>
+              </thead>
+              <tbody id="groupBody"></tbody>
+            </table>
+          </div>
 
           <div class="btn-row" style="margin-top:10px">
             <button class="btn secondary" type="button" id="groupTransferBtn">העברת הציון הקבוצתי לרשימת התעדוף</button>
@@ -2206,6 +2208,8 @@ details.ai>summary:hover{background:var(--light)}
         if(msg) msg.textContent = 'פתק עם דירוג זהה כבר קיים ברשימה. להוסיף גם את הפתק הזה?';
         var dupBox = document.getElementById('ballotDupConfirm');
         if(dupBox) dupBox.hidden = false;
+        var dupNoBtn = document.getElementById('ballotDupNo');
+        if(dupNoBtn) dupNoBtn.focus();
         return;
       }
     }

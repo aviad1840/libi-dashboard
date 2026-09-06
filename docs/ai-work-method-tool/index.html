@@ -30,6 +30,10 @@ body{
   background:var(--warn-bg); color:var(--warn); border-bottom:2px solid #e0b84c;
   padding:10px 20px; font-size:14px; font-weight:500; text-align:center;
 }
+.link-err{
+  background:var(--warn-bg); color:var(--warn); border-bottom:2px solid #e0b84c;
+  padding:10px 20px; font-size:14px; font-weight:500; text-align:center;
+}
 header.hero{background:var(--navy); color:#fff; padding:36px 24px}
 .wrap{max-width:1180px; margin:0 auto}
 header.hero h1{margin:0 0 8px; font-size:28px; font-weight:700; line-height:1.3}
@@ -173,6 +177,7 @@ footer{border-top:1px solid var(--line); padding:20px 24px 40px; color:var(--mut
 /* ===== שדרוגים ===== */
 .note-inline{font-size:13px;color:var(--muted);margin:6px 0 0}
 .todo{background:var(--warn-bg);color:var(--warn);border:1px dashed #e0b84c;border-radius:4px;padding:1px 8px;font-size:13px;font-weight:500;white-space:nowrap;display:inline-block}
+.ph-txt{color:var(--muted);font-size:13px;display:block;margin-top:3px}
 
 /* דוגמה מלאה */
 .ex-meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0 0 16px;font-size:15px;max-width:720px}
@@ -246,12 +251,34 @@ details.ai>summary:hover{background:var(--light)}
 .ai-out dd{margin:0}
 @media(max-width:640px){.ai-out dl{grid-template-columns:1fr}.ai-out dt{margin-top:6px}}
 
+/* מפגש קבוצתי */
+.sess{border:1.5px solid var(--line);border-radius:8px;padding:20px;background:#fff;margin:0 0 18px}
+.sess h3{margin-top:0}
+.sess .field{margin-bottom:14px}
+.plist{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.plist li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:5px;padding:8px 12px;background:var(--soft)}
+.plist .pname{flex:1 1 auto;min-width:0;overflow-wrap:break-word;font-size:15px}
+.plist .pdel{flex:0 0 auto;padding:4px 10px;font-size:13px}
+.sess-empty{color:var(--muted);font-size:14px;margin:0 0 14px}
+.linkbox{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:10px 0}
+.linkbox input[type="text"]{flex:1 1 260px;min-width:0;padding:9px 11px;font-family:inherit;font-size:14px;border:1.5px solid var(--line);border-radius:5px;background:var(--soft);direction:ltr;text-align:left}
+.sess-confirm{background:var(--warn-bg);border:1.5px solid #e0b84c;border-radius:6px;padding:13px 15px;margin:12px 0}
+.sess-confirm p{margin:0 0 10px}
+
+/* מצב משתתף */
+.pview{padding:24px}
+.pview .wrap{max-width:720px}
+.pview h2{margin:0 0 8px}
+.pview h3{margin:26px 0 8px}
+.pview .scale label{min-height:44px;min-width:48px;display:flex;align-items:center;justify-content:center}
+
 @media print{
   body.sum-open .draft-banner,body.sum-open header.hero,body.sum-open .layout,body.sum-open footer,body.sum-open .toolbar{display:none}
   body.sum-open .sum-overlay{position:static;padding:0;overflow:visible}
   .sum-actions{display:none}
   details.ai{display:none}
   .rank li{page-break-inside:avoid}
+  .sess,#s3a .no-print{display:none}
 }
 </style>
 </head>
@@ -261,6 +288,7 @@ details.ai>summary:hover{background:var(--light)}
 <div class="draft-banner" role="note">
   טיוטה לדיון. הרכיבים והניסוחים הם נקודת פתיחה לעבודת הצוות, ומיועדים להשלמה ולתיקון על ידו.
 </div>
+<div id="linkErr" class="link-err" role="alert" hidden></div>
 
 <header class="hero">
   <div class="wrap">
@@ -282,6 +310,7 @@ details.ai>summary:hover{background:var(--light)}
       <li><a href="#s2">2. הלולאה</a></li>
       <li><a href="#s2a">2א. דוגמה מלאה</a></li>
       <li><a href="#s3">3. מנגנון התעדוף</a></li>
+      <li><a href="#s3a">3א. מפת המחלוקת</a></li>
       <li><a href="#s4">4. חלוקת אחריות</a></li>
       <li><a href="#s5">5. מדדים</a></li>
       <li><a href="#s6">6. עומק התערבות</a></li>
@@ -339,7 +368,7 @@ details.ai>summary:hover{background:var(--light)}
       </div>
       <div class="fill">
         <strong>להשלמה על ידי הצוות</strong>
-        תוכן הדוגמה יושב במשתנה <code>EXAMPLE</code> בראש הסקריפט, עם הערה בעברית לכל שדה. מילוי שם מתעדכן כאן אוטומטית, בלי לגעת בסימון העמוד.
+        תוכן הדוגמה יושב במשתנה <code>EXAMPLE</code> בראש הסקריפט, עם הערה בעברית לכל שדה. מילוי שם מתעדכן כאן אוטומטית, בלי לגעת בסימון העמוד. לצד כל שדה ריק מופיע כעת טקסט הנחיה קצר בגוון אפור, המסביר מה נדרש באותו שדה. הטקסט הוא הנחיה בלבד ואינו נתון.
       </div>
     </section>
 
@@ -479,6 +508,148 @@ details.ai>summary:hover{background:var(--light)}
       </details>
     </section>
 
+    <section id="s3a" aria-labelledby="h-s3a">
+      <h2 id="h-s3a">3א | מפת המחלוקת בין המשתתפים</h2>
+      <p>מנגנון התעדוף שלמעלה מניח אדם אחד שממלא את הטופס. כאן כל משתתף מדרג בעצמו, מהנייד שלו, ובלי לראות את הדירוגים של האחרים. הכלי ממזג את הפתקים לציון קבוצתי, ומראה בנפרד איפה הצוות מסכים ואיפה הוא חלוק - ובעיקר, האם הפער בכלל משנה החלטה.</p>
+
+      <div id="sessIntro">
+        <p class="note-inline">אין מפגש פתוח כרגע בדפדפן הזה.</p>
+        <button class="btn" type="button" id="sessOpenBtn">פתיחת מפגש קבוצתי</button>
+      </div>
+
+      <div class="sess" id="sessBuilder" hidden>
+        <h3>הגדרת המפגש</h3>
+        <div class="field">
+          <label for="sessTitle">כותרת המפגש
+            <span class="hint">אופציונלי. לזיהוי בלבד - לא נשלח לשום מקום ולא משפיע על הדירוגים.</span>
+          </label>
+          <input type="text" id="sessTitle" maxlength="60">
+        </div>
+
+        <div class="field">
+          <label for="sessAddName">שם תהליך
+            <span class="hint">עד 8 תהליכים, עד 40 תווים כל שם. השמות יופיעו בקישור שנשלח למשתתפים.</span>
+          </label>
+          <input type="text" id="sessAddName" maxlength="40" aria-describedby="sessNameErr">
+          <span class="error-msg" id="sessNameErr" role="alert"></span>
+        </div>
+        <div class="btn-row">
+          <button class="btn secondary" type="button" id="sessAddBtn">הוספת תהליך לרשימה</button>
+        </div>
+
+        <p class="note-inline" id="sessCount" role="status" style="margin:14px 0 6px"></p>
+        <ul class="plist" id="sessProcList"></ul>
+        <p class="sess-empty" id="sessEmptyMsg">טרם נוספו תהליכים למפגש.</p>
+
+        <div class="btn-row">
+          <button class="btn" type="button" id="sessCreateBtn">יצירת קישור למפגש</button>
+        </div>
+      </div>
+
+      <div class="sess" id="sessLinkWrap" hidden>
+        <h3>המפגש פתוח</h3>
+        <p class="note-inline" id="sessTitleShow"></p>
+        <div class="linkbox">
+          <input type="text" id="sessLink" readonly aria-label="קישור המפגש">
+          <button class="btn secondary" type="button" id="sessCopyBtn">העתקת הקישור</button>
+        </div>
+        <p class="note-inline" id="sessFileWarn" hidden role="alert">הקובץ נפתח כרגע ישירות מהדיסק, ולכן הקישור הזה לא יעבוד למשתתפים אחרים. יש לפרסם את הכלי בכתובת אינטרנט ואז ליצור את המפגש מחדש משם.</p>
+        <p class="note-inline">כל קישור מפגש מייצג סבב החלטה נפרד, גם אם רשימת התהליכים זהה לחלוטין לסבב קודם. ללא זיהוי אישי בקוד ההצבעה שהמשתתפים ישלחו בחזרה.</p>
+        <div class="btn-row">
+          <button class="btn secondary" type="button" id="sessNamesCopyBtn">העתקת רשימת התהליכים</button>
+          <button class="btn secondary" type="button" id="sessCloseBtn">סגירת המפגש</button>
+        </div>
+        <div class="sess-confirm" id="sessCloseConfirm" hidden>
+          <p>לסגור את המפגש? הקישור יפסיק לקבל דירוגים חדשים בדפדפן הזה.</p>
+          <div class="btn-row">
+            <button class="btn secondary" type="button" id="sessCloseYes">כן, לסגור</button>
+            <button class="btn secondary" type="button" id="sessCloseNo">ביטול</button>
+          </div>
+        </div>
+
+        <h3>איסוף דירוגים</h3>
+        <p class="note-inline" id="ballotStatus" role="status"></p>
+        <p class="note-inline" id="ballotPrivacyNote" hidden>בקבוצות קטנות ייתכן שהדירוג יהיה ניתן לזיהוי לפי ההקשר.</p>
+        <div class="field">
+          <label for="ballotCodeInput">קוד ההצבעה שהתקבל מהמשתתף
+            <span class="hint">מודבק בדיוק כפי שהתקבל - מקפים, רווחים ותווים דו-משמעיים (O/0, I/1) מתוקנים אוטומטית.</span>
+          </label>
+          <input type="text" id="ballotCodeInput" autocomplete="off" spellcheck="false" aria-describedby="ballotErr">
+        </div>
+        <div class="field">
+          <label for="ballotLabelInput">תווית למשתתף (אופציונלי)
+            <span class="hint">לזיהוי פנימי בלבד, למשל "משתתף 1". ריק כברירת מחדל, לא נשלח לשום מקום ואינו חלק מקוד ההצבעה.</span>
+          </label>
+          <input type="text" id="ballotLabelInput" maxlength="40">
+        </div>
+        <div class="btn-row">
+          <button class="btn secondary" type="button" id="ballotAddBtn">הוספת פתק</button>
+        </div>
+        <span class="error-msg" id="ballotErr" role="alert"></span>
+
+        <div class="sess-confirm" id="ballotDupConfirm" hidden>
+          <p id="ballotDupMsg"></p>
+          <div class="btn-row">
+            <button class="btn secondary" type="button" id="ballotDupYes">הוספה בכל זאת</button>
+            <button class="btn secondary" type="button" id="ballotDupNo">ביטול</button>
+          </div>
+        </div>
+
+        <ul class="plist" id="ballotList" style="display:none"></ul>
+
+        <div class="sess" id="groupView" hidden>
+          <h3>ציון קבוצתי ומפת מחלוקת</h3>
+          <p class="note-inline">מבוסס על <span id="groupBallotCount"></span> פתקים. הציון הקבוצתי מבוסס על חציון הדירוגים, לא על ממוצע ולא על הסכמה.</p>
+          <div style="overflow-x:auto">
+            <table id="groupTable">
+              <caption>ציון קבוצתי לכל תהליך</caption>
+              <thead>
+                <tr>
+                  <th scope="col">תהליך</th>
+                  <th scope="col">השפעה</th>
+                  <th scope="col">נפח</th>
+                  <th scope="col">פוטנציאל שינוי</th>
+                  <th scope="col">שכפול</th>
+                  <th scope="col">ציון</th>
+                  <th scope="col">עומק מומלץ</th>
+                </tr>
+              </thead>
+              <tbody id="groupBody"></tbody>
+            </table>
+          </div>
+
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn secondary" type="button" id="groupTransferBtn">העברת הציון הקבוצתי לרשימת התעדוף</button>
+          </div>
+          <div class="sess-confirm" id="groupTransferConfirm" hidden>
+            <p><strong>אישור העברה</strong> - כך תשתנה רשימת התעדוף:</p>
+            <ul id="groupTransferPreview" style="margin:0 0 12px;padding-inline-start:20px"></ul>
+            <div class="btn-row">
+              <button class="btn secondary" type="button" id="groupTransferYes">אישור ההעברה</button>
+              <button class="btn secondary" type="button" id="groupTransferNo">ביטול</button>
+            </div>
+          </div>
+
+          <h4>מה לא הוכרע</h4>
+          <div id="groupFindings"></div>
+
+          <h4 id="h-agenda">סדר יום לדיון</h4>
+          <div class="fill">
+            <strong>להשלמה על ידי הצוות</strong>
+            סף ברירת המחדל (0.30 נקודות ציון) נגזר מפער של שתי דרגות דירוג על קריטריון במשקל 15%. אפשר לכייל אותו לאחר הרצה של מספר מפגשים אמיתיים.
+            <div class="wrow" style="margin-top:10px">
+              <label class="wlbl" for="agendaThresh">סף הכללה בסדר היום</label>
+              <input type="range" id="agendaThresh" min="0" max="2" step="0.05" value="0.3"
+                aria-valuemin="0" aria-valuemax="2" aria-valuenow="0.3" aria-valuetext="0.30 נקודות ציון">
+              <output for="agendaThresh" id="agendaThreshOut">0.30</output>
+            </div>
+          </div>
+          <ol class="rank" id="agendaList" aria-labelledby="h-agenda"></ol>
+        </div>
+        <p class="note-inline" id="groupTooFew" hidden></p>
+      </div>
+    </section>
+
     <section id="s4" aria-labelledby="h-s4">
       <h2 id="h-s4">4 | חלוקת אחריות</h2>
       <div class="rule">הבעלות על הערך ועל שינוי התהליך היא עסקית. הגורם הטכנולוגי אחראי על המימוש, לא על התוצאה.</div>
@@ -577,6 +748,35 @@ details.ai>summary:hover{background:var(--light)}
   </main>
 </div>
 
+<section id="pview" class="pview" aria-labelledby="h-pview" hidden>
+  <div class="wrap">
+    <h2 id="h-pview">דירוג תהליכים למפגש<span id="pTitleShow"></span></h2>
+    <p id="pIntro"></p>
+    <p class="note-inline" role="note">הדירוגים שלכם נשמרים בדפדפן הזה בלבד, עד שתשלחו את הקוד למנחה. אין בקוד שם, דוא"ל, מזהה מכשיר או חותמת זמן - ראו הסבר מלא בהמשך.</p>
+
+    <div id="pForm"></div>
+
+    <p class="error-msg" id="pErr" role="alert"></p>
+    <div class="btn-row">
+      <button class="btn" type="button" id="pSubmitBtn">קבלת קוד הדירוג</button>
+    </div>
+    <p class="note-inline" id="pProgress" role="status"></p>
+
+    <div id="pCodeWrap" hidden>
+      <h3>הקוד שלכם</h3>
+      <p>יש להעתיק את הקוד ולשלוח אותו למנחה המפגש - למשל בהודעת ווטסאפ.</p>
+      <div class="linkbox">
+        <input type="text" id="pCode" readonly aria-label="קוד הדירוג">
+        <button class="btn secondary" type="button" id="pCopyBtn">העתקת הקוד</button>
+      </div>
+      <p class="note-inline">הקוד מכיל אך ורק מספר גרסה, מספר התהליכים, סימן זיהוי של המפגש וארבעה מספרים בין 1 ל-5 לכל תהליך, וספרת ביקורת. אין בו שם, דוא"ל, מזהה מכשיר, חותמת זמן או טקסט חופשי, והוא אינו נשלח לשום שרת - ההעתקה וההדבקה הן דרך ההעברה היחידה שלו.</p>
+    </div>
+
+    <p style="margin-top:28px"><a href="#" id="pBackLink">חזרה לכלי המלא</a></p>
+    <p><a href="#" id="pFacilLink">אני המנחה - שחזור תצוגת המנחה מהקישור הזה</a></p>
+  </div>
+</section>
+
 <div class="sum-overlay" id="sumView" role="dialog" aria-modal="true" aria-labelledby="sum-title" hidden>
   <div class="sum-inner">
     <div class="sum-actions">
@@ -644,8 +844,272 @@ details.ai>summary:hover{background:var(--light)}
     ]
   };
 
+  /* ============================================================
+     הנחיות למילוי הדוגמה - מוצגות רק ליד שדה ריק ב-EXAMPLE.
+     ------------------------------------------------------------
+     כלל אכיפה, לא לשבור בסקירה: כל הנחיה כאן בציווי, גוף שני רבים
+     ("תארו", "רשמו", "ציינו"), כדי שלעולם לא תיקרא כעובדה. אסור
+     שתכיל ספרה, שם ארגון או שם תהליך - היא מדריכה איך למלא, ואינה
+     נתון בפני עצמה. מבנה זהה למבנה EXAMPLE, כדי שהתאמה בין השניים
+     תישאר פשוטה.
+     ============================================================ */
+  var GUIDE = {
+    process: "רשמו כאן את שם התהליך שבחרתם להדגים, בשפה שהצוות מכיר.",
+    body: "ציינו את הגוף או היחידה שבהם התהליך פועל בפועל.",
+    baseline: "תארו את המצב לפני השינוי במונחים שניתן למדוד.",
+    outcome: "תארו את התוצאה שנמדדה בסוף, מול אותו קו בסיס בדיוק.",
+    steps: [
+      { before:"תארו מה היה ידוע על הבעיה לפני שהתחלתם - מה לא עבד ולמי זה הפריע.",
+        action:"רשמו איך ניסחתם את הבעיה במונחי תוצאה, ולא כפתרון מוכן מראש.",
+        gate:"ציינו איזה קו בסיס מדיד קבעתם לפני שהמשכתם לשלב הבא.",
+        duration:"רשמו כמה זמן לקח לנסח את הבעיה ולהסכים עליה." },
+      { before:"תארו מה ידעתם על התהליך הקיים לפני המיפוי - מה היה ברור ומה לא.",
+        action:"רשמו איך מיפיתם את התהליך מקצה לקצה, כולל נקודות ההחלטה שבו.",
+        gate:"ציינו מתי מפת התהליך נחשבה מוסכמת על המעורבים.",
+        duration:"רשמו כמה זמן ארך המיפוי בפועל." },
+      { before:"תארו איך התהליך נראה לפני העיצוב מחדש, ומה בו ביקשתם לשנות.",
+        action:"רשמו איך תכננתם את התהליך החדש, ולא רק כלי שנוסף מעל הישן.",
+        gate:"ציינו מתי תהליך היעד נחשב מוגדר דיו כדי לעבור לבנייה.",
+        duration:"רשמו כמה זמן ארך שלב העיצוב מחדש." },
+      { before:"תארו באיזו סביבה ובאילו כלים התחלתם לבנות.",
+        action:"רשמו מה בדיוק נבנה, ומי היה מעורב מהצד העסקי והטכנולוגי.",
+        gate:"ציינו מה הראה לכם שאב-הטיפוס עובד ואפשר לעבור להערכה.",
+        duration:"רשמו כמה זמן ארכה הבנייה." },
+      { before:"תארו מול מי בדקתם את אב-הטיפוס ובאילו תנאים.",
+        action:"רשמו מה מדדתם ואילו מגבלות או סיכונים עלו.",
+        gate:"ציינו אילו ראיות ראשוניות לערך הובילו להחלטה להמשיך.",
+        duration:"רשמו כמה זמן ארכה ההערכה." },
+      { before:"תארו מה נדרש כדי שהפתרון יהיה מוכן למעבר לייצור.",
+        action:"רשמו אילו שלבי אינטגרציה, אבטחה וממשל נתונים בוצעו.",
+        gate:"ציינו מתי הפתרון נחשב פעיל בסביבת ייצור.",
+        duration:"רשמו כמה זמן ארך המעבר לייצור." },
+      { before:"תארו איך אנשים עבדו לפני שהפתרון נכנס לשימוש בפועל.",
+        action:"רשמו אילו הכשרות או עדכוני נהלים בוצעו כדי שהשימוש יתקיים בפועל.",
+        gate:"ציינו איזה שיפור מדיד נראה מול קו הבסיס.",
+        duration:"רשמו כמה זמן ארך האימוץ עד שהשימוש התייצב." },
+      { before:"תארו מה עדיין לא היה מתועד לפני שהתחלתם להעביר את הידע הלאה.",
+        action:"רשמו מה תיעדתם ומה הפכתם לניתן לשימוש חוזר.",
+        gate:"ציינו לאיזה גוף או יחידה הועבר הנכס, ובאיזה שלב הוא נחשב מוכן.",
+        duration:"רשמו כמה זמן ארך תהליך התיעוד וההעברה." }
+    ]
+  };
+
   /* מזהה המודל לעזרה מבוססת AI. להחלפה במחרוזת אחת במקרה הצורך. */
   var AI_MODEL = 'claude-sonnet-4-6';
+
+  /* ============================================================
+     קודק מפגש ופתק - מכשיר ההכרעה הקבוצתי
+     ------------------------------------------------------------
+     קוד טהור בלבד: אין כאן קריאה ל-DOM, ל-localStorage או ל-rows.
+     כל הפונקציות כאן חשופות דרך window.AWM_CODEC לבדיקה ישירה.
+     שלב זה אינו משנה שום התנהגות קיימת בעמוד.
+
+     אלפבית Crockford base32 (ללא I L O U), עם פענוח סלחני:
+     O→0, I/L→1. זה מתקן בדיוק את התווים הדו-משמעיים שמישהו
+     שמעתיק-מדביק או מקליד קוד עלול להתבלבל בהם.
+
+     קישור הישיבה: #s=<base64url(JSON)>.<תגית 4 תווים>
+     JSON = { v, n (nonce, 4 תווים), t (כותרת, מחוץ לחתימה), p (שמות) }
+     ה-nonce אינו אמצעי אבטחה - הוא מונע מיזוג בשוגג בין שני סבבי
+     החלטה שמשתמשים באותה רשימת תהליכים בדיוק.
+
+     פתק המשתתף: גרסה(1) + מספר-תהליכים-פחות-1(1) + תגית-מפגש(4) +
+     דירוגים(2 לתהליך) + ביקורת(2). ראו BALLOT_CRIT למטה - קבוע
+     נפרד מ-W_KEYS בכוונה: אם סדר התצוגה של הקריטריונים ישתנה
+     בעתיד, קודים שכבר הונפקו לא ישתנו במשמעותם.
+     ============================================================ */
+
+  var B32_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+  function b32val(ch){
+    if(!ch) return -1;
+    var c = String(ch).toUpperCase();
+    if(c === 'O') c = '0';
+    else if(c === 'I' || c === 'L') c = '1';
+    return B32_ALPHABET.indexOf(c);
+  }
+  function b32chr(n){ return B32_ALPHABET.charAt(n); }
+  function normalizeCode(raw){
+    return String(raw || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+  }
+  function formatCode(code){
+    return String(code || '').replace(/(.{4})(?=.)/g, '$1-');
+  }
+
+  function fnv1a32(str){
+    var bytes;
+    try { bytes = new TextEncoder().encode(str); }
+    catch(e){
+      bytes = [];
+      for(var k=0;k<str.length;k++) bytes.push(str.charCodeAt(k) & 0xff);
+    }
+    var h = 0x811c9dc5;
+    for(var i=0;i<bytes.length;i++){
+      h ^= bytes[i];
+      h = Math.imul(h, 0x01000193);
+    }
+    return h >>> 0;
+  }
+
+  function utf8ToB64url(str){
+    var bytes = new TextEncoder().encode(str);
+    var bin = '';
+    for(var i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  function b64urlToUtf8(str){
+    try {
+      var b64 = String(str).replace(/-/g,'+').replace(/_/g,'/');
+      while(b64.length % 4) b64 += '=';
+      var bin = atob(b64);
+      var bytes = new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    } catch(e){ return null; }
+  }
+
+  /* לא מנגנון אבטחה - רק הבטחה שלכל מפגש יש זהות משלו, גם כשרשימת
+     התהליכים זהה לחלוטין בין שני סבבים. נפילה ל-Math.random תקינה
+     לצורך הזה בלבד. */
+  function newNonce(){
+    var arr;
+    try { arr = new Uint8Array(4); crypto.getRandomValues(arr); }
+    catch(e){ arr = [Math.random()*256|0, Math.random()*256|0, Math.random()*256|0, Math.random()*256|0]; }
+    var out = '';
+    for(var i=0;i<4;i++) out += b32chr(arr[i] % 32);
+    return out;
+  }
+
+  /* הכותרת (t) נשארת מחוץ לחתימה בכוונה - תיקון שגיאת כתיב בכותרת
+     לא יפסול פתקים שכבר נאספו. */
+  function canonicalSession(s){
+    var names = (s.p || []).map(function(nm){ return String(nm).trim().replace(/\s+/g,' '); });
+    return s.v + '|' + s.n + '|' + names.join('\x1F');
+  }
+  function sessionTag(s){
+    var h = fnv1a32(canonicalSession(s)) & 0xFFFFF;
+    var out = '';
+    for(var shift = 15; shift >= 0; shift -= 5) out += b32chr((h >>> shift) & 31);
+    return out;
+  }
+  function validSession(s){
+    if(!s || typeof s !== 'object') return false;
+    if(s.v !== 1) return false;
+    if(typeof s.n !== 'string' || !/^[0-9A-HJKMNPQRSTVWXYZ]{4}$/.test(s.n)) return false;
+    if(!Array.isArray(s.p) || s.p.length < 1 || s.p.length > 8) return false;
+    for(var i=0;i<s.p.length;i++){
+      if(typeof s.p[i] !== 'string') return false;
+      var trimmed = s.p[i].trim();
+      if(!trimmed || trimmed.length > 40) return false;
+    }
+    if(s.t !== undefined && typeof s.t !== 'string') return false;
+    return true;
+  }
+  function encodeSession(s){
+    var json = JSON.stringify({ v:s.v, n:s.n, t:s.t || '', p:s.p });
+    return utf8ToB64url(json) + '.' + sessionTag(s);
+  }
+  /* מחזירה null בכל מקרה של פסילה, לעולם לא זורקת - ראוטר שקורא
+     לפונקציה הזו לא צריך try/catch משלו כדי להישאר בטוח. */
+  function decodeSession(str){
+    try {
+      var full = String(str || '');
+      var dot = full.lastIndexOf('.');
+      if(dot < 0) return null;
+      var json = b64urlToUtf8(full.slice(0, dot));
+      if(json === null) return null;
+      var obj = JSON.parse(json);
+      if(!validSession(obj)) return null;
+      if(sessionTag(obj) !== full.slice(dot + 1).toUpperCase()) return null;
+      return obj;
+    } catch(e){ return null; }
+  }
+  function buildSessionUrl(s){
+    return location.origin + location.pathname + location.search + '#s=' + encodeSession(s);
+  }
+
+  var BALLOT_CRIT = ['impact','volume','change','repl'];   /* קפוא. לא W_KEYS - ראו הערה למעלה. */
+
+  function ratingsToChars(r){
+    var pv = (r.impact-1)*125 + (r.volume-1)*25 + (r.change-1)*5 + (r.repl-1);
+    return b32chr((pv >> 5) & 31) + b32chr(pv & 31);
+  }
+  function charsToRatings(c1, c2){
+    var v1 = b32val(c1), v2 = b32val(c2);
+    if(v1 < 0 || v2 < 0) return null;
+    var pv = (v1 << 5) | v2;
+    if(pv > 624) return null;
+    var repl = pv % 5; pv = (pv - repl) / 5;
+    var change = pv % 5; pv = (pv - change) / 5;
+    var volume = pv % 5; pv = (pv - volume) / 5;
+    var impact = pv % 5;
+    return { impact: impact+1, volume: volume+1, change: change+1, repl: repl+1 };
+  }
+  /* ביקורת Adler בבסיס 32, מאותחלת ל-1. תופסת כל החלפת תו בודד
+     וכל היפוך שכנים; משאירה כ-1 ל-1024 סיכוי לפספס שיבוש אקראי
+     לגמרי. לא נטען יותר מזה. */
+  function ballotChecksum(body){
+    var s1 = 1, s2 = 1;
+    for(var i=0;i<body.length;i++){
+      var v = b32val(body.charAt(i));
+      if(v < 0) v = 0;
+      s1 = (s1 + v) % 32;
+      s2 = (s2 + s1) % 32;
+    }
+    return b32chr(s2) + b32chr(s1);
+  }
+  function encodeBallot(session, ratings){
+    var n = session.p.length;
+    var body = 'A' + b32chr(n - 1) + sessionTag(session);
+    for(var i=0;i<n;i++) body += ratingsToChars(ratings[i]);
+    return formatCode(body + ballotChecksum(body));
+  }
+  /* סדר הבדיקות קבוע בכוונה: empty, chars, length, checksum,
+     version, count, session, range - כך שקוד מוקלד שגוי לעולם
+     לא ידווח כ"שייך למפגש אחר". */
+  function decodeBallot(code, session){
+    var raw = normalizeCode(code);
+    if(!raw) return { ok:false, err:'empty' };
+    var canon = '';
+    for(var i=0;i<raw.length;i++){
+      var cv = b32val(raw.charAt(i));
+      if(cv < 0) return { ok:false, err:'chars' };
+      canon += b32chr(cv);
+    }
+    raw = canon; /* תווים דו-משמעיים (O/I/L) מתורגמים פעם אחת כאן, כדי שכל השוואה
+                    בהמשך - גרסה, תג המפגש, ביקורת - תפעל על אותה צורה קנונית. */
+    var n = session.p.length;
+    var expectedLen = 8 + 2*n;
+    if(raw.length !== expectedLen) return { ok:false, err:'length', detail:{expected:expectedLen, got:raw.length} };
+
+    var body = raw.slice(0, raw.length - 2);
+    var sum = raw.slice(raw.length - 2);
+    if(ballotChecksum(body) !== sum) return { ok:false, err:'checksum' };
+
+    if(raw.charAt(0) !== 'A') return { ok:false, err:'version' };
+
+    var declaredN = b32val(raw.charAt(1)) + 1;
+    if(declaredN !== n) return { ok:false, err:'count', detail:{expected:n, got:declaredN} };
+
+    if(raw.slice(2, 6) !== sessionTag(session)) return { ok:false, err:'session' };
+
+    var ratings = [];
+    for(var j=0;j<n;j++){
+      var r = charsToRatings(raw.charAt(6 + j*2), raw.charAt(7 + j*2));
+      if(!r) return { ok:false, err:'range' };
+      ratings.push(r);
+    }
+    return { ok:true, ratings: ratings };
+  }
+
+  window.AWM_CODEC = {
+    b32val: b32val, b32chr: b32chr, normalizeCode: normalizeCode, formatCode: formatCode,
+    fnv1a32: fnv1a32, utf8ToB64url: utf8ToB64url, b64urlToUtf8: b64urlToUtf8,
+    newNonce: newNonce, canonicalSession: canonicalSession, sessionTag: sessionTag,
+    validSession: validSession, encodeSession: encodeSession, decodeSession: decodeSession,
+    buildSessionUrl: buildSessionUrl, BALLOT_CRIT: BALLOT_CRIT,
+    encodeBallot: encodeBallot, decodeBallot: decodeBallot, ballotChecksum: ballotChecksum
+  };
 
   var LOOP = [
     {t:"בעיה", who:"מוביל עסקי", what:"הגדרת הבעיה במונחי תוצאה ולא במונחי פתרון. מה לא עובד היום ולמי זה עולה.", gate:"בעיה מנוסחת עם קו בסיס מדיד."},
@@ -831,10 +1295,10 @@ details.ai>summary:hover{background:var(--light)}
   }
 
   /* ===================== דוגמה מלאה ===================== */
-  function todo(txt){
-    return txt && String(txt).trim()
-      ? esc(txt)
-      : '<span class="todo">להשלמה<span class="sr-only"> על ידי הצוות</span></span>';
+  function todo(txt, hint){
+    if(txt && String(txt).trim()) return esc(txt);
+    return '<span class="ph"><span class="todo">להשלמה<span class="sr-only"> על ידי הצוות</span></span>' +
+      (hint ? ' <span class="ph-txt">' + esc(hint) + '</span>' : '') + '</span>';
   }
 
   function renderExample(){
@@ -842,17 +1306,18 @@ details.ai>summary:hover{background:var(--light)}
     var body = document.getElementById('exBody');
     if(!meta || !body) return;
     meta.innerHTML =
-      '<dt>התהליך</dt><dd>' + todo(EXAMPLE.process) + '</dd>' +
-      '<dt>הגוף או היחידה</dt><dd>' + todo(EXAMPLE.body) + '</dd>' +
-      '<dt>קו הבסיס שנמדד</dt><dd>' + todo(EXAMPLE.baseline) + '</dd>' +
-      '<dt>התוצאה מול קו הבסיס</dt><dd>' + todo(EXAMPLE.outcome) + '</dd>';
+      '<dt>התהליך</dt><dd>' + todo(EXAMPLE.process, GUIDE.process) + '</dd>' +
+      '<dt>הגוף או היחידה</dt><dd>' + todo(EXAMPLE.body, GUIDE.body) + '</dd>' +
+      '<dt>קו הבסיס שנמדד</dt><dd>' + todo(EXAMPLE.baseline, GUIDE.baseline) + '</dd>' +
+      '<dt>התוצאה מול קו הבסיס</dt><dd>' + todo(EXAMPLE.outcome, GUIDE.outcome) + '</dd>';
     body.innerHTML = EXAMPLE.steps.map(function(s, i){
+      var g = GUIDE.steps[i] || {};
       return '<tr>' +
         '<th scope="row">' + (i+1) + '. ' + esc(s.stage) + '</th>' +
-        '<td data-label="מה היה">' + todo(s.before) + '</td>' +
-        '<td data-label="מה נעשה">' + todo(s.action) + '</td>' +
-        '<td data-label="שער היציאה">' + todo(s.gate) + '</td>' +
-        '<td data-label="כמה זמן">' + todo(s.duration) + '</td>' +
+        '<td data-label="מה היה">' + todo(s.before, g.before) + '</td>' +
+        '<td data-label="מה נעשה">' + todo(s.action, g.action) + '</td>' +
+        '<td data-label="שער היציאה">' + todo(s.gate, g.gate) + '</td>' +
+        '<td data-label="כמה זמן">' + todo(s.duration, g.duration) + '</td>' +
         '</tr>';
     }).join('');
   }
@@ -923,6 +1388,189 @@ details.ai>summary:hover{background:var(--light)}
       repl:   r.repl   * W.repl   / 100
     };
   }
+
+  /* ============================================================
+     סטטיסטיקת מחלוקת - קוד מת, מקטע ההכרעה הקבוצתי
+     ------------------------------------------------------------
+     קוד טהור בלבד, חשוף דרך window.AWM_STATS לבדיקה ישירה. שלב זה
+     אינו קורא/כותב DOM ואינו משנה שום התנהגות קיימת.
+
+     ציון קבוצתי = חציון לכל קריטריון, לא ממוצע - לא בגלל דיוק
+     סטטיסטי אלא כי זה מספר שהחדר יכול לקבל בלי שמישהו יגיד
+     "אבל אף אחד לא אמר את זה". חציון אינו קונצנזוס, ולכן בכל מקום
+     שמשתמש בערך הזה יש לכתוב "הציון הקבוצתי מבוסס על חציון
+     הדירוגים" ולא "מייצג את הקונצנזוס".
+
+     אופי המחלוקת (לא "מדד מחלוקת" - זהו סיווג פשוט ושקוף, לא
+     ניסיון למדוד משהו במדויק): span<=1 הסכמה; span>=2 ומיעוט<=1
+     דעה חריגה; span>=2 ומיעוט>=2 פיצול.
+
+     סדר היום מסונן בשני תנאים גם יחד: span>=2 (יש מחלוקת אמיתית,
+     לא רק הבדל דרגה אחת שאנשים שמסכימים לגופו של עניין מייצרים
+     דרך קבע), וגם influence>=threshold (סגירת הפער יכולה בכלל
+     להזיז את התוצאה). span=1 עם משקל גבוה יכול לחצות את סף
+     ה-influence לבד, אבל אינו מחלוקת - ולכן שני התנאים, לא אחד.
+     ============================================================ */
+
+  function medianOf(arr){
+    var s = arr.slice().sort(function(a,b){ return a-b; });
+    var n = s.length, mid = n >> 1;
+    return (n % 2) ? s[mid] : (s[mid-1] + s[mid]) / 2;
+  }
+  function meanOf(arr){
+    return arr.reduce(function(a,b){ return a+b; }, 0) / arr.length;
+  }
+  function fmt1(n){ return (Math.round(n*10)/10).toString(); }
+
+  var SHAPE_LABEL = { agree:'הסכמה', lone:'דעה חריגה', split:'פיצול' };
+
+  function statsFor(values){
+    var lo = Math.min.apply(null, values);
+    var hi = Math.max.apply(null, values);
+    var span = hi - lo;
+    var med = medianOf(values);
+    var mean = meanOf(values);
+    var counts = [0,0,0,0,0];
+    values.forEach(function(v){ counts[v-1]++; });
+    var nLow = 0, nHigh = 0;
+    values.forEach(function(v){
+      if(v <= med - 1) nLow++;
+      else if(v >= med + 1) nHigh++;
+    });
+    var minority = Math.min(nLow, nHigh);
+    var shape = span <= 1 ? 'agree' : (minority <= 1 ? 'lone' : 'split');
+    return { lo:lo, hi:hi, span:span, med:med, mean:mean, counts:counts, nLow:nLow, nHigh:nHigh, minority:minority, shape:shape };
+  }
+
+  /* שורה זהה במבנה לשורת רשימת התעדוף הרגילה - כך שהעברה ל-rows
+     נכנסת ישר ל-scoreOf/contribOf/level/render הקיימים, בלי שורת
+     רינדור חדשה. */
+  function consensusRows(session, ballots){
+    return session.p.map(function(name, pi){
+      var row = { name: name };
+      BALLOT_CRIT.forEach(function(crit){
+        row[crit] = medianOf(ballots.map(function(b){ return b.ratings[pi][crit]; }));
+      });
+      row.score = scoreOf(row);
+      return row;
+    });
+  }
+  function extremeRows(session, ballots, which){
+    return session.p.map(function(name, pi){
+      var row = { name: name };
+      BALLOT_CRIT.forEach(function(crit){
+        var values = ballots.map(function(b){ return b.ratings[pi][crit]; });
+        row[crit] = which === 'lo' ? Math.min.apply(null, values) : Math.max.apply(null, values);
+      });
+      row.score = scoreOf(row);
+      return row;
+    });
+  }
+
+  /* "מה לא הוכרע" - הפלט היקר ביותר. מחזירה גם levelUnsettled לפי
+     תהליך, שנעשה בו שימוש חוזר בסדר היום (ולא מחושב פעם שנייה). */
+  function unsettledFindings(session, ballots){
+    var low = extremeRows(session, ballots, 'lo');
+    var high = extremeRows(session, ballots, 'hi');
+    var cons = consensusRows(session, ballots);
+    var findings = [];
+    var levelUnsettled = {};
+
+    session.p.forEach(function(name, pi){
+      var lvLow = level(low[pi].score), lvHigh = level(high[pi].score);
+      var unsettled = lvLow.t !== lvHigh.t;
+      levelUnsettled[pi] = unsettled;
+      if(unsettled){
+        findings.push({
+          kind:'level', pi:pi,
+          text: 'עומק ההתערבות של "' + name + '" אינו מוכרע. לפי הדירוג הנמוך ביותר הציון הוא ' +
+                low[pi].score.toFixed(2) + ' (' + lvLow.t + ') ולפי הגבוה ביותר ' + high[pi].score.toFixed(2) +
+                ' (' + lvHigh.t + '). נדרשת הכרעה בדיון לפני קביעת עומק.'
+        });
+      }
+    });
+
+    var order = cons.map(function(r, pi){ return { pi:pi, name:r.name, score:r.score }; })
+      .sort(function(a,b){ return b.score - a.score; });
+    for(var i=0;i<order.length-1;i++){
+      var a = order[i], nx = order[i+1];
+      var overlap = low[a.pi].score <= high[nx.pi].score && low[nx.pi].score <= high[a.pi].score;
+      if(overlap){
+        findings.push({
+          kind:'order', pair:[a.pi, nx.pi],
+          text: 'הדירוג בין "' + a.name + '" ל-"' + nx.name + '" אינו מוכרע. טווחי הציון שלהם נחתכים.'
+        });
+      }
+    }
+
+    return { items: findings, levelUnsettled: levelUnsettled };
+  }
+
+  /* סדר יום ממוין לפי השפעה על הציון, לא לפי מחלוקת גולמית. שדה
+     decisionImpact הוא חשיפה בלבד של הדגל שכבר חושב ב-unsettledFindings
+     לאותו תהליך - אין כאן חישוב נוסף. */
+  function disagreementItems(session, ballots, threshold){
+    if(typeof threshold !== 'number') threshold = 0.30;
+    var levelUnsettled = unsettledFindings(session, ballots).levelUnsettled;
+    var items = [];
+    session.p.forEach(function(name, pi){
+      BALLOT_CRIT.forEach(function(crit){
+        var values = ballots.map(function(b){ return b.ratings[pi][crit]; });
+        var st = statsFor(values);
+        var influence = st.span * W[crit] / 100;
+        if(st.span >= 2 && influence >= threshold){
+          items.push({
+            pi:pi, crit:crit, name:name, influence:influence, decisionImpact: !!levelUnsettled[pi],
+            lo:st.lo, hi:st.hi, span:st.span, med:st.med, mean:st.mean,
+            counts:st.counts, nLow:st.nLow, nHigh:st.nHigh, minority:st.minority, shape:st.shape
+          });
+        }
+      });
+    });
+    items.sort(function(a,b){ return b.influence - a.influence; });
+    return items;
+  }
+
+  /* תבניות בלבד. כל תבנית מצטטת מספרים שהגיעו מפתקים (ctx) או שואלת
+     שאלה - אסור לה לקבוע עובדה על ארגון, להכיל ספרה שאינה מוזרקת,
+     או לנקוב בשם גוף. ניתנות לשכתוב על ידי הצוות בלי לגעת בלוגיקה. */
+  var DISAGREE_Q = {
+    impact: {
+      lone: function(ctx){ return 'השפעת התהליך "' + ctx.name + '" על האזרח או על ההחלטה: רוב המשתתפים דירגו סביב ' + fmt1(ctx.med) + ', ומשתתף אחד דירג רחוק מכך (הדירוגים נעו בין ' + ctx.lo + ' ל-' + ctx.hi + '). שאלה לדיון - מה אותו משתתף רואה בתהליך שהאחרים לא רואים?'; },
+      split: function(ctx){ return 'השפעת התהליך "' + ctx.name + '" על האזרח או על ההחלטה: הדירוגים נחלקו בין ' + ctx.lo + ' ל-' + ctx.hi + ', בלי דעה מרכזית ברורה. שאלה לדיון - האם המשתתפים מדברים על אותה השפעה בפועל, או על היבטים שונים של התהליך?'; }
+    },
+    volume: {
+      lone: function(ctx){ return 'נפח המקרים של "' + ctx.name + '": רוב המשתתפים דירגו סביב ' + fmt1(ctx.med) + ', ומשתתף אחד דירג רחוק מכך. נפח הוא הקריטריון היחיד שיש לו תשובה מספרית בפועל - שאלה לדיון: האם למישהו יש את המספר, ומי יכול להביא אותו?'; },
+      split: function(ctx){ return 'נפח המקרים של "' + ctx.name + '": הדירוגים נחלקו בין ' + ctx.lo + ' ל-' + ctx.hi + '. נפח הוא הקריטריון היחיד שיש לו תשובה מספרית בפועל - שאלה לדיון: מי יכול להביא את המספר בפועל לפני שממשיכים?'; }
+    },
+    change: {
+      lone: function(ctx){ return 'פוטנציאל השינוי של "' + ctx.name + '": רוב המשתתפים דירגו סביב ' + fmt1(ctx.med) + ', ומשתתף אחד דירג רחוק מכך. שאלה לדיון - מה אותו משתתף רואה בתהליך שמאפשר עיצוב מחדש, שהאחרים לא רואים?'; },
+      split: function(ctx){ return 'פוטנציאל השינוי של "' + ctx.name + '": חלק מהמשתתפים דירגו קרוב ל-' + ctx.lo + ' וחלק קרוב ל-' + ctx.hi + '. שאלה לדיון - האם שני הצדדים מדברים על אותו חלק בתהליך, או שמישהו מציע לעצב מחדש חלק אחר ממנו?'; }
+    },
+    repl: {
+      lone: function(ctx){ return 'כושר השכפול של "' + ctx.name + '": רוב המשתתפים דירגו סביב ' + fmt1(ctx.med) + ', ומשתתף אחד דירג רחוק מכך. שאלה לדיון - האם אותו משתתף מכיר גוף נוסף שכבר מתמודד עם תהליך דומה?'; },
+      split: function(ctx){ return 'כושר השכפול של "' + ctx.name + '": הדירוגים נחלקו בין ' + ctx.lo + ' ל-' + ctx.hi + '. שאלה לדיון - מה בדיוק היה צריך להיבנות מחדש כדי שגוף אחר יוכל להשתמש ביכולת הזו?'; }
+    }
+  };
+  function questionGeneric(ctx){
+    return W_LABEL[ctx.crit] + ' של "' + ctx.name + '": הדירוגים נעו בין ' + ctx.lo + ' ל-' + ctx.hi + ' (חציון ' + fmt1(ctx.med) + '). שאלה לדיון - ממה נובע הפער, ומה צריך להתברר כדי לצמצם אותו?';
+  }
+  function questionFor(item){
+    var byCrit = DISAGREE_Q[item.crit];
+    var fn = byCrit && byCrit[item.shape];
+    var q = fn ? fn(item) : questionGeneric(item);
+    if(Math.abs(item.mean - item.med) >= 0.5){
+      q += ' שימו לב: הממוצע (' + fmt1(item.mean) + ') והחציון (' + fmt1(item.med) + ') רחוקים זה מזה, סימן לדעה אחת חריגה שמושכת את התמונה.';
+    }
+    return q;
+  }
+
+  window.AWM_STATS = {
+    medianOf: medianOf, meanOf: meanOf, statsFor: statsFor, SHAPE_LABEL: SHAPE_LABEL,
+    consensusRows: consensusRows, extremeRows: extremeRows,
+    unsettledFindings: unsettledFindings, disagreementItems: disagreementItems,
+    DISAGREE_Q: DISAGREE_Q, questionFor: questionFor
+  };
 
   function buildWeightRows(){
     var box = document.getElementById('weightRows');
@@ -1046,6 +1694,31 @@ details.ai>summary:hover{background:var(--light)}
         }).join('') +
         '</tbody></table>';
     }
+
+    /* בלוק תוספתי בלבד - מוצג רק כשקיימת ברשימה שורה שמקורה בציון
+       קבוצתי, כדי שמצב יחיד ייראה זהה להיום. אינו משנה סדר או
+       ניסוח של תוכן קיים. */
+    if(rows.some(function(r){ return r.src === 'group'; })){
+      html += '<h3>בסיס הדירוג</h3>';
+      if(sessionState && sessionState.ballots.length >= 3){
+        var agendaItems = disagreementItems(sessionState.session, sessionState.ballots, agendaThreshold);
+        html += '<p>חלק מהתהליכים ברשימה זו מבוססים על ציון קבוצתי, לא על דירוג אדם יחיד. ' +
+          'הציון הקבוצתי מבוסס על ' + sessionState.ballots.length + ' פתקים שנאספו, וחושב כחציון הדירוגים - ' +
+          'לא כממוצע ולא כביטוי להסכמה.</p>';
+        if(agendaItems.length > 0){
+          html += '<p>הנושאים הבאים טרם הוכרעו על סמך הפתקים שנאספו, ומומלץ לדון בהם לפני קביעה סופית:</p><ul>' +
+            agendaItems.map(function(it){
+              return '<li>' + esc(it.name) + ' &middot; ' + esc(W_LABEL[it.crit]) + ' (' + esc(SHAPE_LABEL[it.shape]) + ') - ' + esc(questionFor(it)) + '</li>';
+            }).join('') + '</ul>';
+        } else {
+          html += '<p>לא נמצאו נושאים שעברו את סף ההכללה בסדר היום, לפי הפתקים שנאספו.</p>';
+        }
+      } else {
+        html += '<p>חלק מהתהליכים ברשימה זו מבוססים על ציון קבוצתי (חציון דירוגי משתתפים), לא על דירוג אדם יחיד. ' +
+          'פרטי המפגש (מספר הפתקים וסדר היום) אינם זמינים יותר בדפדפן זה.</p>';
+      }
+    }
+
     document.getElementById('sumBody').innerHTML = html;
   }
 
@@ -1248,10 +1921,677 @@ details.ai>summary:hover{background:var(--light)}
     });
   }
 
+  /* ============================================================
+     מפגש קבוצתי - בונה המנחה
+     ------------------------------------------------------------
+     שלב זה בונה את רשימת התהליכים ומייצר את קישור המפגש. איסוף
+     הפתקים, הציון הקבוצתי ומפת המחלוקת מתווספים בשלב הבא ומשתמשים
+     ב-window.AWM_STATS שכבר קיים כאן.
+     ============================================================ */
+  var MAX_PROCESSES = 8;
+  var MAX_NAME_LEN = 40;
+  var SESSION_STORAGE_KEY = 'ai-work-method-session-v1';
+
+  function loadSessionState(){
+    try {
+      var raw = localStorage.getItem(SESSION_STORAGE_KEY);
+      if(!raw) return null;
+      var obj = JSON.parse(raw);
+      if(!obj || !validSession(obj.session)) return null;
+      if(!Array.isArray(obj.ballots)) obj.ballots = [];
+      return obj;
+    } catch(e){ return null; }
+  }
+  function saveSessionState(){
+    try {
+      if(sessionState) localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionState));
+      else localStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch(e){}
+  }
+
+  var sessionState = loadSessionState();
+  var draftNames = [];
+
+  var sessOpenBtn = document.getElementById('sessOpenBtn');
+  var sessIntro = document.getElementById('sessIntro');
+  var sessBuilder = document.getElementById('sessBuilder');
+  var sessLinkWrap = document.getElementById('sessLinkWrap');
+
+  function showBase(){
+    if(sessIntro) sessIntro.hidden = false;
+    if(sessBuilder) sessBuilder.hidden = true;
+    if(sessLinkWrap) sessLinkWrap.hidden = true;
+  }
+  function showBuilder(){
+    if(sessIntro) sessIntro.hidden = true;
+    if(sessBuilder) sessBuilder.hidden = false;
+    if(sessLinkWrap) sessLinkWrap.hidden = true;
+    renderProcList();
+  }
+  function showLink(){
+    if(sessIntro) sessIntro.hidden = true;
+    if(sessBuilder) sessBuilder.hidden = true;
+    if(sessLinkWrap) sessLinkWrap.hidden = false;
+    renderLinkBox();
+    var codeEl = document.getElementById('ballotCodeInput');
+    var labelEl = document.getElementById('ballotLabelInput');
+    var ballotErrEl = document.getElementById('ballotErr');
+    var dupBox = document.getElementById('ballotDupConfirm');
+    if(codeEl) codeEl.value = '';
+    if(labelEl) labelEl.value = '';
+    if(ballotErrEl) ballotErrEl.textContent = '';
+    if(dupBox) dupBox.hidden = true;
+    pendingBallot = null;
+    renderBallotList();
+  }
+
+  function renderProcList(){
+    var ul = document.getElementById('sessProcList');
+    var empty = document.getElementById('sessEmptyMsg');
+    var count = document.getElementById('sessCount');
+    if(!ul) return;
+    if(draftNames.length === 0){
+      ul.innerHTML = '';
+      ul.style.display = 'none';
+      if(empty) empty.style.display = 'block';
+    } else {
+      ul.style.display = 'grid';
+      if(empty) empty.style.display = 'none';
+      ul.innerHTML = draftNames.map(function(name, i){
+        return '<li><span class="pname">' + (i+1) + '. ' + esc(name) + '</span>' +
+          '<button class="btn secondary pdel" type="button" data-idx="' + i + '" aria-label="הסרת ' + esc(name) + ' מהרשימה">הסרה</button></li>';
+      }).join('');
+      ul.querySelectorAll('[data-idx]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          draftNames.splice(parseInt(btn.dataset.idx, 10), 1);
+          renderProcList();
+        });
+      });
+    }
+    if(count) count.textContent = draftNames.length + ' מתוך ' + MAX_PROCESSES + ' תהליכים.';
+  }
+
+  function renderLinkBox(){
+    if(!sessionState) return;
+    var url = buildSessionUrl(sessionState.session);
+    var linkInput = document.getElementById('sessLink');
+    if(linkInput) linkInput.value = url;
+    var titleShow = document.getElementById('sessTitleShow');
+    if(titleShow){
+      titleShow.textContent = sessionState.session.t
+        ? 'כותרת: ' + sessionState.session.t
+        : 'המפגש כולל ' + sessionState.session.p.length + ' תהליכים.';
+    }
+    var warn = document.getElementById('sessFileWarn');
+    if(warn) warn.hidden = location.protocol !== 'file:';
+  }
+
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+  }
+  function copyPlainText(text, btn){
+    var restore = btn.textContent;
+    function done(){ btn.textContent = 'הועתק'; setTimeout(function(){ btn.textContent = restore; }, 1500); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text); done();
+    }
+  }
+
+  if(sessOpenBtn) sessOpenBtn.addEventListener('click', function(){
+    draftNames = [];
+    showBuilder();
+    var nameEl = document.getElementById('sessAddName');
+    if(nameEl) nameEl.focus();
+  });
+
+  var sessAddBtn = document.getElementById('sessAddBtn');
+  if(sessAddBtn) sessAddBtn.addEventListener('click', function(){
+    var nameEl = document.getElementById('sessAddName');
+    var err = document.getElementById('sessNameErr');
+    var name = nameEl.value.trim();
+    err.textContent = '';
+    if(!name){
+      err.textContent = 'יש להזין שם תהליך.';
+      nameEl.focus();
+      return;
+    }
+    if(name.length > MAX_NAME_LEN){
+      err.textContent = 'שם התהליך ארוך מדי - עד ' + MAX_NAME_LEN + ' תווים.';
+      nameEl.focus();
+      return;
+    }
+    if(draftNames.length >= MAX_PROCESSES){
+      err.textContent = 'הגעתם למספר המרבי של ' + MAX_PROCESSES + ' תהליכים במפגש אחד.';
+      return;
+    }
+    draftNames.push(name);
+    nameEl.value = '';
+    renderProcList();
+    nameEl.focus();
+  });
+
+  var sessCreateBtn = document.getElementById('sessCreateBtn');
+  if(sessCreateBtn) sessCreateBtn.addEventListener('click', function(){
+    var err = document.getElementById('sessNameErr');
+    if(draftNames.length === 0){
+      err.textContent = 'יש להוסיף תהליך אחד לפחות לפני יצירת הקישור.';
+      return;
+    }
+    err.textContent = '';
+    var titleEl = document.getElementById('sessTitle');
+    var session = { v:1, n:newNonce(), t:(titleEl ? titleEl.value.trim() : ''), p:draftNames.slice() };
+    sessionState = { tag: sessionTag(session), session: session, ballots: [] };
+    saveSessionState();
+    showLink();
+  });
+
+  var sessCopyBtn = document.getElementById('sessCopyBtn');
+  if(sessCopyBtn) sessCopyBtn.addEventListener('click', function(){
+    var linkInput = document.getElementById('sessLink');
+    if(linkInput) copyPlainText(linkInput.value, sessCopyBtn);
+  });
+  var sessNamesCopyBtn = document.getElementById('sessNamesCopyBtn');
+  if(sessNamesCopyBtn) sessNamesCopyBtn.addEventListener('click', function(){
+    if(!sessionState) return;
+    var text = sessionState.session.p.map(function(n,i){ return (i+1) + '. ' + n; }).join('\n');
+    copyPlainText(text, sessNamesCopyBtn);
+  });
+
+  var sessCloseBtn = document.getElementById('sessCloseBtn');
+  var sessCloseConfirm = document.getElementById('sessCloseConfirm');
+  var sessCloseYes = document.getElementById('sessCloseYes');
+  var sessCloseNo = document.getElementById('sessCloseNo');
+  if(sessCloseBtn) sessCloseBtn.addEventListener('click', function(){
+    if(sessCloseConfirm){ sessCloseConfirm.hidden = false; }
+    if(sessCloseNo) sessCloseNo.focus();
+  });
+  if(sessCloseYes) sessCloseYes.addEventListener('click', function(){
+    sessionState = null;
+    saveSessionState();
+    if(sessCloseConfirm) sessCloseConfirm.hidden = true;
+    showBase();
+    if(sessOpenBtn) sessOpenBtn.focus();
+  });
+  if(sessCloseNo) sessCloseNo.addEventListener('click', function(){
+    if(sessCloseConfirm) sessCloseConfirm.hidden = true;
+    if(sessCloseBtn) sessCloseBtn.focus();
+  });
+
+  /* ============================================================
+     איסוף פתקים וציון קבוצתי - שלב 6
+     ------------------------------------------------------------
+     ballots חי אך ורק בתוך sessionState (ראו הפרדת ה-state למעלה).
+     כל שגיאת פענוח מוצגת דרך ballotErr; שני אזורים חיים בלבד
+     נוספים כאן - ballotStatus (status) ו-ballotErr (alert).
+     ============================================================ */
+  var ERR_MSG = {
+    empty: 'יש להזין קוד הצבעה.',
+    chars: 'הקוד מכיל תו שאינו חלק מהאלפבית של הקוד. יש לבדוק ולהעתיק שוב.',
+    length: 'אורך הקוד אינו תואם למספר התהליכים במפגש הזה.',
+    checksum: 'ספרת הביקורת אינה תואמת. ייתכן שתו הוקלד לא נכון בהעתקה - יש לבדוק שוב ולנסות להדביק מחדש.',
+    version: 'הקוד אינו בפורמט המוכר לכלי הזה.',
+    count: 'מספר התהליכים בקוד אינו תואם למספר התהליכים במפגש הזה.',
+    session: 'הקוד שייך למפגש אחר. יש לוודא שהמשתתף דירג את הקישור הנכון.',
+    range: 'אחד הדירוגים בקוד חורג מהטווח האפשרי (1 עד 5).'
+  };
+  var pendingBallot = null;
+  var agendaThreshold = 0.30;
+  var SHAPE_CLS = { agree:'b1', lone:'b2', split:'b3' };
+
+  function formatBallotTime(ts){
+    try { return new Date(ts).toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}); }
+    catch(e){ return ''; }
+  }
+
+  function renderBallotList(){
+    if(!sessionState) return;
+    var ballots = sessionState.ballots;
+    var ul = document.getElementById('ballotList');
+    var status = document.getElementById('ballotStatus');
+    var priv = document.getElementById('ballotPrivacyNote');
+    if(ul){
+      if(ballots.length === 0){
+        ul.innerHTML = '';
+        ul.style.display = 'none';
+      } else {
+        ul.style.display = 'grid';
+        ul.innerHTML = ballots.map(function(b, i){
+          var label = b.label ? esc(b.label) : ('פתק ' + (i+1));
+          return '<li><span class="pname">' + label + ' &middot; ' + formatBallotTime(b.at) + '</span>' +
+            '<button class="btn secondary pdel" type="button" data-idx="' + i + '" aria-label="הסרת פתק ' + (i+1) + '">הסרה</button></li>';
+        }).join('');
+        ul.querySelectorAll('[data-idx]').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            sessionState.ballots.splice(parseInt(btn.dataset.idx, 10), 1);
+            saveSessionState();
+            renderBallotList();
+          });
+        });
+      }
+    }
+    if(status){
+      status.textContent = ballots.length === 0
+        ? 'טרם נאסף אף פתק.'
+        : 'נאספו ' + ballots.length + ' פתקים.';
+    }
+    if(priv) priv.hidden = !(ballots.length >= 1 && ballots.length < 4);
+    renderGroupView();
+  }
+
+  function tryAddBallot(force){
+    var codeEl = document.getElementById('ballotCodeInput');
+    var labelEl = document.getElementById('ballotLabelInput');
+    var err = document.getElementById('ballotErr');
+    if(!sessionState || !codeEl) return;
+    var code = codeEl.value;
+    var label = labelEl ? labelEl.value.trim() : '';
+    var dec = decodeBallot(code, sessionState.session);
+    if(!dec.ok){
+      if(err) err.textContent = ERR_MSG[dec.err] || 'הקוד אינו תקין.';
+      return;
+    }
+    if(err) err.textContent = '';
+    if(!force){
+      var dupIdx = -1;
+      for(var di=0; di<sessionState.ballots.length; di++){
+        if(JSON.stringify(sessionState.ballots[di].ratings) === JSON.stringify(dec.ratings)){ dupIdx = di; break; }
+      }
+      if(dupIdx >= 0){
+        pendingBallot = { code: code.trim(), label: label, ratings: dec.ratings };
+        var msg = document.getElementById('ballotDupMsg');
+        if(msg) msg.textContent = 'פתק עם דירוג זהה כבר קיים ברשימה. להוסיף גם את הפתק הזה?';
+        var dupBox = document.getElementById('ballotDupConfirm');
+        if(dupBox) dupBox.hidden = false;
+        var dupNoBtn = document.getElementById('ballotDupNo');
+        if(dupNoBtn) dupNoBtn.focus();
+        return;
+      }
+    }
+    sessionState.ballots.push({ code: code.trim(), label: label, ratings: dec.ratings, at: Date.now() });
+    saveSessionState();
+    codeEl.value = '';
+    if(labelEl) labelEl.value = '';
+    var confirmBox = document.getElementById('ballotDupConfirm');
+    if(confirmBox) confirmBox.hidden = true;
+    pendingBallot = null;
+    renderBallotList();
+    codeEl.focus();
+  }
+
+  var ballotAddBtn = document.getElementById('ballotAddBtn');
+  if(ballotAddBtn) ballotAddBtn.addEventListener('click', function(){ tryAddBallot(false); });
+
+  var ballotDupYes = document.getElementById('ballotDupYes');
+  var ballotDupNo = document.getElementById('ballotDupNo');
+  if(ballotDupYes) ballotDupYes.addEventListener('click', function(){
+    var codeEl = document.getElementById('ballotCodeInput');
+    var labelEl = document.getElementById('ballotLabelInput');
+    var dupBox = document.getElementById('ballotDupConfirm');
+    if(pendingBallot && sessionState){
+      sessionState.ballots.push({ code: pendingBallot.code, label: pendingBallot.label, ratings: pendingBallot.ratings, at: Date.now() });
+      saveSessionState();
+    }
+    pendingBallot = null;
+    if(dupBox) dupBox.hidden = true;
+    if(codeEl) codeEl.value = '';
+    if(labelEl) labelEl.value = '';
+    renderBallotList();
+    if(codeEl) codeEl.focus();
+  });
+  if(ballotDupNo) ballotDupNo.addEventListener('click', function(){
+    pendingBallot = null;
+    var dupBox = document.getElementById('ballotDupConfirm');
+    if(dupBox) dupBox.hidden = true;
+    var codeEl = document.getElementById('ballotCodeInput');
+    if(codeEl) codeEl.focus();
+  });
+
+  function renderGroupView(){
+    var wrap = document.getElementById('groupView');
+    var tooFew = document.getElementById('groupTooFew');
+    if(!wrap || !sessionState) return;
+    var ballots = sessionState.ballots;
+    if(ballots.length < 3){
+      wrap.hidden = true;
+      if(tooFew){
+        tooFew.hidden = false;
+        tooFew.textContent = ballots.length === 0
+          ? 'טרם נאספו פתקים. ציון קבוצתי ומפת מחלוקת מוצגים רק מ-3 פתקים ומעלה.'
+          : 'נאספו ' + ballots.length + ' פתקים. ציון קבוצתי ומפת מחלוקת מוצגים רק מ-3 פתקים ומעלה.';
+      }
+      return;
+    }
+    if(tooFew) tooFew.hidden = true;
+    wrap.hidden = false;
+
+    var session = sessionState.session;
+    var cons = consensusRows(session, ballots);
+    var countEl = document.getElementById('groupBallotCount');
+    if(countEl) countEl.textContent = String(ballots.length);
+
+    var tbody = document.getElementById('groupBody');
+    if(tbody){
+      tbody.innerHTML = cons.map(function(r){
+        var l = level(r.score);
+        return '<tr><th scope="row">'+esc(r.name)+'</th>'+
+          '<td>'+fmt1(r.impact)+'</td><td>'+fmt1(r.volume)+'</td><td>'+fmt1(r.change)+'</td><td>'+fmt1(r.repl)+'</td>'+
+          '<td><strong>'+r.score.toFixed(2)+'</strong></td>'+
+          '<td><span class="badge '+l.cls+'">'+l.t+'</span></td></tr>';
+      }).join('');
+    }
+
+    var uf = unsettledFindings(session, ballots);
+    var findWrap = document.getElementById('groupFindings');
+    if(findWrap){
+      findWrap.innerHTML = uf.items.length
+        ? '<ul>' + uf.items.map(function(f){ return '<li>'+esc(f.text)+'</li>'; }).join('') + '</ul>'
+        : '<p class="note-inline">לא נמצאו ממצאי אי-הכרעה על סמך הפתקים שנאספו.</p>';
+    }
+
+    renderAgenda();
+  }
+
+  function renderAgenda(){
+    if(!sessionState) return;
+    var ballots = sessionState.ballots;
+    var list = document.getElementById('agendaList');
+    if(!list || ballots.length < 3) return;
+    var items = disagreementItems(sessionState.session, ballots, agendaThreshold);
+    if(items.length === 0){
+      list.innerHTML = '<li>לא נמצאו נושאים שעוברים את סף ההכללה בסדר היום, לפי הדירוגים שנאספו.</li>';
+      return;
+    }
+    list.innerHTML = items.map(function(it){
+      return '<li>' +
+        '<div class="rtop">' +
+          '<span class="nm">' + esc(it.name) + ' &middot; ' + esc(W_LABEL[it.crit]) + '</span>' +
+          '<span class="badge ' + SHAPE_CLS[it.shape] + '">' + esc(SHAPE_LABEL[it.shape]) + '</span>' +
+        '</div>' +
+        '<p class="contrib"><span>טווח הדירוגים ' + it.lo + '–' + it.hi + ', חציון ' + fmt1(it.med) + '</span>' +
+        '<span>השפעה על הציון: ' + fmt1(it.influence) + ' נקודות</span></p>' +
+        '<p class="gap">' + (it.decisionImpact ? 'עשוי לשנות את עומק ההתערבות המומלץ.' : 'אינו משנה את עומק ההתערבות המומלץ.') + '</p>' +
+        '<p>' + esc(questionFor(it)) + '</p>' +
+      '</li>';
+    }).join('');
+  }
+
+  var agendaThreshEl = document.getElementById('agendaThresh');
+  if(agendaThreshEl) agendaThreshEl.addEventListener('input', function(){
+    agendaThreshold = parseFloat(agendaThreshEl.value) || 0;
+    var txt = agendaThreshold.toFixed(2);
+    var out = document.getElementById('agendaThreshOut');
+    if(out) out.textContent = txt;
+    agendaThreshEl.setAttribute('aria-valuenow', agendaThreshold);
+    agendaThreshEl.setAttribute('aria-valuetext', txt + ' נקודות ציון');
+    renderAgenda();
+  });
+
+  /* ============================================================
+     העברת הציון הקבוצתי לרשימת התעדוף - שלב 7
+     ------------------------------------------------------------
+     rows נקרא ונכתב ישירות (לעולם לא מועתק למשתנה מקומי לפני
+     שהאישור נלחץ), כדי שהקצאה מחדש של rows במטפל "ניקוי הרשימה"
+     לעולם לא תיצור הפניה מיושנת. שורה קיימת עם אותו שם מוחלפת
+     במקומה; שורה חדשה מתווספת בסוף. עדכון הטבלה, הדירוג המפורש
+     והמטריצה קורה דרך render() הקיים - בלי שורת רינדור חדשה.
+     ============================================================ */
+  function computeTransferPreview(){
+    if(!sessionState) return null;
+    var ballots = sessionState.ballots;
+    if(ballots.length < 3) return null;
+    var cons = consensusRows(sessionState.session, ballots);
+    return cons.map(function(gr){
+      var existingIdx = -1;
+      for(var i=0;i<rows.length;i++){
+        if(rows[i].name === gr.name){ existingIdx = i; break; }
+      }
+      return { groupRow: gr, existingIdx: existingIdx, before: existingIdx >= 0 ? rows[existingIdx].score : null };
+    });
+  }
+
+  function renderTransferPreview(){
+    var preview = computeTransferPreview();
+    var ul = document.getElementById('groupTransferPreview');
+    if(!ul) return;
+    if(!preview){ ul.innerHTML = ''; return; }
+    ul.innerHTML = preview.map(function(p){
+      var after = p.groupRow.score;
+      if(p.existingIdx < 0){
+        return '<li>' + esc(p.groupRow.name) + ' · חדש, אינו קיים ברשימה כיום (' + after.toFixed(2) + ')</li>';
+      }
+      if(Math.abs(p.before - after) < 0.0005){
+        return '<li>' + esc(p.groupRow.name) + ' · ' + after.toFixed(2) + ' (ללא שינוי)</li>';
+      }
+      return '<li>' + esc(p.groupRow.name) + ' · ' + p.before.toFixed(2) + ' &rarr; ' + after.toFixed(2) + '</li>';
+    }).join('');
+  }
+
+  var groupTransferBtn = document.getElementById('groupTransferBtn');
+  var groupTransferConfirm = document.getElementById('groupTransferConfirm');
+  var groupTransferYes = document.getElementById('groupTransferYes');
+  var groupTransferNo = document.getElementById('groupTransferNo');
+
+  if(groupTransferBtn) groupTransferBtn.addEventListener('click', function(){
+    renderTransferPreview();
+    if(groupTransferConfirm) groupTransferConfirm.hidden = false;
+    if(groupTransferNo) groupTransferNo.focus();
+  });
+  if(groupTransferNo) groupTransferNo.addEventListener('click', function(){
+    if(groupTransferConfirm) groupTransferConfirm.hidden = true;
+    if(groupTransferBtn) groupTransferBtn.focus();
+  });
+  if(groupTransferYes) groupTransferYes.addEventListener('click', function(){
+    var preview = computeTransferPreview();
+    if(preview){
+      preview.forEach(function(p){
+        var gr = p.groupRow;
+        var entry = { name: gr.name, impact: gr.impact, volume: gr.volume, change: gr.change, repl: gr.repl, src: 'group' };
+        entry.score = scoreOf(entry);
+        if(p.existingIdx >= 0) rows[p.existingIdx] = entry;
+        else rows.push(entry);
+      });
+      saveRows();
+      render();
+    }
+    if(groupTransferConfirm) groupTransferConfirm.hidden = true;
+    if(groupTransferBtn) groupTransferBtn.focus();
+  });
+
+  function initSession(){
+    if(sessionState) showLink();
+    else showBase();
+  }
+
+  /* ============================================================
+     מצב משתתף - ראוטר
+     ------------------------------------------------------------
+     ה-hash נלכד פעם אחת כאן, בטעינה, ולעולם לא נקרא שוב ישירות
+     מ-location.hash. זה מה שמונע מקישור הדילוג לתוכן הראשי
+     (#main-content) - שהוא הפעולה הראשונה שמשתמש מקלדת מבצע -
+     מלמחוק את מצב המשתתף. מטפל ה-hashchange למטה מתעלם מכל עוגן
+     שכבר קיים בעמוד, כולל זה, ומטעין מחדש רק על שינוי אמיתי.
+     ============================================================ */
+  var INITIAL_HASH = (function(){ try { return location.hash || ''; } catch(e){ return ''; } })();
+
+  function routeMode(hash){
+    try {
+      if(/^#s=/.test(hash)){
+        var s = decodeSession(hash.slice(3));
+        return s ? { m:'participant', s:s } : { m:'badlink' };
+      }
+    } catch(e){}
+    return { m:'single' };
+  }
+  var ROUTE = routeMode(INITIAL_HASH);
+
+  var BALLOT_DRAFT_KEY = 'ai-work-method-ballot-draft-v1';
+  function pLoadDraft(tag){
+    try {
+      var raw = localStorage.getItem(BALLOT_DRAFT_KEY);
+      if(!raw) return null;
+      var obj = JSON.parse(raw);
+      if(!obj || obj.tag !== tag || !Array.isArray(obj.ratings)) return null;
+      return obj.ratings;
+    } catch(e){ return null; }
+  }
+  function pSaveDraft(tag, ratings){
+    try { localStorage.setItem(BALLOT_DRAFT_KEY, JSON.stringify({ tag:tag, ratings:ratings })); } catch(e){}
+  }
+
+  function renderBadLink(){
+    var el = document.getElementById('linkErr');
+    if(!el) return;
+    el.hidden = false;
+    el.textContent = 'הקישור למפגש אינו תקין או נקטע בהעתקה. יש לבקש מהמנחה לשלוח אותו שוב. הכלי עצמו זמין במלואו למטה.';
+  }
+
+  /* מציגה את טופס הדירוג ומחליפה למצב משתתף רק בסוף הפונקציה,
+     אחרי שכל החיווט הצליח - כך שכשל באמצע משאיר את הכלי הרגיל
+     גלוי ותקין, ולא מסך חצי-מצויר. */
+  function renderParticipant(session){
+    var pview = document.getElementById('pview');
+    if(!pview) return;
+
+    var tag = sessionTag(session);
+    var titleShow = document.getElementById('pTitleShow');
+    if(titleShow) titleShow.textContent = session.t ? ' - ' + session.t : '';
+    var intro = document.getElementById('pIntro');
+    if(intro) intro.textContent = 'דרגו כל אחד מ-' + session.p.length + ' התהליכים בארבעה קריטריונים, בסולם 1 עד 5.';
+
+    var draft = pLoadDraft(tag) || session.p.map(function(){ return {}; });
+
+    var formEl = document.getElementById('pForm');
+    formEl.innerHTML = session.p.map(function(name, pi){
+      return '<h3>' + (pi+1) + '. ' + esc(name) + '</h3>' +
+        BALLOT_CRIT.map(function(crit){
+          var gid = 'p' + pi + '-' + crit;
+          var current = draft[pi] && draft[pi][crit];
+          var scale = [1,2,3,4,5].map(function(v){
+            return '<label><input type="radio" name="' + gid + '" value="' + v + '"' +
+              (current === v ? ' checked' : '') + '><span>' + v + '</span></label>';
+          }).join('');
+          return '<div class="field">' +
+            '<span id="lbl-' + gid + '" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">' + W_LABEL[crit] + '</span>' +
+            '<div class="scale" role="radiogroup" aria-labelledby="lbl-' + gid + '">' + scale + '</div>' +
+            '</div>';
+        }).join('');
+    }).join('');
+
+    function countAnswered(){
+      var done = 0, total = session.p.length * BALLOT_CRIT.length;
+      session.p.forEach(function(name, pi){
+        BALLOT_CRIT.forEach(function(crit){
+          if(draft[pi] && typeof draft[pi][crit] === 'number') done++;
+        });
+      });
+      return { done: done, total: total };
+    }
+    var progEl = document.getElementById('pProgress');
+    function updateProgress(){
+      var c = countAnswered();
+      if(progEl) progEl.textContent = 'הושלמו ' + c.done + ' מתוך ' + c.total + ' דירוגים.';
+    }
+    updateProgress();
+
+    formEl.querySelectorAll('input[type=radio]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        var m = /^p(\d+)-(\w+)$/.exec(inp.name);
+        var pi = parseInt(m[1], 10), crit = m[2];
+        if(!draft[pi]) draft[pi] = {};
+        draft[pi][crit] = parseInt(inp.value, 10);
+        pSaveDraft(tag, draft);
+        updateProgress();
+      });
+    });
+
+    var errEl = document.getElementById('pErr');
+    var submitBtn = document.getElementById('pSubmitBtn');
+    if(submitBtn) submitBtn.addEventListener('click', function(){
+      var c = countAnswered();
+      if(c.done < c.total){
+        if(errEl) errEl.textContent = 'יש לדרג את כל התהליכים בכל הקריטריונים לפני קבלת הקוד. הושלמו ' + c.done + ' מתוך ' + c.total + '.';
+        return;
+      }
+      if(errEl) errEl.textContent = '';
+      var ratings = draft.map(function(r){ return { impact:r.impact, volume:r.volume, change:r.change, repl:r.repl }; });
+      var code = encodeBallot(session, ratings);
+      var codeEl = document.getElementById('pCode');
+      if(codeEl) codeEl.value = code;
+      var wrap = document.getElementById('pCodeWrap');
+      if(wrap) wrap.hidden = false;
+      var copyBtn = document.getElementById('pCopyBtn');
+      if(copyBtn) copyBtn.focus();
+    });
+
+    var copyBtn2 = document.getElementById('pCopyBtn');
+    if(copyBtn2) copyBtn2.addEventListener('click', function(){
+      var codeEl = document.getElementById('pCode');
+      if(codeEl) copyPlainText(codeEl.value, copyBtn2);
+    });
+
+    var backLink = document.getElementById('pBackLink');
+    if(backLink) backLink.addEventListener('click', function(e){
+      e.preventDefault();
+      history.replaceState(null, '', location.pathname + location.search);
+      location.reload();
+    });
+
+    var facilLink = document.getElementById('pFacilLink');
+    if(facilLink) facilLink.addEventListener('click', function(e){
+      e.preventDefault();
+      var existing = loadSessionState();
+      if(existing && existing.tag !== tag){
+        var ok = window.confirm('בדפדפן הזה שמור מפגש אחר עם ' + existing.ballots.length + ' דירוגים שנאספו. שחזור תצוגת המנחה למפגש הזה יחליף אותו. להמשיך?');
+        if(!ok) return;
+      }
+      var restored = (existing && existing.tag === tag) ? existing : { tag:tag, session:session, ballots:[] };
+      try { localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(restored)); } catch(e){}
+      history.replaceState(null, '', location.pathname + location.search);
+      location.reload();
+    });
+
+    var layout = document.querySelector('.layout');
+    if(layout) layout.style.display = 'none';
+    pview.hidden = false;
+  }
+
   renderExample();
   buildWeightRows();
-
   render();
+
+  try { initSession(); } catch(e){}
+
+  if(ROUTE.m === 'participant'){
+    try { renderParticipant(ROUTE.s); } catch(e){}
+  } else if(ROUTE.m === 'badlink'){
+    try { renderBadLink(); } catch(e){}
+  }
+
+  /* קליק על קישור הדילוג לתוכן (או על כל עוגן פנימי אחר) משנה את
+     location.hash באמת - זו התנהגות דפדפן רגילה, לא ניתנת למניעה
+     בלי לשבור את קפיצת הדפדפן ליעד. במצב משתתף זה מסוכן במיוחד:
+     גלילה שכבר קרתה לא מתבטלת, אבל אם ה-hash החדש נשאר בשורת
+     הכתובת ומישהו מרענן את העמוד, הטעינה הבאה קוראת hash שגוי
+     ומאבדת את מצב המשתתף. הפתרון: להחזיר את ה-hash המקורי בשקט
+     (replaceState, בלי hashchange נוסף) בכל פעם שהוא נסחף לעוגן
+     פנימי, כל עוד אנחנו במצב משתתף. במצב יחיד אין בכך צורך -
+     קליק על #s3a בניווט אמור פשוט לעבוד כרגיל. */
+  window.addEventListener('hashchange', function(){
+    var h = location.hash || '';
+    if(/^#(main-content|s[1-7]|s2a|s3a)$/.test(h)){
+      if(ROUTE.m === 'participant'){
+        try { history.replaceState(null, '', location.pathname + location.search + INITIAL_HASH); } catch(e){}
+      }
+      return;
+    }
+    location.reload();
+  });
 })();
 </script>
 </body>

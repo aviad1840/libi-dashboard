@@ -38,7 +38,31 @@ header.hero{background:var(--navy); color:#fff; padding:36px 24px}
 .wrap{max-width:1180px; margin:0 auto}
 header.hero h1{margin:0 0 8px; font-size:28px; font-weight:700; line-height:1.3}
 header.hero p{margin:0; color:#bcd8f5; font-size:15px}
-header.hero .meta{margin-top:10px; color:#8fb8dd; font-size:13px}
+header.hero .tagline{margin-top:10px; font-size:17px; color:#fff}
+header.hero .hero-thesis{margin-top:10px; font-size:19px; font-weight:600; color:#fff; border-right:4px solid var(--light); padding-right:12px}
+header.hero .meta{margin-top:14px; color:#8fb8dd; font-size:13px}
+
+.hero-flow{background:var(--soft); border-bottom:1.5px solid var(--line); padding:28px 24px 32px}
+.hero-flow .hf-title{margin:0 0 14px; font-size:19px; color:var(--navy)}
+.hero-flow .field{max-width:640px}
+.hf-questions{display:grid; gap:16px; margin:18px 0 6px}
+.hero-result{margin-top:26px; padding-top:22px; border-top:1.5px dashed var(--line)}
+.hero-result h3{margin-top:0}
+.hf-score{display:flex; align-items:center; gap:12px; margin:0 0 6px}
+.hf-score #hf-score-num{font-size:30px; font-weight:700; color:var(--navy); font-variant-numeric:tabular-nums}
+.track-compare{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0 8px}
+.track{border:1.5px solid var(--line); border-radius:7px; padding:14px 16px; background:#fff}
+.track h4{margin:0 0 6px; font-size:15px; color:var(--navy)}
+.track p{margin:0; font-size:14px; color:var(--muted)}
+.track-redesign{border-color:var(--blue); border-width:2px; background:var(--light)}
+.track-note{font-weight:600; color:var(--navy); font-size:15px; margin:4px 0 0}
+.next-options{display:grid; gap:10px; margin-top:12px}
+.next-options[hidden]{display:none}
+.next-opt{border:1.5px solid var(--line); border-radius:6px; padding:12px 14px; background:#fff}
+.next-opt strong{color:var(--navy); font-size:15px}
+.next-opt p{margin:4px 0 0; font-size:14px; color:var(--muted)}
+.hf-persist-note{margin:18px 0 0; font-size:13px; color:var(--muted)}
+@media(max-width:640px){.track-compare{grid-template-columns:1fr}}
 
 .layout{display:flex; gap:28px; max-width:1180px; margin:0 auto; padding:24px}
 nav.side{flex:0 0 220px; position:sticky; top:16px; align-self:flex-start}
@@ -103,10 +127,8 @@ td.rowhead,th[scope="row"]{font-weight:600; color:var(--navy); background:var(--
   font-weight:600; font-size:16px; margin:14px 0;
 }
 
-/* calculator */
-.calc{border:1.5px solid var(--line); border-radius:8px; padding:20px; background:var(--soft)}
 .field{margin-bottom:14px}
-.field label{display:block; font-weight:600; font-size:15px; margin-bottom:5px; color:var(--navy)}
+.field label,.field .label-like{display:block; font-weight:600; font-size:15px; margin-bottom:5px; color:var(--navy)}
 .field .hint{font-weight:400; font-size:13px; color:var(--muted); display:block; margin-top:2px}
 .field input[type="text"]{
   width:100%; padding:9px 11px; font-family:inherit; font-size:15px;
@@ -195,7 +217,6 @@ table.ex td::before{content:none}
 }
 
 /* משקלים */
-.weights{border:1.5px solid var(--line);border-radius:8px;padding:18px;background:#fff;margin:0 0 18px}
 .wrow{display:grid;grid-template-columns:210px 1fr 62px;gap:6px 14px;align-items:center;margin-bottom:12px}
 .wrow .wlbl{font-weight:600;font-size:15px;color:var(--navy)}
 .wrow output{font-weight:700;font-size:16px;text-align:left;color:var(--navy);font-variant-numeric:tabular-nums}
@@ -234,12 +255,14 @@ table.ex td::before{content:none}
 .sum-fields h3{margin-bottom:4px}
 
 /* עזרה מבוססת AI */
-details.ai{border:1.5px solid var(--line);border-radius:8px;margin:22px 0 0;background:#fff}
-details.ai>summary{cursor:pointer;padding:14px 18px;font-weight:600;color:var(--navy);font-size:16px;list-style:none;border-radius:7px}
-details.ai>summary::-webkit-details-marker{display:none}
-details.ai>summary::before{content:"+";display:inline-block;width:1.3em;font-weight:700;font-size:18px}
-details.ai[open]>summary::before{content:"\2212"}
-details.ai>summary:hover{background:var(--light)}
+details.ai,details.adv{border:1.5px solid var(--line);border-radius:8px;margin:22px 0 0;background:#fff}
+details.ai>summary,details.adv>summary{cursor:pointer;padding:14px 18px;font-weight:600;color:var(--navy);font-size:16px;list-style:none;border-radius:7px}
+details.ai>summary::-webkit-details-marker,details.adv>summary::-webkit-details-marker{display:none}
+details.ai>summary::before,details.adv>summary::before{content:"+";display:inline-block;width:1.3em;font-weight:700;font-size:18px}
+details.ai[open]>summary::before,details.adv[open]>summary::before{content:"\2212"}
+details.ai>summary:hover,details.adv>summary:hover{background:var(--light)}
+details.adv>.adv-body{padding:4px 18px 18px;border-top:1px solid var(--line)}
+details.adv summary .adv-note{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:2px}
 .ai-body{padding:4px 18px 18px;border-top:1px solid var(--line)}
 .ai-note{background:var(--warn-bg);border:1.5px solid #e0b84c;border-radius:6px;padding:13px 15px;font-size:14px;color:var(--warn);margin:14px 0}
 .ai-note strong{display:block;margin-bottom:4px}
@@ -276,9 +299,9 @@ details.ai>summary:hover{background:var(--light)}
   body.sum-open .draft-banner,body.sum-open header.hero,body.sum-open .layout,body.sum-open footer,body.sum-open .toolbar{display:none}
   body.sum-open .sum-overlay{position:static;padding:0;overflow:visible}
   .sum-actions{display:none}
-  details.ai{display:none}
+  details.ai,details.adv{display:none}
   .rank li{page-break-inside:avoid}
-  .sess,#s3a .no-print{display:none}
+  .sess{display:none}
 }
 </style>
 </head>
@@ -293,13 +316,104 @@ details.ai>summary:hover{background:var(--light)}
 <header class="hero">
   <div class="wrap">
     <h1>מעבודה עם AI לשינוי שיטת העבודה</h1>
-    <p>כלי עבודה לצוות ההון האנושי במגזר הציבורי</p>
-    <p class="meta">החלטת ממשלה 4255 · לקראת 30.9.2026</p>
+    <p class="tagline">כלי קצר לבחינת תהליך אמיתי: האם AI רק מאיץ את הקיים, או מאפשר לעצב אותו מחדש?</p>
+    <p class="hero-thesis">אם מכניסים AI לתהליך קיים, מקבלים תהליך קיים עם AI.</p>
+    <p class="meta">כלי עבודה לצוות ההון האנושי במגזר הציבורי · החלטת ממשלה 4255 · לקראת 30.9.2026</p>
   </div>
 </header>
 
 <div class="toolbar" style="padding-top:14px">
   <button class="btn secondary" type="button" onclick="window.print()">הדפסה או שמירה כ-PDF</button>
+</div>
+
+<div class="hero-flow">
+  <div class="wrap">
+    <h2 class="hf-title">בדקו תהליך אחד</h2>
+
+    <div class="field">
+      <label for="p-name">מהו התהליך שאנו בוחנים? <span aria-hidden="true">*</span><span class="sr-only">שדה חובה</span>
+        <span class="hint">כתבו תהליך אמיתי שהצוות מכיר</span>
+      </label>
+      <input type="text" id="p-name" aria-required="true" aria-describedby="p-name-error">
+      <span class="error-msg" id="p-name-error" role="alert"></span>
+    </div>
+
+    <div class="hf-questions">
+      <div class="field">
+        <span class="label-like" id="lbl-impact">א. השפעה
+          <span class="hint">עד כמה התהליך משפיע על האזרח או על איכות ההחלטה? 1 = השפעה שולית, 5 = השפעה ישירה ומשמעותית</span>
+        </span>
+        <div class="scale" role="radiogroup" aria-labelledby="lbl-impact" id="sc-impact"></div>
+      </div>
+
+      <div class="field">
+        <span class="label-like" id="lbl-volume">ב. נפח
+          <span class="hint">עד כמה התהליך חוזר על עצמו ובהיקף משמעותי? 1 = נפח נמוך, 5 = נפח גבוה מאוד</span>
+        </span>
+        <div class="scale" role="radiogroup" aria-labelledby="lbl-volume" id="sc-volume"></div>
+      </div>
+
+      <div class="field">
+        <span class="label-like" id="lbl-change">ג. פוטנציאל שינוי
+          <span class="hint">עד כמה AI יכול לאפשר לשנות את אופן העבודה, ולא רק להאיץ אותו? 1 = ניתן רק להאצה, 5 = ניתן לשנות את שיטת העבודה עצמה</span>
+        </span>
+        <div class="scale" role="radiogroup" aria-labelledby="lbl-change" id="sc-change"></div>
+      </div>
+
+      <div class="field">
+        <span class="label-like" id="lbl-repl">ד. שכפול
+          <span class="hint">עד כמה השינוי שנבנה יכול לעבור בקלות לתהליכים או גופים נוספים? 1 = ייחודי לגוף אחד, 5 = ניתן לשכפול בעלות שולית</span>
+        </span>
+        <div class="scale" role="radiogroup" aria-labelledby="lbl-repl" id="sc-repl"></div>
+      </div>
+    </div>
+
+    <span class="error-msg" id="hf-error" role="alert"></span>
+    <div class="btn-row">
+      <button class="btn" type="button" id="addBtn">בדיקת התהליך</button>
+    </div>
+
+    <div id="heroResult" class="hero-result" hidden>
+      <h3 id="hf-result-title">מה זה אומר?</h3>
+      <p class="hf-score" aria-labelledby="hf-result-title">
+        <span id="hf-score-num"></span>
+        <span id="hf-score-badge" class="badge"></span>
+      </p>
+      <p id="hf-score-desc" class="note-inline"></p>
+
+      <div class="track-compare">
+        <div class="track">
+          <h4>AI בתוך התהליך הקיים</h4>
+          <p>מאיץ את מה שקורה היום - פחות טעויות, פחות זמן, אותו תהליך בדיוק כמו קודם.</p>
+        </div>
+        <div class="track track-redesign">
+          <h4>AI שמאפשר לעצב מחדש את התהליך</h4>
+          <p>משנה את סדר הפעולות, מי מעורב בהן, ואיפה מתקבלת ההחלטה - לא רק מאיץ אותן.</p>
+        </div>
+      </div>
+      <p class="track-note">לא כל תהליך עם AI הוא טרנספורמציה.</p>
+
+      <div class="btn-row">
+        <button class="btn secondary" type="button" id="nextStepBtn" aria-expanded="false" aria-controls="nextStepOptions">להגדיר את הצעד הבא</button>
+      </div>
+      <div class="next-options" id="nextStepOptions" hidden>
+        <div class="next-opt">
+          <strong>לשפר את הקיים</strong>
+          <p>מתאים כשהתהליך עובד בסדר, והשינוי הנדרש הוא ייעול נקודתי ולא מבנה חדש.</p>
+        </div>
+        <div class="next-opt">
+          <strong>לעצב מחדש את התהליך</strong>
+          <p>מתאים כש-AI פותח אפשרות אמיתית לשנות את סדר העבודה או את מי שמעורב בה.</p>
+        </div>
+        <div class="next-opt">
+          <strong>להעמיק בדיקה</strong>
+          <p>מתאים כשהפוטנציאל נראה גבוה אך עדיין אין מספיק מידע כדי להחליט.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="hf-persist-note">הנתונים נשמרים מקומית בדפדפן שלך בלבד, ואינם נשלחים לשום מקום.</p>
+  </div>
 </div>
 
 <div class="layout">
@@ -330,108 +444,76 @@ details.ai>summary:hover{background:var(--light)}
       <p>הכלי בנוי לפי חמש השאלות שהועלו בדיון: אופן ההטמעה, מנגנון התעדוף, חלוקת האחריות, מדדי התפוקה והתוצאה, והתשתיות המאפשרות.</p>
     </section>
 
-    <section id="s2" aria-labelledby="h-s2">
-      <h2 id="h-s2">2 | הלולאה - ההטמעה מתחילה לפני שהכלי נבנה</h2>
-      <p>המודל הרווח הוא כלי, משתמשים, אימוץ. הוא מתאים לכלים רוחביים, אך לא לשינוי תהליך. שני הבדלים מעשיים: העיצוב מחדש קודם לבנייה ולא אחריה, והמעבר לייצור והשכפול הם חלק מהמסלול ולא שלב שמתחיל אחרי שהפיילוט הצליח.</p>
-      <p class="sr-only">בחרו שלב בלולאה כדי לראות את פירוטו.</p>
-      <div class="loop" role="group" aria-label="שמונת שלבי הלולאה">
-        <button type="button" aria-pressed="true" data-i="0">1. בעיה</button>
-        <button type="button" aria-pressed="false" data-i="1">2. תהליך</button>
-        <button type="button" aria-pressed="false" data-i="2">3. עיצוב מחדש</button>
-        <button type="button" aria-pressed="false" data-i="3">4. בנייה</button>
-        <button type="button" aria-pressed="false" data-i="4">5. הערכה</button>
-        <button type="button" aria-pressed="false" data-i="5">6. ייצור</button>
-        <button type="button" aria-pressed="false" data-i="6">7. אימוץ</button>
-        <button type="button" aria-pressed="false" data-i="7">8. שכפול</button>
-      </div>
-      <div class="loop-detail" id="loopDetail" role="region" aria-live="polite" aria-label="פירוט השלב הנבחר"></div>
-    </section>
+    <details class="ai adv">
+      <summary>2 | הלולאה ודוגמה מלאה <span class="adv-note">הרחבה אופציונלית - איך הלולאה נראית על תהליך אחד, מקצה לקצה</span></summary>
+      <div class="adv-body">
+        <section id="s2" aria-labelledby="h-s2">
+          <h2 id="h-s2">2 | הלולאה - ההטמעה מתחילה לפני שהכלי נבנה</h2>
+          <p>המודל הרווח הוא כלי, משתמשים, אימוץ. הוא מתאים לכלים רוחביים, אך לא לשינוי תהליך. שני הבדלים מעשיים: העיצוב מחדש קודם לבנייה ולא אחריה, והמעבר לייצור והשכפול הם חלק מהמסלול ולא שלב שמתחיל אחרי שהפיילוט הצליח.</p>
+          <p class="sr-only">בחרו שלב בלולאה כדי לראות את פירוטו.</p>
+          <div class="loop" role="group" aria-label="שמונת שלבי הלולאה">
+            <button type="button" aria-pressed="true" data-i="0">1. בעיה</button>
+            <button type="button" aria-pressed="false" data-i="1">2. תהליך</button>
+            <button type="button" aria-pressed="false" data-i="2">3. עיצוב מחדש</button>
+            <button type="button" aria-pressed="false" data-i="3">4. בנייה</button>
+            <button type="button" aria-pressed="false" data-i="4">5. הערכה</button>
+            <button type="button" aria-pressed="false" data-i="5">6. ייצור</button>
+            <button type="button" aria-pressed="false" data-i="6">7. אימוץ</button>
+            <button type="button" aria-pressed="false" data-i="7">8. שכפול</button>
+          </div>
+          <div class="loop-detail" id="loopDetail" role="region" aria-live="polite" aria-label="פירוט השלב הנבחר"></div>
+        </section>
 
-    <section id="s2a" aria-labelledby="h-s2a">
-      <h2 id="h-s2a">2א | דוגמה מלאה - תהליך אחד לאורך הלולאה</h2>
-      <p>הלולאה שלמעלה מתארת את המסלול. המקטע הזה מיועד להראות אותו על תהליך אחד אמיתי, מקצה לקצה, בפורמט אחיד לכל שלב. עד שהצוות ימלא אותו, השדות מסומנים כלהשלמה ואין כאן נתונים לדוגמה.</p>
-      <dl class="ex-meta" id="exMeta"></dl>
-      <div style="overflow-x:auto">
-        <table class="ex">
-          <caption>שמונת שלבי הלולאה על תהליך אחד</caption>
-          <thead>
-            <tr>
-              <th scope="col">שלב</th>
-              <th scope="col">מה היה</th>
-              <th scope="col">מה נעשה</th>
-              <th scope="col">שער היציאה</th>
-              <th scope="col">כמה זמן</th>
-            </tr>
-          </thead>
-          <tbody id="exBody"></tbody>
-        </table>
+        <section id="s2a" aria-labelledby="h-s2a">
+          <h2 id="h-s2a">2א | דוגמה מלאה - תהליך אחד לאורך הלולאה</h2>
+          <p>הלולאה שלמעלה מתארת את המסלול. המקטע הזה מיועד להראות אותו על תהליך אחד אמיתי, מקצה לקצה, בפורמט אחיד לכל שלב. עד שהצוות ימלא אותו, השדות מסומנים כלהשלמה ואין כאן נתונים לדוגמה.</p>
+          <dl class="ex-meta" id="exMeta"></dl>
+          <div style="overflow-x:auto">
+            <table class="ex">
+              <caption>שמונת שלבי הלולאה על תהליך אחד</caption>
+              <thead>
+                <tr>
+                  <th scope="col">שלב</th>
+                  <th scope="col">מה היה</th>
+                  <th scope="col">מה נעשה</th>
+                  <th scope="col">שער היציאה</th>
+                  <th scope="col">כמה זמן</th>
+                </tr>
+              </thead>
+              <tbody id="exBody"></tbody>
+            </table>
+          </div>
+          <div class="fill">
+            <strong>להשלמה על ידי הצוות</strong>
+            תוכן הדוגמה יושב במשתנה <code>EXAMPLE</code> בראש הסקריפט, עם הערה בעברית לכל שדה. מילוי שם מתעדכן כאן אוטומטית, בלי לגעת בסימון העמוד. לצד כל שדה ריק מופיע כעת טקסט הנחיה קצר בגוון אפור, המסביר מה נדרש באותו שדה. הטקסט הוא הנחיה בלבד ואינו נתון.
+          </div>
+        </section>
       </div>
-      <div class="fill">
-        <strong>להשלמה על ידי הצוות</strong>
-        תוכן הדוגמה יושב במשתנה <code>EXAMPLE</code> בראש הסקריפט, עם הערה בעברית לכל שדה. מילוי שם מתעדכן כאן אוטומטית, בלי לגעת בסימון העמוד. לצד כל שדה ריק מופיע כעת טקסט הנחיה קצר בגוון אפור, המסביר מה נדרש באותו שדה. הטקסט הוא הנחיה בלבד ואינו נתון.
-      </div>
-    </section>
+    </details>
 
     <section id="s3" aria-labelledby="h-s3">
       <h2 id="h-s3">3 | מנגנון התעדוף</h2>
-      <p>לא לפי בשלות הכלי, לא לפי כמות הרעיונות ולא לפי גודל הגוף. ארבעה קריטריונים, בסולם 1 עד 5. הזינו תהליך אחד או יותר וקבלו ציון, מיקום על המטריצה והמלצה לעומק התערבות.</p>
+      <p>זהו המנגנון שמאחורי הבדיקה למעלה: ארבעה קריטריונים בסולם 1 עד 5, ציון ממוצע משוקלל, ומיקום על מטריצת ערך-מינוף. כל תהליך שנבדק למעלה מצטרף לרשימה כאן, כדי להשוות בין כמה תהליכים כשצריך.</p>
 
-      <div class="weights">
-        <h3 id="w-title" style="margin-top:0">משקלי הקריטריונים</h3>
-        <p class="note-inline">הציון הוא ממוצע משוקלל של ארבעת הקריטריונים. שינוי משקל מעדכן מיד את הציונים, את הדירוג ואת עומק ההתערבות המומלץ. סכום המשקלים נשאר 100 תמיד, וכל שינוי מתחלק בין השאר לפי היחס ביניהם.</p>
-        <div id="weightRows"></div>
-        <p class="wsum" id="wSum" role="status"></p>
-        <div class="btn-row">
-          <button class="btn secondary" type="button" id="wResetBtn">איפוס המשקלים לברירת המחדל</button>
+      <details class="ai adv">
+        <summary>כיול משקלי הקריטריונים <span class="adv-note">אופציונלי - ברירת המחדל מתאימה לרוב המקרים</span></summary>
+        <div class="adv-body">
+          <p class="note-inline">הציון הוא ממוצע משוקלל של ארבעת הקריטריונים. שינוי משקל מעדכן מיד את הציונים, את הדירוג ואת עומק ההתערבות המומלץ. סכום המשקלים נשאר 100 תמיד, וכל שינוי מתחלק בין השאר לפי היחס ביניהם.</p>
+          <div id="weightRows"></div>
+          <p class="wsum" id="wSum" role="status"></p>
+          <div class="btn-row">
+            <button class="btn secondary" type="button" id="wResetBtn">איפוס המשקלים לברירת המחדל</button>
+          </div>
+          <p class="note-inline">המשקלים הם נקודת פתיחה לכיול הצוות ואינם קביעה סגורה. ברירת המחדל: השפעה 35, נפח 20, פוטנציאל שינוי 30, כושר שכפול 15.</p>
         </div>
-        <p class="note-inline">המשקלים הם נקודת פתיחה לכיול הצוות ואינם קביעה סגורה. ברירת המחדל: השפעה 35, נפח 20, פוטנציאל שינוי 30, כושר שכפול 15.</p>
+      </details>
+
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn secondary" type="button" id="sumBtn">יצירת סיכום ישיבה</button>
+        <button class="btn secondary" type="button" id="csvBtn">ייצוא הרשימה לקובץ CSV</button>
+        <button class="btn secondary" type="button" id="clearBtn">ניקוי הרשימה</button>
       </div>
-
-      <div class="calc">
-        <div class="field">
-          <label for="p-name">שם התהליך <span aria-hidden="true">*</span><span class="sr-only">שדה חובה</span>
-            <span class="hint">לדוגמה: טיפול בפנייה, אישור זכאות, הפקת דוח תקופתי</span>
-          </label>
-          <input type="text" id="p-name" aria-required="true" aria-describedby="p-name-error">
-          <span class="error-msg" id="p-name-error" role="alert"></span>
-        </div>
-
-        <div class="field">
-          <span class="label-like" id="lbl-impact" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">השפעה על האזרח או על איכות ההחלטה
-            <span class="hint">1 = השפעה שולית, 5 = השפעה ישירה ומשמעותית</span>
-          </span>
-          <div class="scale" role="radiogroup" aria-labelledby="lbl-impact" id="sc-impact"></div>
-        </div>
-
-        <div class="field">
-          <span id="lbl-volume" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">נפח - כמות המקרים או האינטראקציות
-            <span class="hint">1 = נפח נמוך, 5 = נפח גבוה מאוד</span>
-          </span>
-          <div class="scale" role="radiogroup" aria-labelledby="lbl-volume" id="sc-volume"></div>
-        </div>
-
-        <div class="field">
-          <span id="lbl-change" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">פוטנציאל שינוי - עד כמה התהליך ניתן לעיצוב מחדש
-            <span class="hint">1 = ניתן רק להאצה, 5 = ניתן לשנות את שיטת העבודה עצמה</span>
-          </span>
-          <div class="scale" role="radiogroup" aria-labelledby="lbl-change" id="sc-change"></div>
-        </div>
-
-        <div class="field">
-          <span id="lbl-repl" style="display:block;font-weight:600;font-size:15px;margin-bottom:5px;color:var(--navy)">כושר שכפול - האם יכולת שנבנתה עוברת לגוף הבא
-            <span class="hint">1 = ייחודי לגוף אחד, 5 = ניתן לשכפול בעלות שולית</span>
-          </span>
-          <div class="scale" role="radiogroup" aria-labelledby="lbl-repl" id="sc-repl"></div>
-        </div>
-
-        <div class="btn-row">
-          <button class="btn" type="button" id="addBtn">הוספה לרשימה</button>
-          <button class="btn secondary" type="button" id="sumBtn">יצירת סיכום ישיבה</button>
-          <button class="btn secondary" type="button" id="csvBtn">ייצוא הרשימה לקובץ CSV</button>
-          <button class="btn secondary" type="button" id="clearBtn">ניקוי הרשימה</button>
-        </div>
-        <p class="hint" style="margin-top:10px;font-size:13px;color:var(--muted)">הנתונים נשמרים מקומית בדפדפן שלך בלבד, נשארים זמינים גם אחרי סגירת החלון, ואינם נשלחים לשום מקום. ניקוי הרשימה מוחק אותם.</p>
-      </div>
+      <p class="hint" style="margin-top:10px;font-size:13px;color:var(--muted)">הנתונים נשמרים מקומית בדפדפן שלך בלבד, נשארים זמינים גם אחרי סגירת החלון, ואינם נשלחים לשום מקום. ניקוי הרשימה מוחק אותם.</p>
 
       <div id="resultsWrap" aria-live="polite">
         <table id="resultsTable" style="display:none">
@@ -461,18 +543,23 @@ details.ai>summary:hover{background:var(--light)}
       </div>
 
 
-      <div class="matrix-wrap">
-        <h3 id="matrix-title">מיקום התהליכים על המטריצה</h3>
-        <p class="axis-y">ציר אנכי: מינוף (פוטנציאל שינוי + כושר שכפול)</p>
-        <div class="matrix" id="matrix" role="img" aria-labelledby="matrix-title" aria-describedby="matrix-desc">
-          <div class="q tr">ערך גבוה, מינוף גבוה<br>מועמד ראשון</div>
-          <div class="q tl">ערך נמוך, מינוף גבוה<br>מתאים לנכס רוחבי</div>
-          <div class="q br">ערך גבוה, מינוף נמוך<br>שיפור נקודתי</div>
-          <div class="q bl">ערך נמוך, מינוף נמוך<br>לא לתעדוף כעת</div>
+      <details class="ai adv">
+        <summary>מיקום התהליכים על המטריצה <span class="adv-note">תצוגה חזותית משנית</span></summary>
+        <div class="adv-body">
+          <div class="matrix-wrap">
+            <h3 id="matrix-title">מיקום התהליכים על המטריצה</h3>
+            <p class="axis-y">ציר אנכי: מינוף (פוטנציאל שינוי + כושר שכפול)</p>
+            <div class="matrix" id="matrix" role="img" aria-labelledby="matrix-title" aria-describedby="matrix-desc">
+              <div class="q tr">ערך גבוה, מינוף גבוה<br>מועמד ראשון</div>
+              <div class="q tl">ערך נמוך, מינוף גבוה<br>מתאים לנכס רוחבי</div>
+              <div class="q br">ערך גבוה, מינוף נמוך<br>שיפור נקודתי</div>
+              <div class="q bl">ערך נמוך, מינוף נמוך<br>לא לתעדוף כעת</div>
+            </div>
+            <p class="axis-x">ציר אופקי: ערך (השפעה + נפח) - גדל לכיוון ימין</p>
+            <p id="matrix-desc" class="sr-only" aria-live="polite">אין עדיין תהליכים על המטריצה.</p>
+          </div>
         </div>
-        <p class="axis-x">ציר אופקי: ערך (השפעה + נפח) - גדל לכיוון ימין</p>
-        <p id="matrix-desc" class="sr-only" aria-live="polite">אין עדיין תהליכים על המטריצה.</p>
-      </div>
+      </details>
 
       <details class="ai" id="aiPanel">
         <summary>עזרה בדירוג באמצעות AI - אופציונלי לחלוטין</summary>
@@ -508,7 +595,10 @@ details.ai>summary:hover{background:var(--light)}
       </details>
     </section>
 
-    <section id="s3a" aria-labelledby="h-s3a">
+    <details class="ai adv">
+      <summary>3א | מפת המחלוקת בין המשתתפים <span class="adv-note">כלי מתקדם ואופציונלי - לישיבה עם כמה משתתפים שמדרגים בנפרד</span></summary>
+      <div class="adv-body">
+      <section id="s3a" aria-labelledby="h-s3a">
       <h2 id="h-s3a">3א | מפת המחלוקת בין המשתתפים</h2>
       <p>מנגנון התעדוף שלמעלה מניח אדם אחד שממלא את הטופס. כאן כל משתתף מדרג בעצמו, מהנייד שלו, ובלי לראות את הדירוגים של האחרים. הכלי ממזג את הפתקים לציון קבוצתי, ומראה בנפרד איפה הצוות מסכים ואיפה הוא חלוק - ובעיקר, האם הפער בכלל משנה החלטה.</p>
 
@@ -648,7 +738,9 @@ details.ai>summary:hover{background:var(--light)}
         </div>
         <p class="note-inline" id="groupTooFew" hidden></p>
       </div>
-    </section>
+      </section>
+      </div>
+    </details>
 
     <section id="s4" aria-labelledby="h-s4">
       <h2 id="h-s4">4 | חלוקת אחריות</h2>
@@ -1181,6 +1273,30 @@ details.ai>summary:hover{background:var(--light)}
     return {n:1, cls:'b1', t:'רמה 1'};
   }
 
+  /* תוויות אנושיות לתוצאה המיידית בראש הדף - אותם שלושה ספים בדיוק
+     כמו level() ומקטע 6, רק בניסוח קצר לקורא שאינו טכני. הטקסט
+     המלא של כל רמה מועתק כלשונו ממקטע 6, בלי לשכתב אותו. */
+  var HERO_LEVEL_LABEL = { 1:'שיפור נקודתי', 2:'שינוי תהליך', 3:'מועמד להתערבות עמוקה' };
+  var HERO_LEVEL_DESC = {
+    1:'שימוש ביכולות ובנכסי רוחב משותפים, בלי מנגנון ייעודי בגוף.',
+    2:'ליווי ממוקד לתהליך אחד או שניים בעלי ערך גבוה, עם בעלות עסקית מוגדרת.',
+    3:'מנגנון יישום מלא בגוף, במתכונת ספרינט מוגדר עם שער החלטה בסופו.'
+  };
+  function renderHeroResult(){
+    var panel = document.getElementById('heroResult');
+    if(!panel) return;
+    if(rows.length === 0){ panel.hidden = true; return; }
+    var r = rows[rows.length - 1];
+    var l = level(r.score);
+    panel.hidden = false;
+    document.getElementById('hf-score-num').textContent = r.score.toFixed(2);
+    var badge = document.getElementById('hf-score-badge');
+    badge.className = 'badge ' + l.cls;
+    badge.textContent = HERO_LEVEL_LABEL[l.n];
+    document.getElementById('hf-score-desc').textContent =
+      '"' + r.name + '" - ' + HERO_LEVEL_DESC[l.n];
+  }
+
   function esc(s){
     return String(s).replace(/[&<>"']/g, function(m){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
@@ -1212,7 +1328,17 @@ details.ai>summary:hover{background:var(--light)}
     }
     drawMatrix();
     renderRank();
+    renderHeroResult();
   }
+
+  /* כפתור "להגדיר את הצעד הבא" - חשיפה/הסתרה בלבד, בלי שמירת מצב. */
+  var nextStepBtn = document.getElementById('nextStepBtn');
+  var nextStepOptions = document.getElementById('nextStepOptions');
+  if(nextStepBtn && nextStepOptions) nextStepBtn.addEventListener('click', function(){
+    var willOpen = nextStepOptions.hidden;
+    nextStepOptions.hidden = !willOpen;
+    nextStepBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  });
 
   function drawMatrix(){
     var m = document.getElementById('matrix');
@@ -1240,13 +1366,24 @@ details.ai>summary:hover{background:var(--light)}
   document.getElementById('addBtn').addEventListener('click', function(){
     var nameEl = document.getElementById('p-name');
     var err = document.getElementById('p-name-error');
+    var hfErr = document.getElementById('hf-error');
     var name = nameEl.value.trim();
+    if(hfErr) hfErr.textContent = '';
     if(!name){
       err.textContent = 'יש להזין שם תהליך.';
       nameEl.focus();
       return;
     }
     err.textContent = '';
+    /* בלי ברירת מחדל שקטה - אם קריטריון לא נענה, אין תוצאה, לא ציון בדוי. */
+    var CRIT_KEYS = ['impact','volume','change','repl'];
+    var unanswered = CRIT_KEYS.filter(function(k){
+      return !document.querySelector('input[name="'+k+'"]:checked');
+    });
+    if(unanswered.length > 0){
+      if(hfErr) hfErr.textContent = 'יש לענות על כל ארבע השאלות לפני קבלת התוצאה.';
+      return;
+    }
     var r = {
       name:name, impact:val('impact'), volume:val('volume'),
       change:val('change'), repl:val('repl')

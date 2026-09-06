@@ -616,6 +616,18 @@ details.ai>summary:hover{background:var(--light)}
             <tbody id="groupBody"></tbody>
           </table>
 
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn secondary" type="button" id="groupTransferBtn">העברת הציון הקבוצתי לרשימת התעדוף</button>
+          </div>
+          <div class="sess-confirm" id="groupTransferConfirm" hidden>
+            <p><strong>אישור העברה</strong> - כך תשתנה רשימת התעדוף:</p>
+            <ul id="groupTransferPreview" style="margin:0 0 12px;padding-inline-start:20px"></ul>
+            <div class="btn-row">
+              <button class="btn secondary" type="button" id="groupTransferYes">אישור ההעברה</button>
+              <button class="btn secondary" type="button" id="groupTransferNo">ביטול</button>
+            </div>
+          </div>
+
           <h4>מה לא הוכרע</h4>
           <div id="groupFindings"></div>
 
@@ -1680,6 +1692,31 @@ details.ai>summary:hover{background:var(--light)}
         }).join('') +
         '</tbody></table>';
     }
+
+    /* בלוק תוספתי בלבד - מוצג רק כשקיימת ברשימה שורה שמקורה בציון
+       קבוצתי, כדי שמצב יחיד ייראה זהה להיום. אינו משנה סדר או
+       ניסוח של תוכן קיים. */
+    if(rows.some(function(r){ return r.src === 'group'; })){
+      html += '<h3>בסיס הדירוג</h3>';
+      if(sessionState && sessionState.ballots.length >= 3){
+        var agendaItems = disagreementItems(sessionState.session, sessionState.ballots, agendaThreshold);
+        html += '<p>חלק מהתהליכים ברשימה זו מבוססים על ציון קבוצתי, לא על דירוג אדם יחיד. ' +
+          'הציון הקבוצתי מבוסס על ' + sessionState.ballots.length + ' פתקים שנאספו, וחושב כחציון הדירוגים - ' +
+          'לא כממוצע ולא כביטוי להסכמה.</p>';
+        if(agendaItems.length > 0){
+          html += '<p>הנושאים הבאים טרם הוכרעו על סמך הפתקים שנאספו, ומומלץ לדון בהם לפני קביעה סופית:</p><ul>' +
+            agendaItems.map(function(it){
+              return '<li>' + esc(it.name) + ' &middot; ' + esc(W_LABEL[it.crit]) + ' (' + esc(SHAPE_LABEL[it.shape]) + ') - ' + esc(questionFor(it)) + '</li>';
+            }).join('') + '</ul>';
+        } else {
+          html += '<p>לא נמצאו נושאים שעברו את סף ההכללה בסדר היום, לפי הפתקים שנאספו.</p>';
+        }
+      } else {
+        html += '<p>חלק מהתהליכים ברשימה זו מבוססים על ציון קבוצתי (חציון דירוגי משתתפים), לא על דירוג אדם יחיד. ' +
+          'פרטי המפגש (מספר הפתקים וסדר היום) אינם זמינים יותר בדפדפן זה.</p>';
+      }
+    }
+
     document.getElementById('sumBody').innerHTML = html;
   }
 
@@ -2289,6 +2326,77 @@ details.ai>summary:hover{background:var(--light)}
     agendaThreshEl.setAttribute('aria-valuenow', agendaThreshold);
     agendaThreshEl.setAttribute('aria-valuetext', txt + ' נקודות ציון');
     renderAgenda();
+  });
+
+  /* ============================================================
+     העברת הציון הקבוצתי לרשימת התעדוף - שלב 7
+     ------------------------------------------------------------
+     rows נקרא ונכתב ישירות (לעולם לא מועתק למשתנה מקומי לפני
+     שהאישור נלחץ), כדי שהקצאה מחדש של rows במטפל "ניקוי הרשימה"
+     לעולם לא תיצור הפניה מיושנת. שורה קיימת עם אותו שם מוחלפת
+     במקומה; שורה חדשה מתווספת בסוף. עדכון הטבלה, הדירוג המפורש
+     והמטריצה קורה דרך render() הקיים - בלי שורת רינדור חדשה.
+     ============================================================ */
+  function computeTransferPreview(){
+    if(!sessionState) return null;
+    var ballots = sessionState.ballots;
+    if(ballots.length < 3) return null;
+    var cons = consensusRows(sessionState.session, ballots);
+    return cons.map(function(gr){
+      var existingIdx = -1;
+      for(var i=0;i<rows.length;i++){
+        if(rows[i].name === gr.name){ existingIdx = i; break; }
+      }
+      return { groupRow: gr, existingIdx: existingIdx, before: existingIdx >= 0 ? rows[existingIdx].score : null };
+    });
+  }
+
+  function renderTransferPreview(){
+    var preview = computeTransferPreview();
+    var ul = document.getElementById('groupTransferPreview');
+    if(!ul) return;
+    if(!preview){ ul.innerHTML = ''; return; }
+    ul.innerHTML = preview.map(function(p){
+      var after = p.groupRow.score;
+      if(p.existingIdx < 0){
+        return '<li>' + esc(p.groupRow.name) + ' · חדש, אינו קיים ברשימה כיום (' + after.toFixed(2) + ')</li>';
+      }
+      if(Math.abs(p.before - after) < 0.0005){
+        return '<li>' + esc(p.groupRow.name) + ' · ' + after.toFixed(2) + ' (ללא שינוי)</li>';
+      }
+      return '<li>' + esc(p.groupRow.name) + ' · ' + p.before.toFixed(2) + ' &rarr; ' + after.toFixed(2) + '</li>';
+    }).join('');
+  }
+
+  var groupTransferBtn = document.getElementById('groupTransferBtn');
+  var groupTransferConfirm = document.getElementById('groupTransferConfirm');
+  var groupTransferYes = document.getElementById('groupTransferYes');
+  var groupTransferNo = document.getElementById('groupTransferNo');
+
+  if(groupTransferBtn) groupTransferBtn.addEventListener('click', function(){
+    renderTransferPreview();
+    if(groupTransferConfirm) groupTransferConfirm.hidden = false;
+    if(groupTransferNo) groupTransferNo.focus();
+  });
+  if(groupTransferNo) groupTransferNo.addEventListener('click', function(){
+    if(groupTransferConfirm) groupTransferConfirm.hidden = true;
+    if(groupTransferBtn) groupTransferBtn.focus();
+  });
+  if(groupTransferYes) groupTransferYes.addEventListener('click', function(){
+    var preview = computeTransferPreview();
+    if(preview){
+      preview.forEach(function(p){
+        var gr = p.groupRow;
+        var entry = { name: gr.name, impact: gr.impact, volume: gr.volume, change: gr.change, repl: gr.repl, src: 'group' };
+        entry.score = scoreOf(entry);
+        if(p.existingIdx >= 0) rows[p.existingIdx] = entry;
+        else rows.push(entry);
+      });
+      saveRows();
+      render();
+    }
+    if(groupTransferConfirm) groupTransferConfirm.hidden = true;
+    if(groupTransferBtn) groupTransferBtn.focus();
   });
 
   function initSession(){

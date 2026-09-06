@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Portfolio state",
+  "type": "object",
+  "required": [
+    "updated",
+    "tracks"
+  ],
+  "properties": {
+    "updated": {
+      "type": "string",
+      "format": "date"
+    },
+    "tracks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status",
+          "days_idle"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "lead_stakeholder": {
+            "type": "string"
+          },
+          "commitment_level": {
+            "enum": [
+              "עניין",
+              "מחויבות",
+              "ספונסרשיפ",
+              "בעלות",
+              "לא ידוע"
+            ]
+          },
+          "last_change": {
+            "type": "string"
+          },
+          "last_change_date": {
+            "type": "string"
+          },
+          "next_action": {
+            "type": "string"
+          },
+          "next_action_owner": {
+            "type": "string"
+          },
+          "blocker": {
+            "type": "string"
+          },
+          "deadline": {
+            "type": "string"
+          },
+          "days_idle": {
+            "type": "integer"
+          },
+          "anti_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^AP\\d+$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

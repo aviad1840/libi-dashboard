@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-03T06:17:10Z",
+  "text": "I-20260903-02 איחוד האמירויות - רשות פדרלית ל-AI כפופה לקבינט (תקדים השוואתי ל-OQ6)",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20260903-02"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20260903-02"
+        }
+      ]
+    ]
+  }
+}

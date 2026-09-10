@@ -1,0 +1,89 @@
+{
+  "_doc": "חוזה התזמון. מה שלא רשום כאן - health.py לא שומר עליו. עדכן כאן כשמשנים רוטין.",
+  "_grace_misses": "כמה ירי מתוזמן מותר להחמיץ לפני התראה. 2 = החמצה אחת בודדת אינה התראה",
+  "_barren_limit": "כמה דוחות ריקים ברצף עד שזה נחשב דעיכת תפוקה. null = פטור",
+  "_max_minutes": "תקרת זמן ריצה. heartbeat שעבר את זה בלי finish/fail תואם = hung, RED מיידי",
+  "agents": {
+    "gateway": {
+      "cron": [
+        "6 * * * *"
+      ],
+      "grace_misses": 3,
+      "barren_limit": null,
+      "max_minutes": 15,
+      "why": "שכבת ממשק. 0 הודעות היא תוצאה תקינה, לכן פטור מ-barren"
+    },
+    "scout": {
+      "cron": [
+        "30 2 * * 0-4",
+        "0 6 * * 0"
+      ],
+      "grace_misses": 2,
+      "barren_limit": 3,
+      "max_minutes": 30,
+      "why": "מודיעין יומי + סינתזה שבועית"
+    },
+    "chief-of-staff": {
+      "cron": [
+        "15 3 * * 0-4"
+      ],
+      "grace_misses": 2,
+      "barren_limit": 4,
+      "max_minutes": 30,
+      "why": "הבריף היומי"
+    },
+    "radar": {
+      "cron": [
+        "0 4 * * 1,5"
+      ],
+      "grace_misses": 2,
+      "barren_limit": 3,
+      "max_minutes": 30,
+      "why": "הזדמנויות ודדליינים"
+    },
+    "curator": {
+      "cron": [
+        "30 5 * * 4",
+        "18 5 */3 * *"
+      ],
+      "grace_misses": 2,
+      "barren_limit": 4,
+      "max_minutes": 30,
+      "why": "כיול שבועי + לולאת למידה תלת-יומית"
+    },
+    "amplifier": {
+      "cron": [
+        "0 6 * * 3"
+      ],
+      "grace_misses": 2,
+      "barren_limit": null,
+      "max_minutes": 30,
+      "why": "צינור הפרסום. \"אין מועמד שעובר את הסף\" הוא פלט תקין, לכן פטור מ-barren. טרם חובר ריפו דרך ה-UI",
+      "connected": false
+    }
+  },
+  "stale_sources": {
+    "_doc": "מקורות ש-chief-of-staff מציג בבריף. הבדיקה לפי תאריך commit אחרון שנגע בנתיב (git log), לא mtime - checkout טרי מאפס mtime של כל קובץ בלי קשר לגיל האמיתי. מעל max_hours - RED, chief-of-staff חייב לציין זאת במפורש בבריף ולא להציג את המצב כעדכני",
+    "aviad-desk/intel": {
+      "max_hours": 30,
+      "why": "מודיעין יומי, א-ה. 30 שעות מכסה לילה או יום סגור בודד"
+    },
+    "aviad-desk/radar": {
+      "max_hours": 100,
+      "why": "רץ שני וחמישי - עד 4 ימים בין ריצות תקינות"
+    },
+    "aviad-desk/curator": {
+      "max_hours": 100,
+      "why": "לולאת למידה כל 3 ימים"
+    }
+  },
+  "_lane_invoked": {
+    "_doc": "סוכנים שאין להם טריגר בכוונה. הם נקראים בתוך רוטין קיים לפי נתיב סיכון - ראה context/orchestration.md",
+    "auditor": "R2 ומעלה בתוך amplifier או chief-of-staff",
+    "producer": "לפי בקשה מפורשת של אביעד דרך gateway",
+    "advocate": "שלב 3, מושהה",
+    "rival": "שלב 4, מושהה",
+    "relations": "שלב 4, מושהה"
+  },
+  "_connected": "false = הטריגר קיים אך ללא ריפו מחובר (נוצר דרך API). הוא יורה לתוך קונטיינר ריק ולא יכול להפיק כלום. זה מצב תצורה, לא כשל runtime - health.py מדווח NOT CONNECTED ולא סופר אותו כאדום"
+}

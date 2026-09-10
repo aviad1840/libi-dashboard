@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-07T03:23:33Z",
+  "text": "I-20260907-01: GenAI.mil - תקדים אמריקאי למפעל יכולות AI קבוע",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20260907-01"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20260907-01"
+        }
+      ]
+    ]
+  }
+}

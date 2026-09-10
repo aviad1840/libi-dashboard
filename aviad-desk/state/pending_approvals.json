@@ -1,0 +1,16 @@
+{
+  "_doc": "בקשות לפעולה חיצונית שממתינות לאישור מפורש דרך טלגרם. gateway בלבד כותב לכאן.",
+  "_rules": {
+    "allowed_actions": ["send_email_digest", "override_l2_budget", "accept_curator_patch"],
+    "note": "כל action אחר לא נתמך ולא מבוצע, גם אם אושר בטעות - ראה GATEWAY.md"
+  },
+  "items": [
+    {
+      "id": "curator-patch-2026W37",
+      "action": "accept_curator_patch",
+      "patch_ref": "aviad-desk/curator/patches/2026W37.md",
+      "requested_at": "2026-09-10T06:08:00Z",
+      "status": "pending"
+    }
+  ]
+}

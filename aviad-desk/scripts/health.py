@@ -266,6 +266,11 @@ def check_missed(runs, expected, now):
         since = last or horizon
         if since < horizon:
             since = horizon
+        # לוח זמנים חדש לא נמדד על ירי שקדם לו. בלי זה סוכן שקיבל cron היום נראה
+        # כאילו החמיץ שבועיים, והשומר צועק על משהו שעוד לא הייתה לו הזדמנות לקרות
+        effective = parse_ts(cfg.get("effective_from"))
+        if effective and effective > since:
+            since = effective
         missed = fires_between(crons, since, now)
         if missed >= grace:
             age = "מעולם לא רץ" if not last else f"אחרון: {last:%d.%m %H:%M}Z"

@@ -21,7 +21,9 @@ bash aviad-desk/scripts/desk.sh start scout
 
 **זו ריצת קריאת קבצים בלבד. אל תפעיל WebSearch או WebFetch.**
 
-## שלב 4 - סגירה
+## שלב 4 - סגירה. **הרץ אותה רק אחרי שלב 5**
+
+**התיוק לתור היוצא קורה לפני `finish`, לא אחריו.** `finish` מתחייב על מה שבתור ודוחף. הודעה שתויקה אחרי `finish` נשארת בקונטיינר שנמחק בסוף הריצה - כך אבד הבריף של 8.9.
 
 ```bash
 bash aviad-desk/scripts/desk.sh finish scout --items N --l0 0 --l1 0 --l2 0 --note "סינתזה שבועית"
@@ -29,3 +31,23 @@ bash aviad-desk/scripts/desk.sh finish scout --items N --l0 0 --l1 0 --l2 0 --no
 
 ## שלב 5 - הודעת סיכום
 עד 5 שורות: הדפוס, השאלה הפתוחה שהתקדמה, וההמלצה. משפט אחד לכל אחד.
+
+```bash
+python3 aviad-desk/scripts/outbox_put.py scout "<הסיכום>"
+```
+
+## שלב 6 - מסלול הפרסום (amplifier). **חובה, אחרי ש-`finish scout` הצליח**
+
+לטריגר העצמאי של amplifier אין ריפו מחובר, ולכן הוא מעולם לא הפיק טיוטה אחת. הוא רץ מכאן,
+בסשן שכן עובד - מיד אחרי שהסינתזה של השבוע נכתבה, כך שהדפוס שזיהית זמין לו כמועמד.
+
+```bash
+bash aviad-desk/scripts/desk.sh start amplifier
+```
+
+ואז בצע את `aviad-desk/routines/amplifier.md` **משלב 2 עד שלב 7, במדויק** - כולל
+`desk.sh finish amplifier` גם כש"אין מועמד שעובר את הסף". זה עובד נפרד עם namespace משלו:
+**אל תכתוב ל-`amplify/` בשם scout, ואל תחזור לשלב 3 של scout.** גם כאן - בלי גלישה.
+
+כשל במסלול הזה לא מבטל את הסינתזה, שכבר נדחפה:
+`bash aviad-desk/scripts/desk.sh fail amplifier --reason "..."` - וסיים.

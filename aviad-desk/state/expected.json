@@ -53,13 +53,13 @@
     },
     "amplifier": {
       "cron": [
-        "0 6 * * 3"
+        "0 6 * * 0",
+        "15 3 * * 3"
       ],
       "grace_misses": 2,
       "barren_limit": null,
       "max_minutes": 30,
-      "why": "צינור הפרסום. \"אין מועמד שעובר את הסף\" הוא פלט תקין, לכן פטור מ-barren. טרם חובר ריפו דרך ה-UI",
-      "connected": false
+      "why": "צינור הפרסום. רץ כמסלול בתוך scout-weekly (ראשון) ו-chief-of-staff (רביעי) - לטריגר העצמאי אין ריפו. \"אין מועמד שעובר את הסף\" הוא פלט תקין, לכן פטור מ-barren"
     }
   },
   "stale_sources": {

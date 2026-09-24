@@ -58,7 +58,9 @@ python3 aviad-desk/scripts/health.py
      **מעל 21 יום - המלץ במפורש להקפיא, לא "לעקוב" (AP5).**
 5. העבר קובץ inbox מעובד ל-`inbox/processed/`. לא מובן - ל-`inbox/unclear/` עם שורת נימוק. **אל תשאל שאלות.**
 
-## שלב 4 - סגירה
+## שלב 4 - סגירה. **הרץ אותה רק אחרי שלבים 5 ו-5.5**
+
+**התיוק לתור היוצא קורה לפני `finish`, לא אחריו.** `finish` מתחייב על מה שבתור ודוחף. הודעה שתויקה אחרי `finish` נשארת בקונטיינר שנמחק בסוף הריצה - כך אבד הבריף של 8.9.
 
 ```bash
 bash aviad-desk/scripts/desk.sh finish chief-of-staff --items N --note "שורה אחת"
@@ -126,3 +128,20 @@ python3 aviad-desk/scripts/outbox_put.py chief-of-staff "<הבריף המלא>" 
 
 **אין לך טוקן ואתה לא צריך אחד.** `outbox_put.py` רק מתייק קובץ. אם ל-gateway אין טוקן
 בירייה שלו, ההודעה נשארת בתור ותישלח כשיהיה - שום דבר לא הולך לאיבוד.
+
+## שלב 6 - מסלול הפרסום (amplifier). **ביום רביעי בלבד**
+
+```bash
+[ "$(date -u +%u)" = "3" ] && echo "רביעי - הרץ את מסלול הפרסום" || echo "לא רביעי - סיימת"
+```
+
+לא רביעי - סיימת. רביעי - אחרי ש-`finish chief-of-staff` (שלב 4) הצליח:
+
+```bash
+bash aviad-desk/scripts/desk.sh start amplifier
+```
+
+ואז בצע את `aviad-desk/routines/amplifier.md` **משלב 2 עד שלב 7, במדויק** - כולל
+`desk.sh finish amplifier` גם כש"אין מועמד שעובר את הסף". לטריגר העצמאי של amplifier
+אין ריפו מחובר, ולכן הוא רץ מכאן. **זה עובד נפרד עם namespace משלו** - אל תכתוב ל-`amplify/`
+בשם chief-of-staff. כשל כאן לא מבטל את הבריף, שכבר נשלח: `desk.sh fail amplifier --reason "..."`.

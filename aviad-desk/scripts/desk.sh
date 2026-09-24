@@ -111,6 +111,33 @@ resolve_sys_ref() {
   return 1
 }
 
+# הודעות שסוכן קודם באותו סשן תייק ל-outbox אחרי ה-finish שלו. בלי זה start של הסוכן הבא
+# נעצר על "שינויים לא שמורים", וגם כשאין סוכן הבא - ההודעה נשארת בקונטיינר ונמחקת איתו.
+# כך אבד הבריף של 8.9. רק קבצים חדשים ישירות תחת outbox/ בשם של outbox_put.py -
+# כל שינוי אחר נשאר לבדיקת הבטיחות, שתעצור כמו תמיד.
+flush_pending_outbox() {
+  [ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" = "$LOG_BRANCH" ] || return 0
+  local dirty; dirty="$(git status --porcelain -uall -- . ':(exclude)aviad-desk/scripts' 2>/dev/null)"
+  [ -z "$dirty" ] && return 0
+  if printf '%s\n' "$dirty" | grep -qvE '^\?\? aviad-desk/outbox/[a-z-]+-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{4}\.json$'; then
+    return 0
+  fi
+  local files owners
+  files="$(printf '%s\n' "$dirty" | cut -c4-)"
+  owners="$(printf '%s\n' "$files" | sed -E 's#.*/([a-z-]+)-[0-9]{8}T.*#\1#' | sort -u | tr '\n' ' ')"
+  # shellcheck disable=SC2086
+  git add -- $files 2>/dev/null && git commit -q -m "${owners% }: outbox - הודעות שתויקו אחרי finish" 2>/dev/null || return 0
+  local attempt=0 delay=2
+  until git push -u origin "$LOG_BRANCH" --quiet 2>/dev/null; do
+    attempt=$((attempt+1))
+    if [ "$attempt" -ge 4 ]; then info "אזהרה: דחיפת הודעות ממתינות נכשלה"; return 0; fi
+    git fetch origin "$LOG_BRANCH" --quiet 2>/dev/null
+    git rebase "origin/$LOG_BRANCH" --quiet 2>/dev/null || git rebase --abort 2>/dev/null
+    sleep "$delay"; delay=$((delay*2))
+  done
+  info "נדחפו הודעות שהמתינו בתור: $owners"
+}
+
 # ----------------------------------------------------------------------- start
 cmd_start() {
   local agent="$1"
@@ -123,6 +150,8 @@ cmd_start() {
   done
 
   local sys; sys="$(resolve_sys_ref)" || die "aviad-desk לא נמצא באף ענף מערכת. בדוק ש-$MARKER קיים"
+
+  flush_pending_outbox
 
   # בטיחות: אל תדרוס עבודה מקומית שאינה של הסקריפט עצמו
   if [ -n "$(git status --porcelain -- . ':(exclude)aviad-desk/scripts' 2>/dev/null)" ] && [ "${DESK_FORCE:-0}" != "1" ]; then

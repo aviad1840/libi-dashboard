@@ -108,6 +108,12 @@ check("connected=false הוא YELLOW NOT CONNECTED, לא כשל runtime",
       [(x["level"], x["check"]) for x in res], [("YELLOW", "not_connected")])
 res = h.check_missed([], {"scout": {"cron": ["30 2 * * 0-4"], "grace_misses": 2}}, NOW)
 check("סוכן מחובר שלא הותיר רשומה הוא RED", [x["level"] for x in res], ["RED"])
+res = h.check_missed([], {"amplifier": {"cron": ["15 3 * * 3"], "grace_misses": 2,
+                                        "effective_from": "2026-09-03T00:00:00+00:00"}}, NOW)
+check("cron חדש לא נמדד על ירי שקדם ל-effective_from", [x["level"] for x in res], [])
+res = h.check_missed([], {"amplifier": {"cron": ["15 3 * * *"], "grace_misses": 2,
+                                        "effective_from": "2026-09-01T00:00:00+00:00"}}, NOW)
+check("אחרי effective_from - החמצה אמיתית עדיין RED", [x["level"] for x in res], ["RED"])
 
 print("\nalert_if_new - התראה רק במעבר, לא תזכורת מחזורית")
 import io as _io

@@ -208,7 +208,7 @@ producer עצמו מפעיל Auditor (חובה) ולעיתים Amplifier (רק �
 (`context/README.md`, `CLAUDE.md`). **gateway לא כותב לשם, גם על אישור.** לכן `accept_curator_patch`
 עובד בשני צעדים על פני שתי ריצות שונות:
 
-1. **גילוי (gateway, כל שעה):** קיים `curator/patches/{WEEK}.md` בלי רשומה תואמת ב-`pending_approvals.json`
+1. **גילוי (gateway, כל שעתיים):** קיים `curator/patches/{WEEK}.md` בלי רשומה תואמת ב-`pending_approvals.json`
    (ראה `routines/gateway.md` שלב 3.5) → gateway כותב רשומה `status: "pending"` ושולח כפתור.
    אישור → gateway כותב `status: "approved"` (**רק את זה** - לא נוגע ב-`context/`/`state/tempo.json`).
 2. **החלה (curator, בריצה השבועית הבאה):** `routines/curator-weekly.md` בודק אם יש רשומת

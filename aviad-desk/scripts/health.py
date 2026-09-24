@@ -33,6 +33,7 @@
 """
 import json
 import os
+import re
 import subprocess
 import sys
 import datetime as dt
@@ -58,7 +59,7 @@ HEARTBEAT_DIR = os.path.join(ROOT, "state", "heartbeat")
 #   status=failed   - cmd_fail, כשל מוצהר עם reason
 #   failures > 0    - הסוכן דיווח --failures N
 # ההערה נשמרת ברשומה כלשונה ומוצגת בהתראה, לצורכי audit בלבד.
-STUCK_HOURS = 3          # הודעה בתור מעבר לזה = gateway לא מנקז
+STUCK_HOURS = 3          # גיבוי בלבד, כשאין cron ל-gateway ב-expected.json
 MISSED_LOOKBACK_DAYS = 14
 
 
@@ -444,20 +445,36 @@ def check_stale_sources(now):
     return out
 
 
-def check_stuck(now):
-    """הודעה שתקועה בתור. אם gateway לא מנקז, אביעד לא יודע כלום."""
+def _queued_at(name, path):
+    """זמן התיוק מתוך שם הקובץ (outbox_put.py כותב אותו), לא mtime.
+    checkout טרי מאפס mtime לרגע ה-checkout - בקונטיינר של רוטין כל הודעה נראית בת דקה."""
+    m = re.search(r"-(\d{8}T\d{6}Z)-", name)
+    if m:
+        return dt.datetime.strptime(m.group(1), "%Y%m%dT%H%M%SZ").replace(tzinfo=dt.timezone.utc)
+    return dt.datetime.fromtimestamp(os.path.getmtime(path), dt.timezone.utc)
+
+
+def check_stuck(now, expected=None):
+    """הודעה שתקועה בתור. אם gateway לא מנקז, אביעד לא יודע כלום.
+
+    תקוע = עברו שני ירי מתוזמנים של gateway מאז התיוק, וההודעה עדיין כאן. לא סף שעות
+    קבוע: ב-gateway כל שעתיים עם הפסקת לילה של שמונה שעות, "3 שעות" היה RED כוזב כל בוקר.
+    """
     out = []
     if not os.path.isdir(OUTBOX):
         return out
+    crons = ((expected or {}).get("gateway") or {}).get("cron") or []
     for name in sorted(os.listdir(OUTBOX)):
         path = os.path.join(OUTBOX, name)
         if not os.path.isfile(path) or not name.endswith(".json"):
             continue
-        age_h = (now.timestamp() - os.path.getmtime(path)) / 3600.0
-        if age_h >= STUCK_HOURS:
+        queued = _queued_at(name, path)
+        age_h = (now - queued).total_seconds() / 3600.0
+        stuck = fires_between(crons, queued, now) >= 2 if crons else age_h >= STUCK_HOURS
+        if stuck:
             out.append({
                 "level": "RED", "check": "stuck", "agent": name.split("-")[0],
-                "detail": f"הודעה תקועה בתור {age_h:.0f} שעות: {name}",
+                "detail": f"הודעה תקועה בתור {age_h:.0f} שעות, שני ירי gateway עברו בלי לשלוח: {name}",
             })
     return out
 
@@ -473,7 +490,7 @@ def build(now=None):
         + check_failures(runs, expected, now)
         + check_barren(runs, expected)
         + check_stale_sources(now)
-        + check_stuck(now)
+        + check_stuck(now, expected)
     )
     red = [f for f in findings if f["level"] == "RED"]
     yellow = [f for f in findings if f["level"] == "YELLOW"]

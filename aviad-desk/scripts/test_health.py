@@ -15,6 +15,7 @@ import importlib.util
 import os
 import sys
 import datetime as dt
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 spec = importlib.util.spec_from_file_location("health", os.path.join(HERE, "health.py"))
@@ -114,6 +115,23 @@ check("cron חדש לא נמדד על ירי שקדם ל-effective_from", [x["le
 res = h.check_missed([], {"amplifier": {"cron": ["15 3 * * *"], "grace_misses": 2,
                                         "effective_from": "2026-09-01T00:00:00+00:00"}}, NOW)
 check("אחרי effective_from - החמצה אמיתית עדיין RED", [x["level"] for x in res], ["RED"])
+
+print("\ncheck_stuck - לפי ירי gateway שעבר, לא לפי שעות או mtime")
+_tmp = tempfile.mkdtemp()
+_orig_outbox = h.OUTBOX
+h.OUTBOX = _tmp
+EXP2 = {"gateway": {"cron": ["36 3-19/2 * * *"]}}
+try:
+    # 19:40Z, והלילה עבר בלי ירי עד 03:36Z. עכשיו 03:50 - ירי אחד בלבד עבר מאז
+    open(os.path.join(_tmp, "gateway-20260903T194000Z-aaaa.json"), "w").write("{}")
+    night = dt.datetime(2026, 9, 4, 3, 50, tzinfo=dt.timezone.utc)
+    check("הפסקת לילה של 8 שעות אינה תקיעה (ירי אחד עבר)", [x["level"] for x in h.check_stuck(night, EXP2)], [])
+    later = dt.datetime(2026, 9, 4, 5, 50, tzinfo=dt.timezone.utc)
+    check("שני ירי gateway עברו וההודעה עדיין בתור - RED", [x["level"] for x in h.check_stuck(later, EXP2)], ["RED"])
+    # mtime טרי (checkout) לא מסתיר הודעה ישנה - הגיל נלקח משם הקובץ
+    check("mtime טרי לא מסתיר תקיעה - הגיל משם הקובץ", "10 שעות" in h.check_stuck(later, EXP2)[0]["detail"], True)
+finally:
+    h.OUTBOX = _orig_outbox
 
 print("\nalert_if_new - התראה רק במעבר, לא תזכורת מחזורית")
 import io as _io

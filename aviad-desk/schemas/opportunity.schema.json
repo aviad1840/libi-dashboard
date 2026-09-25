@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Opportunity",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "type",
+    "deadline",
+    "relevance",
+    "novelty",
+    "actionability",
+    "confidence",
+    "status",
+    "source_url",
+    "evidence_level"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^op-\\d{4}-\\d{3}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "תחרות",
+        "קול קורא",
+        "RFI",
+        "מכרז",
+        "כנס",
+        "הרצאה",
+        "מלגה",
+        "מינוי",
+        "משרה"
+      ]
+    },
+    "owner_org": {
+      "type": "string"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date"
+    },
+    "days_left": {
+      "type": "integer"
+    },
+    "relevance": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "why_relevant": {
+      "type": "string"
+    },
+    "novelty": {
+      "enum": [
+        "new",
+        "material-change"
+      ],
+      "description": "חובה. הזדמנות שאינה חדשה ואין בה שינוי מהותי - לא נכנסת (זהה לכלל ב-intel-item)"
+    },
+    "actionability": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "description": "חובה. עד כמה ניתן לפעול על זה עכשיו"
+    },
+    "confidence": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "description": "חובה. ביטחון הסוכן בשיפוט הרלוונטיות/actionability"
+    },
+    "effort_estimate": {
+      "enum": [
+        "נמוך",
+        "בינוני",
+        "גבוה"
+      ]
+    },
+    "advances": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "OQ/C/P שזה מקדם"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "חדש",
+        "בבדיקה",
+        "הוחלט להגיש",
+        "נדחה",
+        "הוגש"
+      ]
+    },
+    "evidence_level": {
+      "enum": [
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "E6"
+      ],
+      "description": "חובה. עד כמה המועד והתנאים מאומתים. קול קורא רשמי הוא E3, שמועה היא E1"
+    }
+  }
+}

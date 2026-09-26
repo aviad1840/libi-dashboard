@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-03T06:17:06Z",
+  "text": "I-20260903-01 McKinsey - מפעל יכולות מגיע לייצור פי 2.3 יותר מקולות קוראים (עוגן כמותי ל-C5)",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20260903-01"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20260903-01"
+        }
+      ]
+    ]
+  }
+}

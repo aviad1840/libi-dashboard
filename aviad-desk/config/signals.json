@@ -1,0 +1,110 @@
+{
+  "_doc": "מקורות האות החי של scout. נקרא על ידי scripts/signal_digest.py בכל ריצה יומית. קריאה בלבד - ערוצי טלגרם ציבוריים דרך t.me/s ו-RSS/Atom, בלי טוקן ובלי התחברות. max: תקרת פריטים למקור (ברירת מחדל 6). filter: null = כל פוסט, ai = רק פוסטים על AI, gov = רק ממשל/מדיניות, ai_gov = שניהם יחד. מקור שלא הניב ממצא מועיל בארבעה שבועות - curator מוריד אותו. כל המקורות אומתו חיים ב-24.09.2026",
+  "sources": [
+    {
+      "id": "avidani",
+      "type": "telegram",
+      "handle": "hackit770",
+      "label": "יובל אבידני",
+      "kind": "מוביל דעה, ישראל",
+      "filter": null
+    },
+    {
+      "id": "geektime",
+      "type": "telegram",
+      "handle": "geektimecoil",
+      "label": "גיקטיים",
+      "kind": "עיתונות טק, ישראל",
+      "filter": "ai"
+    },
+    {
+      "id": "calcalist",
+      "type": "telegram",
+      "handle": "calcalist",
+      "label": "כלכליסט",
+      "kind": "עיתונות כלכלית, ישראל",
+      "filter": "ai"
+    },
+    {
+      "id": "technews_il",
+      "type": "telegram",
+      "handle": "tech_news_israel",
+      "label": "חדשות טכנולוגיה ישראל",
+      "kind": "אגרגטור, ישראל",
+      "filter": "ai"
+    },
+    {
+      "id": "aipost",
+      "type": "telegram",
+      "handle": "aipost",
+      "label": "AI Post",
+      "kind": "חדשות AI מהירות, עולמי",
+      "filter": null,
+      "max": 4
+    },
+    {
+      "id": "transformer",
+      "type": "rss",
+      "url": "https://www.transformernews.ai/feed",
+      "label": "Transformer",
+      "kind": "מדיניות AI, עולמי",
+      "filter": null
+    },
+    {
+      "id": "importai",
+      "type": "rss",
+      "url": "https://jack-clark.net/feed/",
+      "label": "Import AI - Jack Clark",
+      "kind": "מוביל דעה, עולמי",
+      "filter": null
+    },
+    {
+      "id": "mollick",
+      "type": "rss",
+      "url": "https://www.oneusefulthing.org/feed",
+      "label": "Ethan Mollick",
+      "kind": "מוביל דעה, עולמי",
+      "filter": null
+    },
+    {
+      "id": "govuk_ai",
+      "type": "rss",
+      "url": "https://www.gov.uk/search/news-and-communications.atom?keywords=artificial+intelligence",
+      "label": "UK Government - AI",
+      "kind": "ממשלתי רשמי, בריטניה",
+      "filter": "ai"
+    },
+    {
+      "id": "eu_digital",
+      "type": "rss",
+      "url": "https://digital-strategy.ec.europa.eu/en/rss.xml",
+      "label": "EU Digital Strategy",
+      "kind": "ממשלתי רשמי, האיחוד האירופי",
+      "filter": "ai"
+    },
+    {
+      "id": "fedscoop",
+      "type": "rss",
+      "url": "https://fedscoop.com/category/ai/feed/",
+      "label": "FedScoop AI",
+      "kind": "ממשל פדרלי, ארה\"ב",
+      "filter": null
+    },
+    {
+      "id": "aws_public",
+      "type": "rss",
+      "url": "https://aws.amazon.com/blogs/publicsector/feed/",
+      "label": "AWS Public Sector",
+      "kind": "ספק ענן, מגזר ציבורי",
+      "filter": "ai"
+    },
+    {
+      "id": "openai",
+      "type": "rss",
+      "url": "https://openai.com/news/rss.xml",
+      "label": "OpenAI News",
+      "kind": "מעבדה, מקור ראשון",
+      "filter": "gov"
+    }
+  ]
+}

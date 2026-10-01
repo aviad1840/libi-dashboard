@@ -1,0 +1,39 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-01T03:16:58Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n⚠️ מערכת: radar לא עודכן 143 שעות, curator 501 שעות, chief-of-staff החמיץ 3 ירי (אין בריף ל-29-30.9).\n\n1. 🔴 דורש ממני היום\nדדליין 30.9 (תוצר 4255, צוות 11) חלף אתמול. תברר מול אשר דולב אם התוצר נמסר. לא נמצאה ראיה להגשה.\n\n2. 🟠 השתנה מאז אתמול\nהמועד הקריטי עבר. אין ראיה ישראלית חדשה על צוות 11.\n\n3. 🟢 ממצאים חדשים\n- America.gov (C8, E2): לשקול פוסט עד 3.10 - דלת קדמית מול מיצוי פרואקטיבי.\n- ICE RFI למפעל סוכני (C5, E2): לידיעה, ניסוח הפרדת יצירה/בקרה/אישור לשיחת בקרה.\n\n4. 👥 אנשים/קשרים\nאין.\n\n5. 📅 דדליינים / התחייבויות\nאין דדליין עתידי ב-30 יום. radar stale (25.09) - הרשימה הריקה אינה בדיקה של היום.\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nאין מועמד היום.\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: 2 ממצאים. Radar: לא עודכן 143 שעות.\n\nתקוע: T7 (NIIA) ו-T13 (תחרות) 33 יום - המלצה להקפיא אחרי בירור אחד 'הוגש/לא'. T2 21 יום.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        }
+      ],
+      [
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        },
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        }
+      ],
+      [
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

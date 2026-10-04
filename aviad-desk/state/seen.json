@@ -150,6 +150,22 @@
       "title": "ICE מחפשת מפעל תוכנה סוכני - RFI עד 16.10",
       "agent": "scout",
       "tier": "L1"
+    },
+    {
+      "event_id": "251b1ef34c13",
+      "date": "2026-10-04",
+      "item": "I-20261004-01",
+      "title": "GSA - סעיף רכש AI, חובת הודעה תוך 7 ימים על החמרת הטיה",
+      "agent": "scout",
+      "tier": "L1"
+    },
+    {
+      "event_id": "5400c383d0ed",
+      "date": "2026-10-04",
+      "item": "I-20261004-02",
+      "title": "Anthropic - Claude for Government זמין לכלל הסוכנויות, FedRAMP High",
+      "agent": "scout",
+      "tier": "L1"
     }
   ]
 }

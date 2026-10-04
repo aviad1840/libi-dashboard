@@ -1,0 +1,39 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-04T03:16:23Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nהכרע: להקפיא את T2 (צוות 11), T7 (NIIA) ו-T13 (תחרות) או לברר פעם אחת הוגש/לא הוגש. כל הדדליינים חלפו, 24-36 יום בלי תנועה.\n\n2. 🟠 השתנה מאז אתמול\nscout: 2 פריטים חדשים (GSA, Claude for Government). אין ראיה ישראלית חדשה על צוות 11.\n\n3. 🟢 ממצאים חדשים\n- GSA סעיף AI (I-20261004-01): לפתוח את נוסח הסטייה ולשמור את סעיף 7 הימים כדוגמה לחוזה מול ספקי ענן. E2, מקור עיתונאי.\n- Claude for Government (I-20261004-02): לידיעה בלבד, הכרזת ספק.\n\n4. 👥 אנשים/קשרים שדורשים תשומת לב\nאין\n\n5. 📅 דדליינים / התחייבויות\nכל ארבעת המועדים ב-calendar.md חלפו (אחרון 30.09, לא נמצאה ראיה שהוגש). אין דדליין פתוח מתחת ל-14 יום. הלוח עודכן לאחרונה 28.08.\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nאין מועמד היום\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: 2 ממצאים. Radar: אין חדש (2.10). בריאות: amplifier ללא רשומה ב-2 ירי.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        }
+      ],
+      [
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        },
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        }
+      ],
+      [
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

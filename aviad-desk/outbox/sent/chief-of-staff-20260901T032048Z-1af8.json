@@ -1,0 +1,39 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-01T03:20:48Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nאין\n\n2. 🟠 השתנה מאז אתמול\nScout הוסיף ממצא חדש אחד (GovTech סינגפור, OQ1) ופסל בעצמו דגל חשוד - ציטוט שיוחס למבקר המדינה עם תאריך בלתי אפשרי. Radar רק רענן ימים שנותרו לתחרות החדשנות (17) - בלי הזדמנות חדשה.\n\n3. 🟢 ממצאים חדשים - המלצת פעולה\nשקול לצטט את מודל הרישום המרכזי של GovTech סינגפור (AI Assistant Desk) כעוגן השוואתי בינלאומי ל-OQ1 בתוצר צוותי 4255 (דדליין 30.9) - מקור משני בלבד, אל תצטט מספרים או שם פלטפורמה בלי אימות עצמאי.\n\n4. 👥 אנשים/קשרים שדורשים תשומת לב\nאין\n\n5. 📅 דדליינים / התחייבויות\n3.9 (בעוד יומיים) - הגשת NIIA, סל אישי/מגמלה לצמיחה, מוכן. 6.9 (בעוד 5 ימים) - ישיבת צוות 11, סטטוס: הערות במייל לנועה לפני - לא ראיה שבוצע.\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nאין מועמד היום\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: ממצא חדש 1 (Singapore, OQ1), פסל דגל רוטנברג. Radar: אין חדש, רענון ימים בלבד. Gateway: פעיל ברקע, אין הודעות/פידבק חדשות. Curator ו-Advocate: לא רצו ב-24 השעות האחרונות.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        }
+      ],
+      [
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        },
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        }
+      ],
+      [
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

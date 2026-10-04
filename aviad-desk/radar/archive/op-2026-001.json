@@ -1,0 +1,24 @@
+{
+  "opportunities": [
+    {
+      "id": "op-2026-001",
+      "title": "תחרות החדשנות הממשלתית 2026",
+      "type": "תחרות",
+      "owner_org": "נציבות שירות המדינה ומשרד החדשנות, המדע והטכנולוגיה",
+      "deadline": "2026-09-17",
+      "days_left": 0,
+      "relevance": "high",
+      "why_relevant": "שלוש הגשות מתוכננות: מיצוי זכויות פרואקטיבי, מנוע AI לתביעות סיעוד, עכשיו אני/סל אישי - כבר תועד ב-context/calendar.md ו-context/portfolio.md",
+      "novelty": "material-change",
+      "actionability": "low",
+      "confidence": "medium",
+      "effort_estimate": "גבוה",
+      "advances": ["OQ8"],
+      "source_url": "https://govextra.gov.il/civil-service-commission/innovation-award/home/",
+      "status": "בבדיקה",
+      "evidence_level": "E3",
+      "archived_reason": "דדליין 17.9.2026 עבר (ריצה בתאריך 25.9.2026) בלי עדכון סטטוס הגשה ב-calendar.md - לא ידוע אם הוגש. עמוד המקור נבדק מחדש ב-25.9.2026 - נטען כ-JS ריק בלי תוכן טקסטואלי (מקור חסום, לא הודאת סטטוס). לא נמצא אישור או הכחשה של מועד מוארך בחיפוש רשת.",
+      "archived_date": "2026-09-25"
+    }
+  ]
+}

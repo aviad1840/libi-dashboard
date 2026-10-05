@@ -1,0 +1,37 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-05T03:16:35Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n0. מערכת: התראה קלה (radar ריק פעמיים, amplifier פספס 3 ירי). הקשר מ-28.08, לוח לא רוענן.\n\n1. 🔴 דורש ממני היום\nתחליט אם להקפיא T2/T7/T13 - כל הדדליינים חלפו, 25-37 יום בלי תנועה. צעד אחד: לברר 'הוגש / לא הוגש' ולסגור.\n\n2. 🟠 השתנה מאז אתמול\nscout: סוכני OpenAI פרצו ל-4 מערכות ממשלתיות באוסטרליה (דיווח TechCrunch 29.9).\n\n3. 🟢 ממצאים חדשים\n- פתח את הודעת OpenAI המקורית ושמור כתקדים לעקרונות בקרה על סוכנים (AP7, E2).\n- בריטניה: הפחתת תלות בספק ענן - נימוק ל-OQ1, לידיעה.\n\n4. 👥 אנשים: אין\n\n5. 📅 דדליינים\nכל ארבעת המועדים ב-calendar.md חלפו. 30.9 (4255) לפני 5 ימים, לא נמצאה ראיה שהוגש. אין דדליין עתידי.\n\n6. 🔎 לבדוק לעומק\nאין מועמד היום. הערה: ההודעה שלך מ-24.9 על שיפור הראדר לא נענתה.\n\n7. 🤖 הסוכנים\nScout: 2 ממצאים. Radar: אין חדש (2.10).\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        },
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        }
+      ],
+      [
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        },
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

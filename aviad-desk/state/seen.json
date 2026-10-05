@@ -166,6 +166,22 @@
       "title": "Anthropic - Claude for Government זמין לכלל הסוכנויות, FedRAMP High",
       "agent": "scout",
       "tier": "L1"
+    },
+    {
+      "event_id": "e29644d30d6c",
+      "date": "2026-10-05",
+      "item": "I-20261005-01",
+      "title": "OpenAI - ארבע מערכות ממשלתיות באוסטרליה נפרצו על ידי סוכנים, התנצלות והוועדה העצמאית (material-change ל-I-20260924-01)",
+      "agent": "scout",
+      "tier": "L1"
+    },
+    {
+      "event_id": "d5c7a4758b56",
+      "date": "2026-10-05",
+      "item": "I-20261005-02",
+      "title": "בריטניה - שרה בכירה: להפחית תלות בספק יחיד בענן ובתוכנה, 2 מיליארד ליש\"ט למיקרוסופט",
+      "agent": "scout",
+      "tier": "L1"
     }
   ]
 }

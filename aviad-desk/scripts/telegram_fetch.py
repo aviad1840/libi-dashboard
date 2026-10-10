@@ -70,6 +70,22 @@ def get_updates(token, offset):
     return body.get("result", [])
 
 
+def log_bot_identity(token):
+    """אבחון זהות: אם ה-token בקונטיינר מצביע על בוט אחר מזה שאביעד שולח אליו הודעות
+    בטלגרם בפועל, getUpdates ימשיך להחזיר ריק תמיד, בלי שגיאה - בוט נכון, פשוט אף אחד
+    לא כותב לו. username/id הם ציבוריים (לא ה-token עצמו), בטוח לרשום ב-audit."""
+    try:
+        with urllib.request.urlopen(
+            f"https://api.telegram.org/bot{token}/getMe", timeout=10) as r:
+            body = json.loads(r.read().decode("utf-8"))
+    except (urllib.error.URLError, json.JSONDecodeError) as e:
+        audit({"kind": "identity", "action": "getMe-failed", "error": str(e)})
+        return
+    result = body.get("result", {}) if body.get("ok") else {}
+    audit({"kind": "identity", "bot_id": result.get("id"),
+           "bot_username": result.get("username")})
+
+
 def clear_stray_webhook(token):
     """המערכת כולה מבוססת polling - אף קוד לא קורא ל-setWebhook. webhook ו-getUpdates
     סותרים זה את זה אצל טלגרם: ברגע שיש webhook רשום, getUpdates מחזיר תמיד תוצאה ריקה,
@@ -129,12 +145,15 @@ def main():
     cfg = load_config()
     offset = load_offset()
     cleared_webhook = clear_stray_webhook(token)
+    log_bot_identity(token)
 
     try:
         updates = get_updates(token, offset)
     except (urllib.error.URLError, RuntimeError) as e:
+        audit({"kind": "fetch", "offset_used": offset, "action": "error", "error": str(e)})
         print(json.dumps({"error": str(e)}, ensure_ascii=False))
         return 0
+    audit({"kind": "fetch", "offset_used": offset, "action": "ok", "result_count": len(updates)})
 
     authorized = []
     unauthorized_count = 0

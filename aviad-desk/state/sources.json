@@ -1,0 +1,14 @@
+{
+  "_doc": "ROI למקור. curator מתחזק.",
+  "_rules": {
+    "min_sample": 20,
+    "note": "אסור להסיר או להוריד Tier למקור מתחת ל-20 פריטים ממנו. עד אז - דירוג בלבד. זו הייתה תקלה בגרסה הקודמת: החלטה על מדגם של 9 פריטים היא רעש",
+    "window_days": 56,
+    "decay": "פריטים מעל 56 יום במשקל חצי",
+    "score": "(useful*1 + novel*2 + decision_impact*4) / runs_touched",
+    "demote_below": 0.15,
+    "promote_above": 1.0,
+    "require_consecutive_windows": 2
+  },
+  "sources": {}
+}

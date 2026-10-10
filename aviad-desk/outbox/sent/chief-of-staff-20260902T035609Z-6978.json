@@ -1,0 +1,39 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-02T03:56:09Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nאין\n\n2. 🟠 השתנה מאז אתמול\ngateway שקט כ-23 שעות (מאז 01.09 05:11Z, 22 יריות מתוזמנות ללא רשומה) - כולל ההודעה הזו,\nשתישלח רק כשהוא יחזור לרוץ. שום ממצא עסקי חדש לא נכנס מאז הריצה הקודמת.\n\n3. 🟢 ממצאים חדשים - המלצת פעולה, לא רשימת פעילות\nאין מועמד שעבר את הסף\n\n4. 👥 אנשים/קשרים שדורשים תשומת לב\nאין\n\n5. 📅 דדליינים / התחייבויות\nהגשת NIIA (סל אישי/מגמלה לצמיחה) - מחר, 3.9, מוכן | ישיבת צוות 11 - 6.9, בעוד 4 ימים\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nאין מועמד היום\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: אין ריצה ב-24 שעות (אחרונה 01.09). Radar: אין ריצה ב-24 שעות (אחרונה 31.08).\nGateway: 2 ריצות ואז שקט מ-05:11Z. Chief-of-staff: הריצה הזו, דוח ללא ממצא חדש.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        }
+      ],
+      [
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        },
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        }
+      ],
+      [
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

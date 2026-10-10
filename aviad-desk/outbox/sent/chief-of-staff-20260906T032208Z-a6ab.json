@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-06T03:22:08Z",
+  "text": "I-20260906-01: תקדים AP2 - המטה הלאומי דחה דוח מקצועי בהחלטת חוות שרתים",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20260906-01"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20260906-01"
+        }
+      ]
+    ]
+  }
+}

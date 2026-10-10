@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-27T03:25:32Z",
+  "text": "I-20260927-02 - אוטומציית נגישות USWDS (AP9)",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20260927-02"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20260927-02"
+        }
+      ]
+    ]
+  }
+}

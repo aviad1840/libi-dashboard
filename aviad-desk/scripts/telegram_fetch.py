@@ -87,21 +87,20 @@ def log_bot_identity(token):
 
 
 def clear_stray_webhook(token):
-    """המערכת כולה מבוססת polling - אף קוד לא קורא ל-setWebhook. webhook ו-getUpdates
-    סותרים זה את זה אצל טלגרם: ברגע שיש webhook רשום, getUpdates מחזיר תמיד תוצאה ריקה,
-    גם כשיש הודעות ממתינות בפועל - בלי שום שגיאה שתסגיר למה. זה בדיוק הסימפטום שחזר:
-    הודעות שאביעד שלח מ-9.10 ואילך לא נקלטו באף ריצה, בלי שגיאה בלוג.
-    בודק ומנקה בכל ריצה - קריאה זולה, ו-deleteWebhook הוא no-op בטוח כשאין webhook."""
+    """בודק getWebhookInfo בכל ריצה - קריאה זולה. אם יש webhook רשום (אסור, המערכת
+    מבוססת polling בלבד), מנקה אותו: webhook רשום גורם ל-getUpdates להחזיר ריק תמיד
+    בלי שגיאה. גם כשאין webhook, pending_update_count מהתשובה מעיד אם לטלגרם יש
+    בפועל עדכונים ממתינים לבוט הזה - נרשם תמיד ב-audit, ראה log_pending_count."""
     try:
         with urllib.request.urlopen(
             f"https://api.telegram.org/bot{token}/getWebhookInfo", timeout=10) as r:
             info = json.loads(r.read().decode("utf-8")).get("result", {})
     except (urllib.error.URLError, json.JSONDecodeError):
-        return None
+        return None, None
+    pending = info.get("pending_update_count", 0)
     url = info.get("url") or ""
     if not url:
-        return None
-    pending = info.get("pending_update_count", 0)
+        return None, pending
     try:
         urllib.request.urlopen(
             f"https://api.telegram.org/bot{token}/deleteWebhook", timeout=10)
@@ -109,7 +108,7 @@ def clear_stray_webhook(token):
         pass
     audit({"kind": "webhook", "action": "cleared-stray-webhook",
            "found_url": url, "pending_update_count": pending})
-    return {"url": url, "pending_update_count": pending}
+    return {"url": url, "pending_update_count": pending}, pending
 
 
 def answer_callback(token, callback_query_id, text):
@@ -144,8 +143,9 @@ def main():
     setup_code = os.environ.get("TELEGRAM_SETUP_CODE", "")
     cfg = load_config()
     offset = load_offset()
-    cleared_webhook = clear_stray_webhook(token)
+    cleared_webhook, pending_at_telegram = clear_stray_webhook(token)
     log_bot_identity(token)
+    audit({"kind": "pending_count", "pending_update_count": pending_at_telegram})
 
     try:
         updates = get_updates(token, offset)

@@ -50,13 +50,18 @@ python3 aviad-desk/scripts/telegram_fetch.py
 נבדק בפועל בריצה חיה - לא נמצא webhook רשום (`cleared_stray_webhook` חזר ריק). ההשערה הזו
 נפסלה כגורם לשקט שהתחיל ב-9.10 03:36 ואילך. הסיבה האמיתית עדיין לא אותרה.
 
-**לאבחון הממשיך: `state/telegram_audit.jsonl` כולל כעת שורת `"kind": "identity"`
-(bot_id/bot_username מ-getMe, ציבורי, לא ה-token) ושורת `"kind": "fetch"` בכל ריצה
+**עדכון נוסף 10.10:** אביעד אישר ש-`aviad_ai_Maneger_bot` הוא בדיוק הבוט שהוא כותב לו.
+חוסר ההתאמה בין token/בוט נפסל גם הוא. העדכון הבא נבדק ועוד לא פתר: `pending_update_count`
+מ-getWebhookInfo (מגיע גם בלי webhook רשום) נרשם כעת ב-audit כ-`"kind": "pending_count"`
+בכל ריצה - אם הוא 0, זה אומר שלטלגרם עצמו אין שום עדכון ממתין לבוט הזה, כלומר ההודעות
+שאביעד שולח בטלגרם לא מגיעות לשרתי טלגרם בכלל בשביל הבוט הזה - לא תקלה בקוד הזה.
+
+**לאבחון הממשיך: `state/telegram_audit.jsonl` כולל שורת `"kind": "identity"`
+(bot_id/bot_username מ-getMe, ציבורי, לא ה-token), שורת `"kind": "pending_count"`
+(pending_update_count מטלגרם, גם כשאין webhook), ושורת `"kind": "fetch"` בכל ריצה
 (offset_used + result_count, או error אם getUpdates נכשל) - גם כשאין אף הודעה חדשה.
-אם ריצת gateway רואה שורת `fetch` עם `result_count: 0` יחד עם ידיעה שאביעד שלח הודעה
-בפועל סביב אותו זמן - זה מצביע על חוסר התאמה בין ה-token/בוט שה-container מריץ לבין
-הבוט שאביעד בפועל כותב לו בטלגרם, ולא על באג בקוד הקיים. דווח את bot_username בהערת
-ה-finish כשיש חשד כזה, כדי שאביעד יוכל להשוות לבוט שהוא רואה באפליקציה שלו.**
+דווח bot_username ו-pending_update_count בהערת ה-finish בכל ריצה שבה result_count
+הוא 0 אבל יש חשד שאביעד שלח הודעה - כדי שאביעד יוכל להשוות למה שהוא רואה בפועל.**
 
 ### 3. ניתוב - אתה מחליט, לא סקריפט
 

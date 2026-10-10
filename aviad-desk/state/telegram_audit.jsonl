@@ -18,3 +18,6 @@
 {"kind": "identity", "bot_id": 8848234501, "bot_username": "aviad_ai_Maneger_bot", "ts": "2026-10-10T20:59:08Z"}
 {"kind": "pending_count", "pending_update_count": 0, "ts": "2026-10-10T20:59:08Z"}
 {"kind": "fetch", "offset_used": 85384940, "action": "ok", "result_count": 0, "ts": "2026-10-10T20:59:08Z"}
+{"kind": "identity", "action": "getMe-failed", "error": "HTTP Error 401: Unauthorized", "ts": "2026-10-10T21:17:37Z"}
+{"kind": "pending_count", "pending_update_count": null, "ts": "2026-10-10T21:17:37Z"}
+{"kind": "fetch", "offset_used": 85384940, "action": "error", "error": "HTTP Error 401: Unauthorized", "ts": "2026-10-10T21:17:37Z"}

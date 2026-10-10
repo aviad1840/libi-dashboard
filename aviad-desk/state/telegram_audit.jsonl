@@ -10,3 +10,5 @@
 {"update_id": 85384937, "kind": "message", "sender": 437439952, "action": "accepted", "content_type": "text", "ts": "2026-10-08T15:37:09Z"}
 {"update_id": 85384938, "kind": "message", "sender": 437439952, "action": "accepted", "content_type": "text", "ts": "2026-10-09T03:36:40Z"}
 {"update_id": 85384939, "kind": "message", "sender": 437439952, "action": "accepted", "content_type": "text", "ts": "2026-10-09T03:36:40Z"}
+{"kind": "identity", "bot_id": 8848234501, "bot_username": "aviad_ai_Maneger_bot", "ts": "2026-10-10T20:12:23Z"}
+{"kind": "fetch", "offset_used": 85384940, "action": "ok", "result_count": 0, "ts": "2026-10-10T20:12:24Z"}

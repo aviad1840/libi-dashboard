@@ -70,6 +70,32 @@ def get_updates(token, offset):
     return body.get("result", [])
 
 
+def clear_stray_webhook(token):
+    """המערכת כולה מבוססת polling - אף קוד לא קורא ל-setWebhook. webhook ו-getUpdates
+    סותרים זה את זה אצל טלגרם: ברגע שיש webhook רשום, getUpdates מחזיר תמיד תוצאה ריקה,
+    גם כשיש הודעות ממתינות בפועל - בלי שום שגיאה שתסגיר למה. זה בדיוק הסימפטום שחזר:
+    הודעות שאביעד שלח מ-9.10 ואילך לא נקלטו באף ריצה, בלי שגיאה בלוג.
+    בודק ומנקה בכל ריצה - קריאה זולה, ו-deleteWebhook הוא no-op בטוח כשאין webhook."""
+    try:
+        with urllib.request.urlopen(
+            f"https://api.telegram.org/bot{token}/getWebhookInfo", timeout=10) as r:
+            info = json.loads(r.read().decode("utf-8")).get("result", {})
+    except (urllib.error.URLError, json.JSONDecodeError):
+        return None
+    url = info.get("url") or ""
+    if not url:
+        return None
+    pending = info.get("pending_update_count", 0)
+    try:
+        urllib.request.urlopen(
+            f"https://api.telegram.org/bot{token}/deleteWebhook", timeout=10)
+    except urllib.error.URLError:
+        pass
+    audit({"kind": "webhook", "action": "cleared-stray-webhook",
+           "found_url": url, "pending_update_count": pending})
+    return {"url": url, "pending_update_count": pending}
+
+
 def answer_callback(token, callback_query_id, text):
     data = json.dumps({"callback_query_id": callback_query_id, "text": text}).encode("utf-8")
     req = urllib.request.Request(
@@ -102,6 +128,7 @@ def main():
     setup_code = os.environ.get("TELEGRAM_SETUP_CODE", "")
     cfg = load_config()
     offset = load_offset()
+    cleared_webhook = clear_stray_webhook(token)
 
     try:
         updates = get_updates(token, offset)
@@ -190,12 +217,17 @@ def main():
 
     save_offset(max_update_id + 1)
 
-    print(json.dumps({
+    out = {
         "authorized": authorized,
         "unauthorized_count": unauthorized_count,
         "bound_now": bound_now,
         "bound_chat_id": cfg.get("allowed_chat_id"),
-    }, ensure_ascii=False, indent=2))
+    }
+    if cleared_webhook:
+        # זה הממצא שצריך להופיע בהערת הסיכום - webhook שהיה רשום הוא הסיבה שהודעות
+        # לא נקלטו בשום ריצה, בלי שגיאה גלויה. ראה clear_stray_webhook
+        out["cleared_stray_webhook"] = cleared_webhook
+    print(json.dumps(out, ensure_ascii=False, indent=2))
     return 0
 
 

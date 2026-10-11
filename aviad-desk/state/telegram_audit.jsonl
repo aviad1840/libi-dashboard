@@ -27,3 +27,6 @@
 {"kind": "identity", "action": "getMe-failed", "error": "HTTP Error 401: Unauthorized", "ts": "2026-10-11T09:36:49Z"}
 {"kind": "pending_count", "pending_update_count": null, "ts": "2026-10-11T09:36:49Z"}
 {"kind": "fetch", "offset_used": 85384940, "action": "error", "error": "HTTP Error 401: Unauthorized", "ts": "2026-10-11T09:36:50Z"}
+{"kind": "identity", "action": "getMe-failed", "error": "HTTP Error 401: Unauthorized", "ts": "2026-10-11T11:37:25Z"}
+{"kind": "pending_count", "pending_update_count": null, "ts": "2026-10-11T11:37:25Z"}
+{"kind": "fetch", "offset_used": 85384940, "action": "error", "error": "HTTP Error 401: Unauthorized", "ts": "2026-10-11T11:37:25Z"}

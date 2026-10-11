@@ -1,0 +1,37 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-11T03:16:13Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n⚠️ ערוץ הטלגרם: HTTP 401, נדרש טוקן חדש. הודעות נצברות בתור.\n\n1. 🔴 דורש ממני היום\nלהחליף טוקן טלגרם. ואז: 'הוגש / לא הוגש' על 4255 (30.9, חלף לפני 11 ימים).\n\n2. 🟠 השתנה מאז אתמול\nscout: סוכני Anthropic מול גופי ממשל (CLAIM, E2, OQ4). אחרת אין.\n\n3. 🟢 ממצאים חדשים\nלאתר דוח Anthropic המקורי לפני פוסט (חלון עד 13.10).\n\n4. 👥 אנשים/קשרים\nאין\n\n5. 📅 דדליינים\nכל ארבעת המועדים בלוח חלפו. אין עתידי. radar: 4 ריקים ברצף - 'לא נמצא', לא 'נבדק ונקי'.\n\n6. 🔎 לבדוק לעומק\nאין מועמד היום\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: ממצא אחד. Radar: אין חדש (09.10).\n\nתקוע: T2 31 יום - להקפיא. T7, T13 43 יום - להקפיא/לסגור.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        },
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        }
+      ],
+      [
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        },
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

@@ -468,3 +468,4 @@
 {"date": "2026-10-13", "ts": "2026-10-13T19:37:00+00:00", "agent": "gateway", "status": "failed", "reason": "telegram_fetch: HTTP 401 Unauthorized (token נדחה)"}
 {"date": "2026-10-13", "ts": "2026-10-13T19:37:02+00:00", "agent": "gateway", "status": "degraded", "items": 0, "failures": 1, "l0": 0, "l1": 0, "l2": 0, "note": "0 נשלחו מהתור (42 ממתינות, אין chat_id מקושר), 0 הודעות, telegram_fetch נכשל ב-401 Unauthorized - ה-token נדחה על ידי טלגרם, נדרש חידוש, שומר: תקין, אין patch ל-2026W42"}
 {"date": "2026-10-14", "ts": "2026-10-14T02:48:27+00:00", "agent": "scout", "status": "ok", "items": 0, "failures": 0, "l0": 22, "l1": 0, "l2": 0, "note": "ריצה ריקה: אין ממצא שעבר שערים; FedScoop 403"}
+{"date": "2026-10-14", "ts": "2026-10-14T03:16:28+00:00", "agent": "chief-of-staff", "status": "ok", "items": 1, "failures": 0, "l0": 0, "l1": 0, "l2": 0, "note": "בריף 14.10: טלגרם שבור 4 ימים, כל הדדליינים חלפו, אין ממצא חדש"}

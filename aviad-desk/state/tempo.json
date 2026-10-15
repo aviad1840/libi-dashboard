@@ -21,7 +21,7 @@
     "radar": {
       "level": "low",
       "since": "2026-10-08",
-      "runs_without_useful": 3
+      "runs_without_useful": 5
     },
     "advocate": {
       "level": "low",

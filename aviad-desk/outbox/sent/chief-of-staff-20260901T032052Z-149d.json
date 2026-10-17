@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-09-01T03:20:52Z",
+  "text": "GovTech סינגפור - רישום סוכני AI ופלטפורמת AI Assistant Desk (I-20260901-01)",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20260901-01"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20260901-01"
+        }
+      ]
+    ]
+  }
+}

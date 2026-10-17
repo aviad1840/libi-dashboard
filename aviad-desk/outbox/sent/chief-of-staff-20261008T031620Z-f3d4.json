@@ -1,0 +1,37 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-08T03:16:20Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n⚠️ מערכת: curator לא עודכן 166 שעות, radar 3 ריקים ברצף - אין ממצא אדום.\n\n1. 🔴 דורש ממני היום\nאין. הצעה: תחליט אם להקפיא את T2 (צוות 11, 28 יום ללא תנועה) ולברר מול אשר דולב אם התוצר נמסר.\n\n2. 🟠 השתנה מאז אתמול\nscout: דוח ריק. ללא שינוי.\n\n3. 🟢 ממצאים חדשים\nאין מועמד שעבר את הסף. פתוח: I-20261006-01 - הוסף תנאי הצלחה למסמך ההוכחה של ארנק הזכויות.\n\n4. 👥 אנשים/קשרים\nאין\n\n5. 📅 דדליינים / התחייבויות\nכל ארבעת המועדים חלפו. הקרוב: 30.09 (4255) - לפני 8 ימים, לא נמצאה ראיה שהוגש. radar ריק = לא נמצא, לא נבדק ונקי.\n\n6. 🔎 לבדוק לעומק\nאין מועמד היום. תקוע: T7 ו-T13 40 יום - לסגור אחרי בירור הוגש/לא הוגש.\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: 0 ממצאים (14 מועמדים נפסלו). Radar: אין חדש.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        },
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        }
+      ],
+      [
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        },
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

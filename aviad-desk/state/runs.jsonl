@@ -518,3 +518,4 @@
 {"date": "2026-10-18", "ts": "2026-10-18T02:48:43+00:00", "agent": "scout", "status": "ok", "items": 2, "failures": 0, "l0": 4, "l1": 2, "l2": 0, "note": "2 פריטים, אות חי 26 פריטים, ארבע שאילתות, X/לינקדאין חלקי"}
 {"date": "2026-10-18", "ts": "2026-10-18T03:16:13+00:00", "agent": "chief-of-staff", "status": "degraded", "items": 2, "failures": 1, "l0": 0, "l1": 2, "l2": 0, "note": "בריף 18.10; טלגרם שבור 8 ימים (401), 88 תקועות; הלוח לא רוענן 51 יום"}
 {"date": "2026-10-18", "ts": "2026-10-18T03:37:43+00:00", "agent": "gateway", "status": "failed", "reason": "telegram_fetch: HTTP 401 Unauthorized (טוקן לא תקף)"}
+{"date": "2026-10-18", "ts": "2026-10-18T03:37:45+00:00", "agent": "gateway", "status": "degraded", "items": 0, "failures": 1, "l0": 0, "l1": 0, "l2": 0, "note": "telegram_fetch נכשל 401 Unauthorized - הטוקן נדחה על ידי טלגרם; outbox: 0 נשלחו, 93 ממתינות, אין chat_id מקושר; שומר: ללא פלט"}

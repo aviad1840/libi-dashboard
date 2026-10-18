@@ -520,3 +520,4 @@
 {"date": "2026-10-18", "ts": "2026-10-18T03:37:43+00:00", "agent": "gateway", "status": "failed", "reason": "telegram_fetch: HTTP 401 Unauthorized (טוקן לא תקף)"}
 {"date": "2026-10-18", "ts": "2026-10-18T03:37:45+00:00", "agent": "gateway", "status": "degraded", "items": 0, "failures": 1, "l0": 0, "l1": 0, "l2": 0, "note": "telegram_fetch נכשל 401 Unauthorized - הטוקן נדחה על ידי טלגרם; outbox: 0 נשלחו, 93 ממתינות, אין chat_id מקושר; שומר: ללא פלט"}
 {"date": "2026-10-18", "ts": "2026-10-18T05:37:06+00:00", "agent": "gateway", "status": "degraded", "items": 0, "failures": 1, "l0": 0, "l1": 0, "l2": 0, "note": "telegram_fetch נכשל: ניסיון ראשון connection reset, שני HTTP 401 (טוקן לא תקף או נדחה). 0 הודעות עובדו. outbox_send: 0 נשלחו, 95 ממתינים, אין chat_id מקושר. שומר: תקין (ללא פלט)"}
+{"date": "2026-10-18", "ts": "2026-10-18T06:13:19+00:00", "agent": "scout", "status": "ok", "items": 3, "failures": 0, "l0": 0, "l1": 0, "l2": 0, "note": "סינתזה שבועית"}

@@ -533,3 +533,4 @@
 {"date": "2026-10-19", "ts": "2026-10-19T03:16:44+00:00", "agent": "chief-of-staff", "status": "ok", "items": 1, "failures": 0, "l0": 0, "l1": 0, "l2": 0, "note": "בריף 19.10; טלגרם שבור 9 ימים (401), 103 תקועות; לוח לא רוענן 52 יום"}
 {"date": "2026-10-19", "ts": "2026-10-19T03:37:02+00:00", "agent": "gateway", "status": "failed", "reason": "telegram_fetch: HTTP 401 Unauthorized (טוקן לא תקף)"}
 {"date": "2026-10-19", "ts": "2026-10-19T03:37:04+00:00", "agent": "gateway", "status": "degraded", "items": 0, "failures": 1, "l0": 0, "l1": 0, "l2": 0, "note": "0 נשלחו מהתור (106 ממתינים, אין chat_id מקושר), 0 הודעות, telegram_fetch נכשל ב-401 Unauthorized - הטוקן ב-TELEGRAM_BOT_TOKEN כנראה לא תקף ודורש החלפה, שומר: תקין"}
+{"date": "2026-10-19", "ts": "2026-10-19T04:02:25+00:00", "agent": "radar", "status": "ok", "items": 0, "failures": 0, "l0": 3, "l1": 0, "l2": 0, "note": "ריצה ריקה: 3 חיפושים, אין הזדמנות חדשה, קול קורא מיצוי זכויות נסגר 8.10 (לינקדאין בלבד)"}

@@ -1,0 +1,5 @@
+{
+  "agent": "gateway",
+  "created_at": "2026-10-21T03:37:17Z",
+  "text": "gateway: ריצה הסתיימה עם 1 כשלים\n2026-10-21 03:37Z\n0 נשלחו מהתור (134 ממתינות, אין chat_id מקושר), 0 הודעות. telegram_fetch: HTTP 401 Unauthorized - הטוקן לא תקף, דורש החלפה. שומר: תקין. patches של curator (W37,W40-W42) לא נשלחו לאישור כי אין ערוץ"
+}

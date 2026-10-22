@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-22T03:16:46Z",
+  "text": "DHS: ויתור גורף על איסורים בידי קצין AI [I-20261022-01]",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20261022-01"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20261022-01"
+        }
+      ]
+    ]
+  }
+}

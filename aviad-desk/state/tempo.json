@@ -19,9 +19,9 @@
       "runs_without_useful": 0
     },
     "radar": {
-      "level": "low",
-      "since": "2026-10-08",
-      "runs_without_useful": 5
+      "level": "dormant",
+      "since": "2026-10-22",
+      "runs_without_useful": 7
     },
     "advocate": {
       "level": "low",

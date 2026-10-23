@@ -1,3 +1,25 @@
 {
-  "opportunities": []
+  "opportunities": [
+    {
+      "id": "op-2026-002",
+      "title": "dg.o 2027 - קול קורא למאמרים: AI Transformation and Government Innovation",
+      "type": "קול קורא",
+      "owner_org": "dg.o 2027, SeoulTech, סיאול (28.6-1.7.2027)",
+      "deadline": "2027-01-17",
+      "days_left": 86,
+      "relevance": "medium",
+      "why_relevant": "כנס מחקר ממשלה דיגיטלית בנושא AI בממשלה. ערוץ פרסום אקדמי לדוקטרינה ולראיות C1/C6/C8. מאמרי מחקר 17.1.2027; פאנלים, סדנאות ופוסטרים 31.1.2027. כל השעות 23:59 AoE",
+      "novelty": "new",
+      "actionability": "low",
+      "confidence": "medium",
+      "effort_estimate": "גבוה",
+      "advances": [
+        "OQ4",
+        "C8"
+      ],
+      "source_url": "https://easychair.org/cfp/seoultechDGO2027",
+      "status": "חדש",
+      "evidence_level": "E3"
+    }
+  ]
 }

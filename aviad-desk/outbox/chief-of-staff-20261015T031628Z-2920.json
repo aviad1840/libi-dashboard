@@ -1,0 +1,37 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-15T03:16:28Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n⚠️ ערוץ הטלגרם שבור 5 ימים (401, כ-56 הודעות תקועות). נדרש טוקן חדש ב-gateway.\n\n1. 🔴 דורש ממני היום\nלבדוק ידנית ב-gov.il את הקול הקורא הבין-משרדי של מערך הדיגיטל/המטה הלאומי ל-AI (מועד הגשה לא נמצא).\n\n2. 🟠 השתנה מאז אתמול\nאין.\n\n3. 🟢 ממצאים חדשים\nאין מועמד שעבר את הסף.\n\n4. 👥 אנשים/קשרים שדורשים תשומת לב\nאין.\n\n5. 📅 דדליינים / התחייבויות\nכל ארבעת המועדים חלפו. הקרוב: 30.9 (תוצר 4255) - לא נמצאה ראיה שהוגש. radar ריק 5 ריצות - לא נבדק ונקי.\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nאין מועמד היום.\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: ריצה ריקה. Radar: אין חדש.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        },
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        }
+      ],
+      [
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        },
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

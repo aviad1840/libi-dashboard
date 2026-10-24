@@ -1,0 +1,39 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-18T03:16:13Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nהחלף טוקן בוט טלגרם ב-gateway - HTTP 401 כבר 8 ימים, 88 הודעות תקועות, הבריפים מ-11.10 לא הגיעו.\n\n2. 🟠 השתנה מאז אתמול\nscout: 2 פריטים חדשים (RFI/RFP בארה\"ב, תקרית OpenAI). radar: 6 ריקים ברצף.\n\n3. 🟢 ממצאים חדשים\n- I-20261018-01: לבדוק אם בקול הקורא הבין-משרדי יש מנגנון הוכחת יכולת, ולהעלות בצוות 11.\n- I-20261018-02: להחליט אם פוסט 'דיווח עצמי של סוכן אינו בקרה'.\n\n4. 👥 אנשים/קשרים שדורשים תשומת לב\nאין\n\n5. 📅 דדליינים / התחייבויות\nכל ארבעת המועדים ב-calendar.md חלפו; הקרוב: 30.09 (4255) לפני 18 יום, לא נמצאה ראיה שהוגש. הלוח לא רוענן 51 יום.\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nקול קורא בין-משרדי של מערך הדיגיטל - מועד לא נמצא, בדיקה ידנית ב-gov.il.\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: 2 ממצאים. Radar: אין חדש.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        }
+      ],
+      [
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        },
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        }
+      ],
+      [
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

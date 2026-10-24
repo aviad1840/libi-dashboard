@@ -1,0 +1,28 @@
+{
+  "update_id": 85384928,
+  "message": {
+    "message_id": 1,
+    "from": {
+      "id": 437439952,
+      "is_bot": false,
+      "first_name": "aviad",
+      "last_name": "itz",
+      "language_code": "he"
+    },
+    "chat": {
+      "id": 437439952,
+      "first_name": "aviad",
+      "last_name": "itz",
+      "type": "private"
+    },
+    "date": 1788039574,
+    "text": "/start",
+    "entities": [
+      {
+        "offset": 0,
+        "length": 6,
+        "type": "bot_command"
+      }
+    ]
+  }
+}

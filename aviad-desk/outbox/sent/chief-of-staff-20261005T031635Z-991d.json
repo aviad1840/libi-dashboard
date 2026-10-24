@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-05T03:16:35Z",
+  "text": "I-20261005-02 - בריטניה, הפחתת תלות בספק ענן (AP12, E2)",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20261005-02"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20261005-02"
+        }
+      ]
+    ]
+  }
+}

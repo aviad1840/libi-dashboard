@@ -1,0 +1,91 @@
+# מניפסט המערכת - קריא למכונה ולאדם
+version: 1.0
+owner: aviad
+principle: "context is portable, runners are replaceable"
+
+agents:
+  - id: scout
+    namespace: intel/
+    engine: claude-code-routines   # ניתן להחלפה. ראה runners/ENGINE-FIT.md
+    cadence: {daily: "05:30 Sun-Thu", weekly: "06:00 Sun"}
+    cost_class: [A, B]
+    phase: 1
+  - id: radar
+    namespace: radar/
+    engine: claude-code-routines   # ניתן להחלפה. ראה runners/ENGINE-FIT.md
+    cadence: {weekly: ["07:00 Mon", "07:00 Fri"]}
+    cost_class: [A]
+    phase: 2
+  - id: advocate
+    namespace: advocate/
+    engine: claude-code-routines   # ניתן להחלפה. ראה runners/ENGINE-FIT.md
+    cadence: {weekly: "07:00 Tue"}
+    cost_class: [C]
+    phase: 3
+    note: "ריצת העומק היחידה - ראשונה בסולם ההורדה"
+  - id: rival
+    namespace: landscape/
+    engine: claude-code-routines   # ניתן להחלפה. ראה runners/ENGINE-FIT.md
+    cadence: {weekly: "07:00 Wed"}
+    cost_class: [A]
+    phase: 4
+  - id: relations
+    namespace: people/
+    engine: claude-code-routines   # ניתן להחלפה. ראה runners/ENGINE-FIT.md
+    cadence: {weekly: "07:00 Thu"}
+    cost_class: [A]
+    phase: 4
+  - id: curator
+    namespace: curator/
+    engine: claude-code-routines   # ניתן להחלפה. ראה runners/ENGINE-FIT.md
+    cadence: {weekly: "08:30 Thu"}
+    cost_class: [B]
+    phase: 2
+    writes_to: [curator/, context/sources.md, context/filter.md]
+  - id: chief-of-staff
+    namespace: desk/
+    engine: claude-code-routines   # ניתן להחלפה. ראה runners/ENGINE-FIT.md
+    cadence: {daily: "06:15 Sun-Thu"}
+    cost_class: [A]
+    phase: 5
+    input: inbox/
+  - id: auditor
+    namespace: audit/
+    engine: claude-code
+    cadence: {on_demand: true}
+    phase: 1
+  - id: producer
+    namespace: drafts/
+    engine: claude-code
+    cadence: {on_demand: true}
+    phase: 3
+  - id: amplifier
+    namespace: amplify/
+    engine: claude-code
+    cadence: {on_demand: true}
+    phase: 5
+
+execution:
+  tiers: [L0, L1, L2]
+  default_tier: L0
+  l2_budget_per_week: 2
+  l1_budget_per_run: 5
+  context_policy: context/LOADING.md
+  dedup: state/seen.json
+  tempo: state/tempo.json
+  source_roi: state/sources.json
+
+metrics:
+  primary: [cost_per_useful_finding, cost_per_novel_finding, decision_impact, human_minutes_per_useful_finding]
+  not_measured: [runs, tokens, items, agents]
+
+rules:
+  write_isolation: "סוכן כותב אך ורק ל-namespace שלו. חריג יחיד: curator"
+  no_outbound: "אף סוכן לא יוצר קשר עם אף אדם, בשום ערוץ"
+  evidence_required: "כל טענה נושאת דירוג E0-E6"
+  test_question: "כל פריט נושא תיוג OQ/C/P/AP - אחרת לא נכנס"
+  prompt_changes: "curator מציע, אביעד מאשר. לעולם לא אוטומטי"
+  escalation: "L0 כברירת מחדל. L1 עד 5 בריצה. L2 רק על טריגר מפורש, 2 בשבוע בכל המערכת"
+  dedup: "אירוע שדווח לא חוזר 14 יום אלא בשינוי מהותי"
+  min_sample: "אין החלטה על מקור מתחת ל-20 פריטים ממנו"
+  value_gate: "פריט בלי תיוג OQ/C/P/AP/OPP/OWN, או שאינו חדש - נזרק"

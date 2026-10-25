@@ -1,0 +1,37 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-25T03:16:49Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n0. 🔴 הטלגרם שבור 15 יום (HTTP 401). 177 הודעות תקועות, כל הבריפים מ-11.10 לא הגיעו. נדרש טוקן בוט חדש ב-gateway.\n\n1. 🔴 דורש ממני היום\nתחליט אם להקפיא T2/T7/T13 - כל הדדליינים (3.9, 17.9, 30.9) חלפו ואין ראיה להגשה. בדוק מול אשר דולב / אבי מוליאן / אורי כזום.\n\n2. 🟠 השתנה מאז אתמול\nscout: פריט USDA על אדם בלולאה. radar: ללא שינוי מ-23.10.\n\n3. 🟢 ממצאים חדשים\nצרף את ויכוח USDA/CBP לתיק הדוקטרינה כנימוק לבקרה מותאמת סיכון (I-20261025-01, לא דחוף).\n\n4. 👥 אנשים\nאין\n\n5. 📅 דדליינים\nהקרוב: dg.o 2027 - 17.1.2027 (84 יום). calendar.md לא רוענן מאז 28.08.\n\n6. 🔎 לבדוק לעומק\nאין מועמד היום\n\n7. 🤖 הסוכנים\nScout: 1 ממצא. Radar: הזדמנות אחת (23.10). Gateway: כשל טלגרם 149 ברצף.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        },
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        }
+      ],
+      [
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        },
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

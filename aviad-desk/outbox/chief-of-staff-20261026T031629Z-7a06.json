@@ -1,0 +1,37 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-26T03:16:29Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nאין. (דגל מערכת: טלגרם HTTP 401 כבר 16 יום - להחליף טוקן בוט ב-gateway; 188 הודעות תקועות)\n\n2. 🟠 השתנה מאז אתמול\nscout: אין ממצא שעובר סף. ללא שינוי בתיקים.\n\n3. 🟢 ממצאים חדשים\nאין מועד שעבר את הסף.\n\n4. 👥 אנשים/קשרים\nאין\n\n5. 📅 דדליינים / התחייבויות\nכל מועדי calendar.md חלפו (הקרוב: 30.9, תוצר 4255, לפני 26 יום, לא נמצאה ראיה שהוגש). קדימה: dg.o 17.1.2027 (83 יום). הלוח לא רוענן 59 יום.\n\n6. 🔎 דברים שכדאי לבדוק לעומק\nאין מועד היום\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: 0 ממצאים. Radar: אין חדש.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        },
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        }
+      ],
+      [
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        },
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

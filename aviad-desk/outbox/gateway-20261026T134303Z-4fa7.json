@@ -1,0 +1,5 @@
+{
+  "agent": "gateway",
+  "created_at": "2026-10-26T13:43:03Z",
+  "text": "gateway: ריצה הסתיימה עם 1 כשלים\n2026-10-26 13:43Z\ntelegram_fetch נכשל פעמיים (TimeoutError ב-getWebhookInfo), לא נמשכו הודעות. outbox: 0 נשלחו, 197 ממתינות, אין chat_id מקושר. שומר: תקין (ללא פלט). בדיקת curator patch דולגה (אין ערוץ שליחה)"
+}

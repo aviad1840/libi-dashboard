@@ -278,6 +278,14 @@
       "title": "ארה\"ב - בכיר USDA: אדם בלולאה אינו בר-קיימא אחרי קיצוצים, בכיר CBP חולק",
       "agent": "scout",
       "tier": "L1"
+    },
+    {
+      "event_id": "07b91c4d60d6",
+      "date": "2026-10-28",
+      "item": "I-20261028-01",
+      "title": "ארה\"ב - GSA מרחיבה הסכם OneGov עם Anthropic, 40% הנחה על טוקנים בלי מינימום (material-change ל-I-20261021-01)",
+      "agent": "scout",
+      "tier": "L1"
     }
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-20T03:16:39Z",
+  "text": "I-20261020-01 - בריטניה, מכתב CST: גישה למודלים מובילים + יכולת מקומית (OQ1, AP11)",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20261020-01"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20261020-01"
+        }
+      ]
+    ]
+  }
+}

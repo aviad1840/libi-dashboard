@@ -1,0 +1,39 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-07T03:16:42Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nתברר מול אשר דולב אם תוצר 4255 (דדליין 30.9) נמסר - 7 ימים אחרי, לא נמצאה ראיה.\n\n2. 🟠 השתנה מאז אתמול\nאין. scout: דוח ריק.\n\n3. 🟢 ממצאים חדשים\nאין מועמד שעבר את הסף.\n\n4. 👥 אנשים/קשרים\nאין\n\n5. 📅 דדליינים / התחייבויות\nכל 4 המועדים בלוח חלפו. אין דדליין עתידי ידוע. radar ריק 3 ריצות - זה לא נבדק ונקי. הלוח לא רוענן 40 יום.\n\n6. 🔎 לבדוק לעומק\nויילס/C8 (15%, בלי השפעה כללית) - סעיף תנאי הצלחה לארנק הזכויות.\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: ריק. Radar: אין חדש. Curator: לא עודכן 142 שעות.\n\n⚠️ T2 27 יום, T7 ו-T13 39 יום - להקפיא/לסגור.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        }
+      ],
+      [
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        },
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        }
+      ],
+      [
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

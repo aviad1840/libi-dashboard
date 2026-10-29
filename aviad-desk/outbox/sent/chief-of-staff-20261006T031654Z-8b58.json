@@ -1,0 +1,19 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-06T03:16:54Z",
+  "text": "I-20261006-01 - ויילס: כ-15% קיבלו הטבה בפיילוט מיצוי פרואקטיבי, בלי הבדל כללי (C8)",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "👍",
+          "callback_data": "fb:up:I-20261006-01"
+        },
+        {
+          "text": "👎",
+          "callback_data": "fb:down:I-20261006-01"
+        }
+      ]
+    ]
+  }
+}

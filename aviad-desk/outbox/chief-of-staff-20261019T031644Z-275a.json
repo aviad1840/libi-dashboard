@@ -1,0 +1,37 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-19T03:16:44Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n1. 🔴 דורש ממני היום\nתחליט להקפיא את T2 (צוות 11, 4255): 39 יום בלי תנועה, דדליין 30.9 חלף ואין ראיה שהוגש. צעד אחד: לברר מול אשר דולב אם התוצר נמסר.\n\n2. 🟠 השתנה מאז אתמול\nאין שינוי. scout: אין ממצא שעבר את הסף.\n\n3. 🟢 ממצאים חדשים\nאין מועמד שעבר את הסף.\n\n4. 👥 אנשים/קשרים\nאין.\n\n5. 📅 דדליינים / התחייבויות\nכל 4 המועדים ב-calendar.md חלפו (הקרוב: 30.9, לפני 19 יום). אין דדליין עתידי. radar ריק 6 ריצות - לא נמצא, לא נבדק-ונקי. הלוח לא רוענן 52 יום.\n\n6. 🔎 לבדוק לעומק\nראיה ל-C6: דוח KPMG 2026 (48%) לא אומת, הקישור החזיר 404.\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: אין ממצא. Radar: ריק.\n\n⚠️ הטלגרם שבור 9 ימים (401), 103 הודעות תקועות. נדרש טוקן בוט חדש.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        },
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        }
+      ],
+      [
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        },
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "agent": "chief-of-staff",
+  "created_at": "2026-10-12T03:16:55Z",
+  "text": "🌅 AI DESK - MORNING BRIEF\n\n⚠️ ערוץ הטלגרם שבור (401, אין chat_id) - 15 הודעות תקועות. נדרש טוקן חדש.\n\n1. 🔴 דורש ממני היום\nאין. (הכי תקוע: T2 צוות 11/4255 - 32 יום, דדליין 30.9 חלף. המלצה: להקפיא או לברר מול אשר דולב אם התוצר נמסר)\n\n2. 🟠 השתנה מאז אתמול\nscout: דוח ריק. אין שינוי.\n\n3. 🟢 ממצאים חדשים\nאין מועמד שעבר את הסף.\n\n4. 👥 אנשים/קשרים\nאין.\n\n5. 📅 דדליינים / התחייבויות\nכל 4 המועדים בלוח חלפו. אין דדליין עתידי ידוע. radar ריק 4 ריצות - לא נמצא, לא בהכרח נקי.\n\n6. 🔎 לבדוק לעומק\nאין מועמד היום.\n\n7. 🤖 מה הסוכנים עשו בלילה\nScout: דוח ריק. Radar: אין חדש.\n\nמה תרצה שאבדוק?",
+  "keyboard": {
+    "inline_keyboard": [
+      [
+        {
+          "text": "Deep Research",
+          "callback_data": "opt:deep_research"
+        },
+        {
+          "text": "Project",
+          "callback_data": "opt:project"
+        },
+        {
+          "text": "People",
+          "callback_data": "opt:people"
+        }
+      ],
+      [
+        {
+          "text": "Claims",
+          "callback_data": "opt:claims"
+        },
+        {
+          "text": "Content",
+          "callback_data": "opt:content"
+        },
+        {
+          "text": "Everything",
+          "callback_data": "opt:everything"
+        }
+      ]
+    ]
+  }
+}
